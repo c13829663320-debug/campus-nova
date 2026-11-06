@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="30 92 325 190">
+  <title>B-NW-09 湖边圆形图书馆</title>
+  <desc>approximate vector rebuild from selected-campus-map.jpg; occluded faces not reconstructed</desc>
+  <g id="base">
+    <ellipse cx="150" cy="238" rx="112" ry="15" fill="#7FA85C" opacity="0.18"/>
+    <ellipse cx="150" cy="228" rx="108" ry="36" fill="#ECE9E1" opacity="1.0"/>
+  </g>
+  <g id="walls">
+    <polygon points="58,206 150,248 150,268 58,226" fill="#F5F1E8"/>
+    <polygon points="242,206 150,248 150,268 242,226" fill="#D9D4C8"/>
+    <polygon points="120,252 180,250 182,272 118,274" fill="#9FC3D8"/>
+    <polygon points="66,142.0 132,175.0 132,227.0 66,194.0" fill="#F5F1E8"/>
+    <polygon points="216,133.0 132,175.0 132,227.0 216,185.0" fill="#D9D4C8"/>
+    <polygon points="66,157.6 132,190.6 132,196.8 66,163.8" fill="#A8C8D8"/>
+    <polygon points="213,181.0 305,227.0 305,263.0 213,217.0" fill="#F5F1E8"/>
+    <polygon points="347,206.0 305,227.0 305,263.0 347,242.0" fill="#D9D4C8"/>
+    <polygon points="347,220.4 305,241.4 305,245.0 347,224.0" fill="#BEB9AD"/>
+  </g>
+  <g id="roof">
+    <polygon points="150,100 216,133.0 132,175.0 66,142.0" fill="#ECE9E1"/>
+    <polygon points="66,142.0 132,175.0 132,181.0 66,148.0" fill="#DCD8CE"/>
+    <polygon points="141.3,120.8 171.0,135.7 141.6,150.4 111.9,135.6" fill="#7FB2D9"/>
+    <polygon points="255,160 347,206.0 305,227.0 213,181.0" fill="#C9C6BE"/>
+    <polygon points="213,181.0 305,227.0 305,233.0 213,187.0" fill="#B9B6AE"/>
+  </g>
+  <g id="mask"/>
+</svg>

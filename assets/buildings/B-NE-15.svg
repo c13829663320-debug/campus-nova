@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="4.2 22 433.8 308.74">
+  <title>B-NE-15 大长蓝顶教学楼</title>
+  <desc>Long multi-storey teaching block with light-blue roof and two darker roof divider strips</desc>
+  <g id="base">
+  <ellipse cx="215" cy="302.5" rx="202.8" ry="20.24" fill="#7FA85C" opacity="0.18"/>
+  <polygon points="85,72.5 85,84.5 345,294.5 345,306.5 430,264 430,252" fill="#86B060" opacity="0.5"/>
+  </g>
+  <g id="walls">
+  <polygon points="85,72.5 345,202.5 345,294.5 85,164.5" fill="#F5F1E8"/>
+  <polygon points="430,160 345,202.5 345,294.5 430,252" fill="#D9D4C8"/>
+  <polygon points="85,100.1 345,230.1 345,237.1 85,107.1" fill="#C7C2B6"/>
+  <polygon points="85,124.02 345,254.02 345,261.02 85,131.02" fill="#C7C2B6"/>
+  </g>
+  <g id="roof">
+  <polygon points="170,30 430,160 345,202.5 85,72.5" fill="#7FB2D9"/>
+  <polygon points="85,72.5 345,202.5 345,208.5 85,78.5" fill="#6A9CC4"/>
+  <polygon points="140.25,44.875 400.25,174.875 400.25,178.875 140.25,48.875" fill="#5E96C0" opacity="0.8"/>
+  <polygon points="114.75,57.625 374.75,187.625 374.75,191.625 114.75,61.625" fill="#5E96C0" opacity="0.8"/>
+  </g>
+  <g id="mask"/>
+</svg>

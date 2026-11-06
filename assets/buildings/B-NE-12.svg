@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="31.8 32 241.2 192.5">
+  <title>B-NE-12 橙顶办公楼</title>
+  <desc>Small square office with coral-orange flat roof, cream walls</desc>
+  <g id="base">
+  <ellipse cx="129.5" cy="202.5" rx="89.7" ry="14" fill="#7FA85C" opacity="0.18"/>
+  <polygon points="72,79 72,91 187,194.5 187,206.5 265,167.5 265,155.5" fill="#86B060" opacity="0.5"/>
+  </g>
+  <g id="walls">
+  <polygon points="72,79 187,136.5 187,194.5 72,137" fill="#F5F1E8"/>
+  <polygon points="265,97.5 187,136.5 187,194.5 265,155.5" fill="#D9D4C8"/>
+  <polygon points="72,96.4 187,153.9 187,160.9 72,103.4" fill="#C7C2B6"/>
+  </g>
+  <g id="roof">
+  <polygon points="150,40 265,97.5 187,136.5 72,79" fill="#E8976A"/>
+  <polygon points="72,79 187,136.5 187,142.5 72,85" fill="#D4825A"/>
+  </g>
+  <g id="mask"/>
+</svg>

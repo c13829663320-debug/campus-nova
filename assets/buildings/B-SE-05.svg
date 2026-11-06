@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-95 -10 205 175">
+  <title>B-SE-05 斜顶玻璃体育馆</title>
+  <desc>approximate vector rebuild from selected-campus-map.jpg; square white base with pyramidal blue glass roof, white framing cross, mullion lines; occluded faces not reconstructed</desc>
+  <!-- footprint a=95 (right axis), b=80 (left axis), h=55. P1=(0,0) P2=(95,47.5) P3=(15,87.5) P4=(-80,40). roof apex A=(8,20) -->
+  <g id="base">
+    <ellipse cx="7" cy="148" rx="100" ry="20" fill="#7FA85C" opacity="0.18"/>
+    <polygon points="15,87.5 95,47.5 95,60 15,100.5 -80,53 -80,40" fill="#86B060" opacity="0.55"/>
+  </g>
+  <g id="walls">
+    <!-- lit left wall -->
+    <polygon points="-80,40 15,87.5 15,142.5 -80,95" fill="#F5F1E8"/>
+    <!-- shadow right wall -->
+    <polygon points="95,47.5 15,87.5 15,142.5 95,102.5" fill="#D9D4C8"/>
+    <!-- ground floor window band on lit wall -->
+    <polygon points="-62,62 -5,89 -5,99 -62,72" fill="#C7C2B6"/>
+  </g>
+  <g id="roof">
+    <!-- white roof frame / back slope base -->
+    <polygon points="0,0 95,47.5 15,87.5 -80,40" fill="#FFFFFF"/>
+    <!-- left blue glass slope: A P4 P1 -->
+    <polygon points="8,20 -80,40 0,0" fill="#7FB2D9"/>
+    <!-- right blue glass slope: A P2 P3 -->
+    <polygon points="8,20 95,47.5 15,87.5" fill="#7FB2D9"/>
+    <!-- front small blue slope: A P3 P4 -->
+    <polygon points="8,20 15,87.5 -80,40" fill="#7FB2D9"/>
+    <!-- white framing beams between adjacent blue slopes -->
+    <polygon points="5.5,20 10.5,20 17.5,87 12.5,87" fill="#FFFFFF"/>
+    <polygon points="6.5,21.5 9.5,18.5 -75,40 -78,39" fill="#FFFFFF"/>
+    <!-- mullions: left slope, 2 lines parallel to P1-P4 -->
+    <polygon points="5.6,14 -18.4,26 -19.8,28.7 4.3,16.7" fill="#5E96C0"/>
+    <polygon points="3.6,9 -40.4,31 -41.8,33.7 2.3,11.7" fill="#5E96C0"/>
+    <!-- mullions: right slope, 2 lines parallel to P2-P3 -->
+    <polygon points="34.1,28.25 10.1,40.25 9.3,43.25 33.3,31.25" fill="#5E96C0"/>
+    <polygon points="55.85,35.1 11.85,57.1 11.05,60.1 55.05,38.1" fill="#5E96C0"/>
+    <!-- mullion: front slope, 1 line -->
+    <polygon points="10.45,43.6 -22.8,27 -23.8,29.8 9.45,46.4" fill="#5E96C0"/>
+  </g>
+  <g id="mask"/>
+</svg>

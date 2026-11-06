@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="4 12 122 174">
+  <title>B-NW-05 公寓群烟囱塔楼二</title>
+  <desc>approximate vector rebuild from selected-campus-map.jpg; occluded faces not reconstructed</desc>
+  <g id="base">
+    <ellipse cx="64" cy="164.0" rx="52.0" ry="13" fill="#7FA85C" opacity="0.18"/>
+    <ellipse cx="64" cy="156.0" rx="44.199999999999996" ry="9" fill="#86B060" opacity="0.4"/>
+  </g>
+  <g id="walls">
+    <polygon points="14,51.0 64,76.0 64,152.0 14,127.0" fill="#F5F1E8"/>
+    <polygon points="118,49.0 64,76.0 64,152.0 118,125.0" fill="#D9D4C8"/>
+    <polygon points="14,66.2 64,91.2 64,98.0 14,73.0" fill="#C7C2B6"/>
+    <polygon points="14,89.0 64,114.0 64,120.8 14,95.8" fill="#C7C2B6"/>
+    <polygon points="118,64.2 64,91.2 64,98.0 118,71.0" fill="#BEB9AD"/>
+  </g>
+  <g id="roof">
+    <polygon points="68,24 118,49.0 64,76.0 14,51.0" fill="#ECE9E1"/>
+    <polygon points="14,51.0 64,76.0 64,82.0 14,57.0" fill="#DCD8CE"/>
+    <polygon points="62.9,25.5 76.9,32.5 76.9,48.5 62.9,41.5" fill="#C9C6BE"/>
+    <polygon points="88.9,26.5 76.9,32.5 76.9,48.5 88.9,42.5" fill="#B5B2AA"/>
+    <polygon points="74.9,19.5 88.9,26.5 76.9,32.5 62.9,25.5" fill="#D8D5CD"/>
+  </g>
+  <g id="mask"/>
+</svg>

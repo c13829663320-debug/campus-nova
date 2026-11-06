@@ -1,0 +1,508 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 850" role="img" aria-labelledby="title desc">
+  <title id="title">东莞职业技术学院校本部 2.5D 校园地图</title>
+  <desc id="desc">以映月湖为中心，包含图书馆、笃行楼、修远楼、学生宿舍区、滋兰餐厅、田径场、体育馆、西门、东门和西南门的微缩立体校园导览图</desc>
+  <defs>
+    <linearGradient id="grass" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#eef4e6"/>
+      <stop offset=".52" stop-color="#dce9d4"/>
+      <stop offset="1" stop-color="#cbdec7"/>
+    </linearGradient>
+    <linearGradient id="water" x1=".15" y1="0" x2=".85" y2="1">
+      <stop stop-color="#b8ddd4"/>
+      <stop offset=".48" stop-color="#87c2b8"/>
+      <stop offset="1" stop-color="#65a99f"/>
+    </linearGradient>
+    <linearGradient id="roofTeal" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#769b9a"/>
+      <stop offset="1" stop-color="#456f73"/>
+    </linearGradient>
+    <linearGradient id="roofCoral" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#e5a185"/>
+      <stop offset="1" stop-color="#bd725e"/>
+    </linearGradient>
+    <linearGradient id="roofCream" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#fffdf4"/>
+      <stop offset="1" stop-color="#e8e1d1"/>
+    </linearGradient>
+    <linearGradient id="glass" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#b8d9d4"/>
+      <stop offset="1" stop-color="#6e9fa2"/>
+    </linearGradient>
+    <pattern id="grassTexture" width="34" height="34" patternUnits="userSpaceOnUse">
+      <circle cx="6" cy="8" r="1.3" fill="#9fbea0" opacity=".2"/>
+      <circle cx="25" cy="24" r="1" fill="#fff" opacity=".45"/>
+    </pattern>
+    <pattern id="solar" width="16" height="12" patternUnits="userSpaceOnUse" patternTransform="skewY(-24)">
+      <rect width="16" height="12" fill="#53777d"/>
+      <path d="M0 0H16V12" fill="none" stroke="#91afb0" stroke-width="1" opacity=".65"/>
+    </pattern>
+    <filter id="shadow" x="-40%" y="-40%" width="190%" height="220%">
+      <feDropShadow dx="0" dy="12" stdDeviation="9" flood-color="#365d50" flood-opacity=".2"/>
+    </filter>
+    <filter id="smallShadow" x="-50%" y="-50%" width="200%" height="220%">
+      <feDropShadow dx="0" dy="5" stdDeviation="4" flood-color="#365d50" flood-opacity=".2"/>
+    </filter>
+    <filter id="soft" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="12"/>
+    </filter>
+
+    <g id="tree">
+      <ellipse cx="1" cy="17" rx="17" ry="7" fill="#6f9877" opacity=".2"/>
+      <path d="M-2 14 0-10 4 14" fill="#8d7658"/>
+      <circle cx="0" cy="-12" r="16" fill="#4f8c68"/>
+      <circle cx="-9" cy="-15" r="11" fill="#72a879"/>
+      <circle cx="8" cy="-19" r="11" fill="#92bc85"/>
+      <circle cx="-2" cy="-23" r="9" fill="#a6c991"/>
+    </g>
+    <g id="treeGold">
+      <ellipse cx="1" cy="17" rx="17" ry="7" fill="#6f9877" opacity=".18"/>
+      <path d="M-2 14 0-10 4 14" fill="#8d7658"/>
+      <circle cx="0" cy="-12" r="16" fill="#b3a75c"/>
+      <circle cx="-9" cy="-15" r="11" fill="#d1bf6f"/>
+      <circle cx="8" cy="-19" r="11" fill="#e1d188"/>
+      <circle cx="-2" cy="-23" r="9" fill="#ecdd9c"/>
+    </g>
+    <g id="dorm">
+      <path d="M0 29 57 0l62 25-58 33Z" fill="#f7e8d8"/>
+      <path d="M0 29 61 58v62L0 91Z" fill="#ead2bd"/>
+      <path d="m61 58 58-33v62l-58 33Z" fill="#cda992"/>
+      <path d="M-5 25 57-5l67 27-63 36Z" fill="url(#roofCoral)"/>
+      <path d="m8 46 15 7v12l-15-7Zm27 13 15 7v12l-15-7ZM8 72l15 7v12l-15-7Zm27 13 15 7v12l-15-7Z" fill="#83a6a5"/>
+      <path d="m74 62 14-8v12l-14 8Zm24-14 13-8v12l-13 8ZM74 88l14-8v12l-14 8Zm24-14 13-8v12l-13 8Z" fill="#759795"/>
+      <path d="M5 31 57 7l55 22" fill="none" stroke="#f6c3a7" stroke-width="2" opacity=".8"/>
+    </g>
+    <g id="teachingBlock">
+      <path d="M0 43 92 0l109 42-94 53Z" fill="#f4eedf"/>
+      <path d="M0 43 107 95v69L0 112Z" fill="#e4dbc8"/>
+      <path d="m107 95 94-53v69l-94 53Z" fill="#c7bfaf"/>
+      <path d="M-6 38 92-6l116 44-101 57Z" fill="url(#roofTeal)"/>
+      <path d="m18 40 75-37 89 34-76 43Z" fill="url(#solar)" opacity=".95"/>
+      <path d="m17 73 22 12v15l-22-12Zm35 18 22 12v15l-22-12Zm35 18 14 8v15l-14-8ZM17 102l22 12v15l-22-12Zm35 18 22 12v15l-22-12Z" fill="#7e9fa0"/>
+      <path d="m124 99 20-12v16l-20 12Zm33-19 20-12v16l-20 12Zm-33 48 20-12v16l-20 12Zm33-19 20-12v16l-20 12Z" fill="#668b8d"/>
+      <path d="M2 43 92 3l104 40" fill="none" stroke="#a9c1bc" stroke-width="2" opacity=".8"/>
+    </g>
+    <g id="westBlock">
+      <path d="M0 38 81 0l113 39-83 48Z" fill="#f4eee2"/>
+      <path d="M0 38 111 87v72L0 108Z" fill="#ddd8cc"/>
+      <path d="m111 87 83-48v72l-83 48Z" fill="#bbbcb2"/>
+      <path d="M-5 33 81-6l119 41-89 52Z" fill="url(#roofCream)"/>
+      <path d="m18 34 64-32 93 32-65 38Z" fill="url(#solar)"/>
+      <g fill="#769799">
+        <path d="m16 67 19 10v15l-19-10Zm31 16 19 10v15l-19-10Zm31 16 19 10v15l-19-10ZM16 96l19 10v15l-19-10Zm31 16 19 10v15l-19-10Z"/>
+        <path d="m127 91 18-11v15l-18 11Zm29-17 18-11v15l-18 11Zm-29 46 18-11v15l-18 11Zm29-17 18-11v15l-18 11Z"/>
+      </g>
+    </g>
+    <g id="smallHall">
+      <path d="M0 32 63 0l82 30-65 38Z" fill="#f8f0df"/>
+      <path d="M0 32 80 68v52L0 84Z" fill="#e6d7c1"/>
+      <path d="m80 68 65-38v52l-65 38Z" fill="#cbbba7"/>
+      <path d="M-5 27 63-6l88 32-71 42Z" fill="url(#roofCoral)"/>
+      <path d="m18 57 45 20v25l-45-20Z" fill="url(#glass)"/>
+      <path d="m94 72 35-20v25l-35 20Z" fill="#789c9b"/>
+    </g>
+    <g id="court">
+      <rect width="94" height="52" rx="4" fill="#72aca7"/>
+      <rect x="4" y="4" width="86" height="44" rx="2" fill="none" stroke="#d9eee2" stroke-width="1.6"/>
+      <path d="M47 4v44M4 26h90" stroke="#d9eee2" stroke-width="1.3"/>
+      <circle cx="47" cy="26" r="8" fill="none" stroke="#d9eee2" stroke-width="1.3"/>
+      <path d="M4 15h12v22H4m86-22H78v22h12" fill="none" stroke="#d9eee2" stroke-width="1.3"/>
+    </g>
+    <g id="lamp">
+      <ellipse cy="7" rx="5" ry="2" fill="#5b7d6c" opacity=".18"/>
+      <path d="M0 6V-12" stroke="#71867b" stroke-width="2"/>
+      <circle cy="-14" r="4" fill="#fff8d9" stroke="#71867b" stroke-width="1.5"/>
+    </g>
+  </defs>
+
+  <style>
+    #campus-zones path { fill-opacity: .13; stroke-width: 2; stroke-opacity: .42; stroke-dasharray: 10 8; stroke-linecap: round; }
+    .zone-labels text { paint-order: stroke; stroke: #f7f5ea; stroke-width: 5px; stroke-linejoin: round; opacity: .78; }
+  </style>
+
+  <!-- campus ground -->
+  <rect width="1200" height="850" rx="42" fill="url(#grass)"/>
+  <rect width="1200" height="850" rx="42" fill="url(#grassTexture)"/>
+  <path d="M40 151Q109 54 252 61L426 84Q568 25 709 63L1128 36Q1174 240 1157 391L1184 666Q1120 812 968 813L723 790Q577 838 420 794L76 821Q22 655 50 512L26 304Q18 218 40 151Z" fill="none" stroke="#f8f6eb" stroke-width="30"/>
+  <path d="M40 151Q109 54 252 61L426 84Q568 25 709 63L1128 36Q1174 240 1157 391L1184 666Q1120 812 968 813L723 790Q577 838 420 794L76 821Q22 655 50 512L26 304Q18 218 40 151Z" fill="none" stroke="#bdceba" stroke-width="2" stroke-dasharray="3 11" stroke-linecap="round"/>
+  <path d="M45 702Q262 752 410 688T738 738T1152 687" fill="none" stroke="#b4d0b4" stroke-width="64" opacity=".24"/>
+  <path d="M923 49Q1079 162 1164 299" fill="none" stroke="#f2f6e9" stroke-width="76" opacity=".32"/>
+
+  <!-- five functional zones -->
+  <g id="campus-zones">
+    <g fill="#6E93B8" stroke="#5C82A8">
+      <path d="M 46 386 Q 160 362 292 364 L 374 384 Q 412 410 422 460 Q 430 502 464 526 L 474 548 L 466 606 Q 464 668 424 708 L 330 732 Q 198 752 92 744 Q 46 738 44 664 L 46 470 Z"/>
+      <path d="M 430 550 Q 470 532 570 528 Q 664 524 686 554 L 694 690 Q 686 744 636 756 L 518 766 Q 456 764 446 714 Z"/>
+      <path d="M 644 308 Q 760 286 882 292 Q 970 298 990 336 L 984 470 Q 970 522 918 538 L 842 554 Q 774 562 734 534 Q 666 514 644 480 Z"/>
+      <path d="M 68 196 Q 110 176 200 174 Q 292 172 316 200 L 320 300 Q 314 344 248 354 L 150 358 Q 94 352 76 320 Z"/>
+    </g>
+    <g fill="#4FA79B" stroke="#3E8F84">
+      <path d="M 348 292 Q 414 236 516 232 Q 592 228 624 276 Q 646 312 652 348 Q 660 384 706 400 Q 764 418 798 458 Q 832 500 810 552 Q 786 604 720 624 L 622 638 Q 528 642 458 608 L 372 552 Q 318 512 318 434 Z"/>
+    </g>
+    <g fill="#76A97C" stroke="#5E9070">
+      <path d="M 856 404 Q 930 392 1010 398 Q 1082 404 1102 430 L 1132 520 Q 1150 580 1140 680 L 1120 752 Q 1106 790 1042 794 L 936 800 Q 866 796 850 756 L 838 690 Q 812 640 818 570 L 828 460 Z"/>
+    </g>
+    <g fill="#CE8B6B" stroke="#B77457">
+      <path d="M 702 44 Q 790 20 900 20 Q 1010 20 1096 30 Q 1140 38 1142 118 L 1136 300 Q 1130 340 1052 344 L 906 348 Q 780 348 724 336 Q 698 320 700 240 L 700 120 Q 700 70 702 44 Z"/>
+      <path d="M 396 108 Q 470 92 566 94 Q 660 96 692 116 Q 706 134 704 176 L 702 228 Q 696 262 654 268 L 560 272 Q 470 274 424 262 Q 396 248 394 200 Z"/>
+      <path d="M 58 60 Q 150 44 258 46 Q 320 48 342 74 L 356 110 Q 362 140 344 168 L 326 196 Q 306 220 252 226 L 154 230 Q 84 232 62 208 Q 42 182 46 128 Z"/>
+    </g>
+    <g fill="#C69A52" stroke="#AD8442">
+      <path d="M 596 158 Q 640 142 706 146 Q 730 148 734 176 L 738 226 Q 734 256 700 262 L 634 266 Q 596 262 594 226 Z"/>
+      <path d="M 740 148 Q 790 132 864 138 Q 916 144 918 178 L 920 234 Q 916 264 870 270 L 786 272 Q 746 268 742 232 Z"/>
+      <path d="M 924 316 Q 980 302 1046 308 Q 1088 314 1090 344 L 1086 400 Q 1078 430 1030 434 L 960 436 Q 922 430 920 398 Z"/>
+    </g>
+  </g>
+
+  <!-- road network -->
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M65 349C194 335 250 273 358 242S576 231 698 267 913 334 1139 348" stroke="#c8d2c0" stroke-width="35"/>
+    <path d="M65 349C194 335 250 273 358 242S576 231 698 267 913 334 1139 348" stroke="#faf6e9" stroke-width="29"/>
+    <path d="M245 91C281 180 331 208 358 242M688 80C671 152 674 216 698 267M1080 89C1033 184 1056 269 1139 348" stroke="#faf6e9" stroke-width="24"/>
+    <path d="M112 662C252 654 350 593 414 518S528 438 628 456 768 543 846 617 1012 698 1134 664" stroke="#c8d2c0" stroke-width="33"/>
+    <path d="M112 662C252 654 350 593 414 518S528 438 628 456 768 543 846 617 1012 698 1134 664" stroke="#faf6e9" stroke-width="27"/>
+    <path d="M664 786C664 686 645 565 628 456M846 617C817 540 795 442 789 345S757 201 731 131" stroke="#faf6e9" stroke-width="24"/>
+    <path d="M188 378C214 471 220 563 197 646M388 91C440 146 488 176 548 206" stroke="#faf6e9" stroke-width="18"/>
+    <path d="M939 362C1001 421 1028 464 1041 521" stroke="#faf6e9" stroke-width="20"/>
+  </g>
+  <g fill="none" stroke="#d8d7c6" stroke-width="2" stroke-dasharray="3 13" stroke-linecap="round" opacity=".9">
+    <path d="M65 349C194 335 250 273 358 242S576 231 698 267 913 334 1139 348"/>
+    <path d="M112 662C252 654 350 593 414 518S528 438 628 456 768 543 846 617 1012 698 1134 664"/>
+    <path d="M664 786C664 686 645 565 628 456"/>
+  </g>
+
+  <!-- Yingyue Lake -->
+  <path d="M373 265C430 224 524 234 575 280C625 324 585 379 637 405C694 430 744 438 776 458C816 482 824 542 798 574C776 604 716 596 678 564C628 522 584 493 512 490C430 487 358 442 338 373C321 321 335 284 373 265Z" fill="#5f9287" opacity=".18" transform="translate(0 10)" filter="url(#soft)"/>
+  <path d="M373 265C430 224 524 234 575 280C625 324 585 379 637 405C694 430 744 438 776 458C816 482 824 542 798 574C776 604 716 596 678 564C628 522 584 493 512 490C430 487 358 442 338 373C321 321 335 284 373 265Z" fill="url(#water)" stroke="#d7e7d4" stroke-width="9"/>
+  <g fill="none" stroke="#d8f0e5" stroke-linecap="round" opacity=".65">
+    <path d="M381 290C429 258 500 260 541 290" stroke-width="5"/>
+    <path d="M363 336C408 317 463 322 490 340" stroke-width="3"/>
+    <path d="M690 470C730 452 772 458 798 480" stroke-width="5"/>
+    <path d="M700 560C736 580 772 578 792 558" stroke-width="3"/>
+  </g>
+  <g fill="none" stroke="#5c9e96" stroke-width="3" stroke-linecap="round" opacity=".45">
+    <path d="M393 417c34 28 77 39 118 37"/>
+    <path d="M758 505c18 6 34 5 50-2"/>
+  </g>
+  <text x="712" y="520" fill="#e9f6ee" opacity=".78" font-family="PingFang SC, Microsoft YaHei, sans-serif" font-size="24" font-weight="700" letter-spacing="8" transform="rotate(10 712 520)">映月湖</text>
+  <text x="721" y="543" fill="#e9f6ee" opacity=".58" font-family="Arial, sans-serif" font-size="8" letter-spacing="3" transform="rotate(10 721 543)">YINGYUE LAKE</text>
+
+  <!-- zigzag bridge and lake bridge -->
+  <g filter="url(#smallShadow)">
+    <path d="M362 397 390 379 417 399 443 379 470 400 493 382" fill="none" stroke="#ac8b6c" stroke-width="12" stroke-linejoin="round"/>
+    <path d="M362 392 390 374 417 394 443 374 470 395 493 377" fill="none" stroke="#f3e4c9" stroke-width="7" stroke-linejoin="round"/>
+  </g>
+  <g filter="url(#smallShadow)">
+    <path d="M682 408 725 579" stroke="#b7b7a7" stroke-width="25"/>
+    <path d="M682 402 725 573" stroke="#fffdf3" stroke-width="19"/>
+    <path d="M675 407 718 574M689 404 732 570" stroke="#d8d8c8" stroke-width="2"/>
+    <g stroke="#b4b8a8" stroke-width="2">
+      <path d="m679 431 20-3m-14 29 20-3m-14 29 20-3m-14 29 20-3m-14 29 20-3m-14 29 20-3"/>
+    </g>
+  </g>
+  <g transform="translate(412 352)" filter="url(#smallShadow)">
+    <path d="M0 21 27 6l29 11-28 17Z" fill="#e7d7ba"/>
+    <path d="M4 15 27 1l26 10-25 15Z" fill="#b9775f"/>
+    <path d="M9 19v25m38-27v25M28 25v24" stroke="#9d745d" stroke-width="4"/>
+    <path d="M4 44 28 55l25-14" fill="none" stroke="#e9dbc0" stroke-width="5"/>
+  </g>
+
+  <!-- sports courts north -->
+  <g transform="translate(411 121) skewY(-5)" filter="url(#smallShadow)">
+    <use href="#court" x="0" y="0"/>
+    <use href="#court" x="102" y="0"/>
+    <use href="#court" x="0" y="61"/>
+    <use href="#court" x="102" y="61"/>
+  </g>
+  <g transform="translate(566 122) skewY(-5)" filter="url(#smallShadow)">
+    <rect width="89" height="110" rx="4" fill="#b78372"/>
+    <g fill="#86b5ad" stroke="#e4efe2" stroke-width="1.5">
+      <rect x="5" y="5" width="36" height="47"/>
+      <rect x="48" y="5" width="36" height="47"/>
+      <rect x="5" y="58" width="36" height="47"/>
+      <rect x="48" y="58" width="36" height="47"/>
+    </g>
+    <path d="M23 5v47m48-47v47M23 58v47m48-47v47" stroke="#f4f7e9" stroke-width="1" stroke-dasharray="3 3"/>
+  </g>
+
+  <!-- teaching and faculty apartments, northwest -->
+  <g filter="url(#shadow)">
+    <g transform="translate(119 117) scale(.82)"><use href="#smallHall"/></g>
+    <g transform="translate(215 96) scale(.66)"><use href="#smallHall"/></g>
+    <g transform="translate(106 250) scale(.88)"><use href="#westBlock"/></g>
+    <g transform="translate(194 285) scale(.58)"><use href="#smallHall"/></g>
+    <g transform="translate(576 177) scale(.63)"><use href="#dorm"/></g>
+    <g transform="translate(606 209) scale(.63)"><use href="#dorm"/></g>
+  </g>
+  <g font-family="PingFang SC, Microsoft YaHei, sans-serif" text-anchor="middle" fill="#42564e">
+    <g transform="translate(167 107)"><rect x="-48" y="-15" width="96" height="25" rx="12" fill="#fffdf4" opacity=".9"/><text y="3" font-size="12" font-weight="700">教师公寓</text></g>
+    <g transform="translate(145 253)"><rect x="-68" y="-15" width="136" height="25" rx="12" fill="#fffdf4" opacity=".9"/><text y="3" font-size="12" font-weight="700">19栋 · 人文艺术大楼</text></g>
+    <g transform="translate(165 333)"><rect x="-45" y="-13" width="90" height="23" rx="11" fill="#fffdf4" opacity=".88"/><text y="3" font-size="11">附属幼儿园</text></g>
+    <g transform="translate(626 169)"><rect x="-51" y="-14" width="102" height="24" rx="12" fill="#fffdf4" opacity=".9"/><text y="3" font-size="11" font-weight="700">青年教师公寓</text></g>
+    <g transform="translate(479 108)"><rect x="-49" y="-14" width="98" height="24" rx="12" fill="#fffdf4" opacity=".88"/><text y="3" font-size="11" font-weight="700">1号篮球场</text></g>
+    <g transform="translate(609 108)"><rect x="-49" y="-14" width="98" height="24" rx="12" fill="#fffdf4" opacity=".88"/><text y="3" font-size="11" font-weight="700">2号羽毛球场</text></g>
+  </g>
+
+  <!-- west academic buildings 6A 6B 6C -->
+  <g filter="url(#shadow)">
+    <g transform="translate(101 414) scale(.85)"><use href="#westBlock"/></g>
+    <g transform="translate(137 493) scale(.85)"><use href="#westBlock"/></g>
+    <g transform="translate(86 571) scale(.92)"><use href="#westBlock"/></g>
+    <g transform="translate(353 569) scale(.65)"><use href="#smallHall"/></g>
+  </g>
+  <g font-family="PingFang SC, Microsoft YaHei, sans-serif" font-size="12" font-weight="800" text-anchor="middle" fill="#42564e">
+    <g transform="translate(156 423)"><rect x="-22" y="-14" width="44" height="25" rx="12" fill="#fffdf4"/><text y="4">6B</text></g>
+    <g transform="translate(213 504)"><rect x="-22" y="-14" width="44" height="25" rx="12" fill="#fffdf4"/><text y="4">6C</text></g>
+    <g transform="translate(143 585)"><rect x="-22" y="-14" width="44" height="25" rx="12" fill="#fffdf4"/><text y="4">6A</text></g>
+    <g transform="translate(400 573)"><rect x="-34" y="-14" width="68" height="25" rx="12" fill="#fffdf4"/><text y="4">培训楼</text></g>
+  </g>
+  <g transform="translate(320 470) rotate(-12)" filter="url(#smallShadow)">
+    <rect width="87" height="48" rx="5" fill="#71a9bd"/>
+    <rect x="5" y="5" width="77" height="38" rx="2" fill="none" stroke="#e1f0e9" stroke-width="1.5"/>
+    <path d="M43.5 5v38M5 24h77" stroke="#e1f0e9" stroke-width="1.3"/>
+  </g>
+  <g transform="translate(333 528)" font-family="PingFang SC, Microsoft YaHei, sans-serif" text-anchor="middle"><rect x="-44" y="-13" width="88" height="23" rx="11" fill="#fffdf4" opacity=".9"/><text y="3" fill="#42564e" font-size="11" font-weight="700">2号网球场</text></g>
+
+  <!-- library and university services -->
+  <g transform="translate(452 242)" filter="url(#shadow)">
+    <path d="M-19 75 66 25l128 47-88 55Z" fill="#d9d4c3"/>
+    <path d="M-19 75 106 127v20L-19 95Z" fill="#eee8d9"/>
+    <path d="m106 127 88-55v20l-88 55Z" fill="#c8c3b5"/>
+    <path d="M0 54 67 15l105 39-68 42Z" fill="#fbf8ed"/>
+    <path d="M0 54 104 96v58L0 102Z" fill="#e9e2d2"/>
+    <path d="m104 96 68-42v58l-68 42Z" fill="#c9c3b5"/>
+    <path d="M-7 48 67 8l113 42-76 46Z" fill="url(#roofCream)"/>
+    <path d="m17 65 70 29v42l-70-29Z" fill="url(#glass)"/>
+    <path d="m118 99 39-24v42l-39 24Z" fill="#729b9c"/>
+    <path d="M45 39c10-26 60-31 79-9l-12 27c-15-13-42-10-52 7Z" fill="#d8e5dc"/>
+    <path d="M55 38c12-17 41-20 57-7l-7 16c-13-8-29-6-38 4Z" fill="#6e9998"/>
+    <g stroke="#f5f0e2" stroke-width="4"><path d="M34 74v42M57 84v42M80 93v42M132 88v43"/></g>
+    <path d="m88 99 16 7v48l-16-7Z" fill="#536f70"/>
+    <path d="M-23 153 105 203 198 146" fill="none" stroke="#faf7ec" stroke-width="8"/>
+  </g>
+  <g transform="translate(636 184)" filter="url(#smallShadow)">
+    <path d="M0 22 35 4l49 17-36 22Z" fill="#f6eedd"/>
+    <path d="M0 22 48 43v35L0 52Z" fill="#e3d5c1"/>
+    <path d="m48 43 36-22v35L48 78Z" fill="#c9b7a2"/>
+    <path d="M-4 18 35 0l53 18-40 25Z" fill="#7b9b91"/>
+  </g>
+  <g font-family="PingFang SC, Microsoft YaHei, sans-serif" text-anchor="middle" fill="#42564e">
+    <g transform="translate(668 177)"><rect x="-52" y="-14" width="104" height="24" rx="12" fill="#fffdf4" opacity=".9"/><text y="3" font-size="11" font-weight="700">超市 · 医务室</text></g>
+    <g transform="translate(392 417)"><rect x="-38" y="-13" width="76" height="23" rx="11" fill="#fffdf4" opacity=".85"/><text y="3" font-size="11" font-weight="700">九曲廊桥</text></g>
+  </g>
+
+  <!-- central dining and student services -->
+  <g filter="url(#shadow)">
+    <g transform="translate(652 214) scale(.78)"><use href="#smallHall"/></g>
+    <g transform="translate(778 183) scale(.88)"><use href="#smallHall"/></g>
+    <g transform="translate(958 342) scale(.9)"><use href="#smallHall"/></g>
+  </g>
+  <g transform="translate(820 174)" font-family="PingFang SC, Microsoft YaHei, sans-serif" text-anchor="middle"><rect x="-65" y="-14" width="130" height="25" rx="12" fill="#fffdf4" opacity=".92"/><text y="3" fill="#42564e" font-size="11" font-weight="700">修远楼 · 学生活动中心</text></g>
+  <g transform="translate(1015 344)" font-family="PingFang SC, Microsoft YaHei, sans-serif" text-anchor="middle"><rect x="-62" y="-14" width="124" height="25" rx="12" fill="#fffdf4" opacity=".92"/><text y="3" fill="#42564e" font-size="11" font-weight="700">滋兰餐厅（一饭）</text></g>
+
+  <!-- northeast dormitory community -->
+  <g filter="url(#shadow)">
+    <g transform="translate(704 65) scale(.63)"><use href="#dorm"/></g>
+    <g transform="translate(788 51) scale(.63)"><use href="#dorm"/></g>
+    <g transform="translate(875 42) scale(.63)"><use href="#dorm"/></g>
+    <g transform="translate(962 34) scale(.63)"><use href="#dorm"/></g>
+    <g transform="translate(1043 51) scale(.68)"><use href="#dorm"/></g>
+    <g transform="translate(715 128) scale(.63)"><use href="#dorm"/></g>
+    <g transform="translate(803 117) scale(.63)"><use href="#dorm"/></g>
+    <g transform="translate(891 108) scale(.63)"><use href="#dorm"/></g>
+    <g transform="translate(979 100) scale(.63)"><use href="#dorm"/></g>
+    <g transform="translate(1051 133) scale(.63)"><use href="#dorm"/></g>
+    <g transform="translate(907 171) scale(.63)"><use href="#dorm"/></g>
+    <g transform="translate(994 166) scale(.63)"><use href="#dorm"/></g>
+    <g transform="translate(1038 212) scale(.63)"><use href="#dorm"/></g>
+    <g transform="translate(914 233) scale(.63)"><use href="#dorm"/></g>
+    <g transform="translate(994 250) scale(.63)"><use href="#dorm"/></g>
+    <g transform="translate(928 294) scale(.63)"><use href="#dorm"/></g>
+    <g transform="translate(1007 303) scale(.63)"><use href="#dorm"/></g>
+  </g>
+  <g font-family="PingFang SC, Microsoft YaHei, sans-serif" font-size="10" font-weight="700" text-anchor="middle" fill="#53645b">
+    <text x="742" y="70">17栋</text><text x="826" y="56">14栋</text><text x="913" y="47">13栋</text><text x="1000" y="39">9栋</text><text x="1090" y="55">18栋</text>
+    <text x="753" y="133">15栋</text><text x="841" y="122">12栋</text><text x="929" y="113">11栋</text><text x="1017" y="105">7栋</text><text x="1089" y="138">10栋</text>
+    <text x="945" y="176">5栋</text><text x="1032" y="171">8栋</text><text x="1076" y="217">6栋</text><text x="952" y="238">3栋</text><text x="1032" y="255">4栋</text>
+    <text x="966" y="299">1栋</text><text x="1045" y="308">2栋</text>
+  </g>
+  <g transform="translate(1091 260) scale(.55)" filter="url(#smallShadow)"><use href="#court"/></g>
+  <g transform="translate(1090 321)" font-family="PingFang SC, Microsoft YaHei, sans-serif" text-anchor="middle"><rect x="-42" y="-12" width="84" height="22" rx="11" fill="#fffdf4" opacity=".9"/><text y="3" fill="#42564e" font-size="10">2号羽毛球场</text></g>
+
+  <!-- Cainiao parcel station · dorm front -->
+  <g transform="translate(768 268)" filter="url(#smallShadow)">
+    <ellipse cx="2" cy="34" rx="50" ry="14" fill="#4f7a68" opacity=".16"/>
+    <path d="M-38 12v24L4 54v-24Z" fill="#efe7d6"/>
+    <path d="m4 30 34-20v24L4 54Z" fill="#d5cbb8"/>
+    <path d="M-38 12 0-6l42 14-38 22Z" fill="#f8f3e6"/>
+    <path d="M-46 8 0-14l47 16-42 22Z" fill="#3E6E8F"/>
+    <path d="M-38 14 0 28l40-14" fill="none" stroke="#F0C465" stroke-width="4" stroke-linecap="round"/>
+    <path d="m-26 34 8 4v-9l-8-4Zm10 5 8 4v-9l-8-4Zm-20-10 8 4v-9l-8-4Z" fill="#E2A163"/>
+    <path d="M-30 36v-10l6-4 6 3-6 4 6 3-6 4Z" fill="#F3D08A" opacity=".9"/>
+    <g transform="translate(0 -30)">
+      <rect x="-52" y="-14" width="104" height="28" rx="9" fill="#2F5F83" stroke="#fffdf4" stroke-width="2"/>
+      <path d="M-34-4h8v10h-8Zm10 5 6-5v10l-6 5Z" fill="#F3CE7E"/>
+      <text y="4" fill="#fffdf4" font-family="PingFang SC, Microsoft YaHei, sans-serif" font-size="13" font-weight="800" text-anchor="middle" letter-spacing="2">菜鸟驿站</text>
+      <path d="M0 14 -6 21 6 21Z" fill="#2F5F83"/>
+    </g>
+  </g>
+
+  <!-- main teaching cluster -->
+  <g filter="url(#shadow)">
+    <g transform="translate(666 323) scale(.88)"><use href="#teachingBlock"/></g>
+    <g transform="translate(697 391) scale(.88)"><use href="#teachingBlock"/></g>
+    <g transform="translate(816 437) scale(.72)"><use href="#teachingBlock"/></g>
+    <g transform="translate(849 493) scale(.67)"><use href="#teachingBlock"/></g>
+  </g>
+  <g font-family="PingFang SC, Microsoft YaHei, sans-serif" text-anchor="middle" fill="#42564e" font-weight="700">
+    <g transform="translate(762 327)"><rect x="-65" y="-14" width="130" height="25" rx="12" fill="#fffdf4" opacity=".93"/><text y="3" font-size="11">笃行楼 · 教二</text></g>
+    <g transform="translate(797 397)"><rect x="-65" y="-14" width="130" height="25" rx="12" fill="#fffdf4" opacity=".93"/><text y="3" font-size="11">崇德楼 · 教一</text></g>
+    <g transform="translate(902 447)"><rect x="-65" y="-14" width="130" height="25" rx="12" fill="#fffdf4" opacity=".93"/><text y="3" font-size="11">精技楼 · 教四</text></g>
+    <g transform="translate(928 510)"><rect x="-65" y="-14" width="130" height="25" rx="12" fill="#fffdf4" opacity=".93"/><text y="3" font-size="11">创新楼 · 教三</text></g>
+  </g>
+  <g transform="translate(792 562)" filter="url(#smallShadow)">
+    <path d="M0 20 45 0l61 22-46 27Z" fill="#eee8d8"/>
+    <path d="M8 17 45 2l52 19-38 22Z" fill="#9dbd9d"/>
+    <path d="M16 19 45 7l41 15-30 17Z" fill="#d7e3c8"/>
+  </g>
+  <g transform="translate(842 626)" font-family="PingFang SC, Microsoft YaHei, sans-serif" text-anchor="middle"><rect x="-36" y="-12" width="72" height="22" rx="11" fill="#fffdf4" opacity=".9"/><text y="3" fill="#42564e" font-size="10" font-weight="700">亲水平台</text></g>
+  <g transform="translate(456 334)" font-family="PingFang SC, Microsoft YaHei, sans-serif" text-anchor="middle"><rect x="-34" y="-12" width="68" height="22" rx="11" fill="#fffdf4" opacity=".82"/><text y="3" fill="#42564e" font-size="10" font-weight="700">湖心亭</text></g>
+
+  <!-- southwest teaching buildings -->
+  <g filter="url(#shadow)">
+    <g transform="translate(460 554) scale(.68)"><use href="#teachingBlock"/></g>
+    <g transform="translate(441 625) scale(.68)"><use href="#teachingBlock"/></g>
+    <g transform="translate(495 690) scale(.68)"><use href="#teachingBlock"/></g>
+    <g transform="translate(580 610) scale(.68)"><use href="#teachingBlock"/></g>
+    <g transform="translate(750 651) scale(.79)"><use href="#westBlock"/></g>
+    <g transform="translate(954 659) scale(.72)"><use href="#smallHall"/></g>
+  </g>
+  <g font-family="PingFang SC, Microsoft YaHei, sans-serif" text-anchor="middle" fill="#42564e" font-size="10" font-weight="700">
+    <g transform="translate(520 566)"><rect x="-66" y="-13" width="132" height="23" rx="11" fill="#fffdf4"/><text y="3">现代信息技术大楼 · 8A</text></g>
+    <g transform="translate(500 639)"><rect x="-66" y="-13" width="132" height="23" rx="11" fill="#fffdf4"/><text y="3">设计与智造大楼 · 8B</text></g>
+    <g transform="translate(554 704)"><rect x="-66" y="-13" width="132" height="23" rx="11" fill="#fffdf4"/><text y="3">现代服务大楼 · 8C</text></g>
+    <g transform="translate(640 624)"><rect x="-66" y="-13" width="132" height="23" rx="11" fill="#fffdf4"/><text y="3">数字化教学大楼 · 8D</text></g>
+    <g transform="translate(816 665)"><rect x="-35" y="-13" width="70" height="24" rx="12" fill="#fffdf4"/><text y="3" font-size="11">行政楼</text></g>
+    <g transform="translate(1007 672)"><rect x="-35" y="-13" width="70" height="24" rx="12" fill="#fffdf4"/><text y="3" font-size="11">体育馆</text></g>
+  </g>
+
+  <!-- swimming pool and basketball -->
+  <g transform="translate(1067 434) skewY(7)" filter="url(#smallShadow)">
+    <rect width="71" height="42" rx="5" fill="#f5f0df"/>
+    <rect x="6" y="6" width="59" height="30" rx="3" fill="#78b9c1"/>
+    <path d="M17 6v30m12-30v30m12-30v30m12-30v30" stroke="#d7efea" stroke-width="1.5"/>
+  </g>
+  <g transform="translate(1090 488)" font-family="PingFang SC, Microsoft YaHei, sans-serif" text-anchor="middle"><rect x="-29" y="-12" width="58" height="22" rx="11" fill="#fffdf4"/><text y="3" fill="#42564e" font-size="10" font-weight="700">游泳池</text></g>
+  <g transform="translate(958 572) rotate(-8)" filter="url(#smallShadow)"><use href="#court"/></g>
+  <g transform="translate(1005 632)" font-family="PingFang SC, Microsoft YaHei, sans-serif" text-anchor="middle"><rect x="-42" y="-12" width="84" height="22" rx="11" fill="#fffdf4"/><text y="3" fill="#42564e" font-size="10" font-weight="700">5号篮球场</text></g>
+
+  <!-- athletics stadium -->
+  <g transform="translate(1008 523) rotate(-9 79 126)" filter="url(#shadow)">
+    <rect width="158" height="252" rx="73" fill="#bd7865"/>
+    <rect x="8" y="8" width="142" height="236" rx="66" fill="none" stroke="#e7ad8e" stroke-width="3"/>
+    <rect x="16" y="16" width="126" height="220" rx="59" fill="none" stroke="#e7ad8e" stroke-width="2.5"/>
+    <rect x="24" y="24" width="110" height="204" rx="51" fill="none" stroke="#e7ad8e" stroke-width="2.5"/>
+    <rect x="34" y="34" width="90" height="184" rx="40" fill="#79a878"/>
+    <path d="M79 35v182M35 126h88" stroke="#e7edcf" stroke-width="1.7"/>
+    <circle cx="79" cy="126" r="23" fill="none" stroke="#e7edcf" stroke-width="1.7"/>
+    <circle cx="79" cy="126" r="2.5" fill="#e7edcf"/>
+    <rect x="50" y="47" width="58" height="39" rx="3" fill="none" stroke="#e7edcf" stroke-width="1.5"/>
+    <rect x="50" y="166" width="58" height="39" rx="3" fill="none" stroke="#e7edcf" stroke-width="1.5"/>
+    <path d="M50 59H38v15h12m58-15h12v15h-12M50 193H38v-15h12m58 15h12v-15h-12" fill="none" stroke="#e7edcf" stroke-width="1.4"/>
+    <text x="79" y="119" fill="#f4f5dc" font-family="PingFang SC, Microsoft YaHei, sans-serif" font-size="16" font-weight="800" text-anchor="middle" letter-spacing="3">田径场</text>
+    <text x="79" y="138" fill="#e3ebce" font-family="Arial, sans-serif" font-size="7" text-anchor="middle" letter-spacing="2">ATHLETIC FIELD</text>
+  </g>
+
+  <!-- tennis and volleyball near gym -->
+  <g transform="translate(861 708) rotate(9)" filter="url(#smallShadow)">
+    <rect width="72" height="103" rx="5" fill="#f3eee0"/>
+    <rect x="6" y="6" width="60" height="91" fill="#7ca9b2"/>
+    <path d="M6 51.5h60M36 6v91" stroke="#ecf3e7" stroke-width="1.5"/>
+    <path d="M6 20h60M6 83h60" stroke="#ecf3e7" stroke-width="1.2"/>
+  </g>
+  <g transform="translate(945 749) rotate(-7)" filter="url(#smallShadow)">
+    <rect width="69" height="42" rx="4" fill="#d49a7e"/>
+    <rect x="5" y="5" width="59" height="32" fill="none" stroke="#f4ecda" stroke-width="1.4"/>
+    <path d="M34.5 5v32" stroke="#f4ecda" stroke-width="1.4"/>
+  </g>
+  <g font-family="PingFang SC, Microsoft YaHei, sans-serif" text-anchor="middle" fill="#42564e" font-size="10" font-weight="700">
+    <g transform="translate(865 818)"><rect x="-42" y="-12" width="84" height="22" rx="11" fill="#fffdf4"/><text y="3">1号网球场</text></g>
+    <g transform="translate(979 801)"><rect x="-31" y="-12" width="62" height="22" rx="11" fill="#fffdf4"/><text y="3">排球场</text></g>
+  </g>
+
+  <!-- campus gates -->
+  <g transform="translate(42 318)" filter="url(#smallShadow)">
+    <path d="M0 30 32 12l43 15-33 20Z" fill="#f5eddb"/>
+    <path d="M8 29v43l13 6V35m36-1v42l12-7V27" fill="#ded3bf"/>
+    <path d="M-3 25 32 6l47 16-11 15-35-13-28 16Z" fill="#5f8581"/>
+    <path d="M22 41 58 27v13L22 53Z" fill="#f7f1e2"/>
+  </g>
+  <g transform="translate(1111 315)" filter="url(#smallShadow)">
+    <path d="M0 30 32 12l43 15-33 20Z" fill="#f5eddb"/>
+    <path d="M8 29v43l13 6V35m36-1v42l12-7V27" fill="#ded3bf"/>
+    <path d="M-3 25 32 6l47 16-11 15-35-13-28 16Z" fill="#5f8581"/>
+    <path d="M22 41 58 27v13L22 53Z" fill="#f7f1e2"/>
+  </g>
+  <g transform="translate(627 771)" filter="url(#smallShadow)">
+    <path d="M0 30 32 12l43 15-33 20Z" fill="#f5eddb"/>
+    <path d="M8 29v43l13 6V35m36-1v42l12-7V27" fill="#ded3bf"/>
+    <path d="M-3 25 32 6l47 16-11 15-35-13-28 16Z" fill="#5f8581"/>
+    <path d="M22 41 58 27v13L22 53Z" fill="#f7f1e2"/>
+  </g>
+  <g font-family="PingFang SC, Microsoft YaHei, sans-serif" font-size="12" font-weight="800" text-anchor="middle" fill="#42564e">
+    <g transform="translate(51 309)"><rect x="-25" y="-14" width="50" height="26" rx="13" fill="#fffdf4"/><text y="4">西门</text></g>
+    <g transform="translate(653 806)"><rect x="-34" y="-14" width="68" height="26" rx="13" fill="#fffdf4"/><text y="4">西南门</text></g>
+  </g>
+
+  <!-- trees and landscape -->
+  <g>
+    <use href="#tree" x="82" y="132"/><use href="#treeGold" x="102" y="92" transform="scale(.9)"/>
+    <use href="#tree" x="292" y="120"/><use href="#tree" x="340" y="102"/><use href="#treeGold" x="369" y="155"/>
+    <use href="#tree" x="298" y="277"/><use href="#tree" x="319" y="321"/><use href="#treeGold" x="276" y="351"/>
+    <use href="#tree" x="397" y="210"/><use href="#tree" x="444" y="190"/><use href="#treeGold" x="506" y="218"/>
+    <use href="#tree" x="696" y="112"/><use href="#tree" x="751" y="174"/><use href="#treeGold" x="728" y="203"/>
+    <use href="#tree" x="1130" y="102"/><use href="#tree" x="1132" y="185"/><use href="#treeGold" x="1120" y="239"/>
+    <use href="#tree" x="895" y="90"/><use href="#tree" x="968" y="142"/><use href="#treeGold" x="881" y="211"/>
+    <use href="#tree" x="1127" y="402"/><use href="#tree" x="1094" y="395"/><use href="#treeGold" x="1129" y="583"/>
+    <use href="#tree" x="980" y="460"/><use href="#tree" x="946" y="521"/><use href="#treeGold" x="967" y="551"/>
+    <use href="#tree" x="936" y="645"/><use href="#tree" x="913" y="684"/><use href="#treeGold" x="956" y="719"/>
+    <use href="#tree" x="731" y="740"/><use href="#tree" x="709" y="784"/><use href="#treeGold" x="766" y="790"/>
+    <use href="#tree" x="583" y="774"/><use href="#tree" x="454" y="774"/><use href="#treeGold" x="403" y="729"/>
+    <use href="#tree" x="345" y="692"/><use href="#tree" x="300" y="645"/><use href="#treeGold" x="278" y="714"/>
+    <use href="#tree" x="81" y="727"/><use href="#tree" x="106" y="779"/><use href="#treeGold" x="198" y="753"/>
+    <use href="#tree" x="57" y="536"/><use href="#tree" x="69" y="462"/><use href="#treeGold" x="96" y="387"/>
+    <use href="#tree" x="375" y="475"/><use href="#tree" x="418" y="520"/><use href="#treeGold" x="469" y="512"/>
+    <use href="#tree" x="593" y="521"/><use href="#tree" x="611" y="581"/><use href="#treeGold" x="655" y="628"/>
+    <use href="#tree" x="771" y="584"/><use href="#tree" x="791" y="615"/><use href="#treeGold" x="742" y="637"/>
+  </g>
+  <g opacity=".9">
+    <use href="#lamp" x="337" y="259"/><use href="#lamp" x="612" y="255"/><use href="#lamp" x="900" y="320"/>
+    <use href="#lamp" x="254" y="635"/><use href="#lamp" x="441" y="496"/><use href="#lamp" x="646" y="545"/>
+    <use href="#lamp" x="822" y="601"/><use href="#lamp" x="671" y="722"/><use href="#lamp" x="1108" y="652"/>
+  </g>
+
+  <!-- parking and small campus details -->
+  <g transform="translate(603 319) skewY(9)" opacity=".85">
+    <rect width="75" height="38" rx="5" fill="#e5e2d5"/>
+    <g stroke="#fffdf5" stroke-width="2"><path d="M9 4v30M23 4v30M37 4v30M51 4v30M65 4v30"/></g>
+    <g fill="#8ca7a0"><rect x="11" y="9" width="9" height="20" rx="3"/><rect x="39" y="9" width="9" height="20" rx="3"/></g>
+    <g fill="#d29b7e"><rect x="25" y="9" width="9" height="20" rx="3"/><rect x="53" y="9" width="9" height="20" rx="3"/></g>
+  </g>
+  <g transform="translate(640 357)" font-family="PingFang SC, Microsoft YaHei, sans-serif" text-anchor="middle"><rect x="-27" y="-11" width="54" height="20" rx="10" fill="#fffdf4" opacity=".88"/><text y="3" fill="#53645b" font-size="9" font-weight="700">停车场</text></g>
+
+  <!-- zone labels -->
+  <g class="zone-labels" font-family="PingFang SC, Microsoft YaHei, sans-serif" font-size="13" font-weight="800" text-anchor="middle" letter-spacing="3">
+    <text x="262" y="744" fill="#4F7098">教学科研区</text>
+    <text x="884" y="378" fill="#B47257">宿舍生活区</text>
+    <text x="1014" y="756" fill="#5D8A63">运动健康区</text>
+    <text x="640" y="474" fill="#3F8C81">湖景文化区</text>
+    <text x="670" y="250" fill="#A87F3C">餐饮社交区</text>
+  </g>
+
+  <!-- north arrow -->
+  <g transform="translate(1126 759)" opacity=".72">
+    <circle r="30" fill="#fffdf5" opacity=".72"/>
+    <path d="M0-21 8 7 0 3-8 7Z" fill="#355f5b"/>
+    <path d="M0 3 8 7 0 21-8 7Z" fill="#a7bcb0"/>
+    <text y="-27" fill="#355f5b" font-family="Arial, sans-serif" font-size="10" font-weight="800" text-anchor="middle">N</text>
+  </g>
+</svg>

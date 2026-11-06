@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="47.8 19 279.2 232.54">
+  <title>B-NE-02 东北第一排宿舍楼</title>
+  <desc>2:1 isometric long dorm, cream walls, light gray roof</desc>
+  <g id="base">
+  <ellipse cx="184.5" cy="225.5" rx="128.7" ry="18.04" fill="#7FA85C" opacity="0.18"/>
+  <polygon points="102,53 102,65 267,217.5 267,229.5 319,203.5 319,191.5" fill="#86B060" opacity="0.5"/>
+  </g>
+  <g id="walls">
+  <polygon points="102,53 267,135.5 267,217.5 102,135" fill="#F5F1E8"/>
+  <polygon points="319,109.5 267,135.5 267,217.5 319,191.5" fill="#D9D4C8"/>
+  <polygon points="102,77.6 267,160.1 267,167.1 102,84.6" fill="#C7C2B6"/>
+  <polygon points="102,98.92 267,181.42 267,188.42 102,105.92" fill="#C7C2B6"/>
+  </g>
+  <g id="roof">
+  <polygon points="154,27 319,109.5 267,135.5 102,53" fill="#ECE9E1"/>
+  <polygon points="102,53 267,135.5 267,141.5 102,59" fill="#DCD8CE"/>
+  </g>
+  <g id="mask"/>
+</svg>

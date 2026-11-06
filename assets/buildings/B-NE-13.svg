@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="10.96 27 265.04 239.36">
+  <title>B-NE-13 灰色方形大楼</title>
+  <desc>Larger square block with light-gray roof and walls, small roof skylight</desc>
+  <g id="base">
+  <ellipse cx="111" cy="239" rx="92.04" ry="19.36" fill="#7FA85C" opacity="0.18"/>
+  <polygon points="52,84 52,96 170,231 170,243 268,194 268,182" fill="#86B060" opacity="0.5"/>
+  </g>
+  <g id="walls">
+  <polygon points="52,84 170,143 170,231 52,172" fill="#E8E5DE"/>
+  <polygon points="268,94 170,143 170,231 268,182" fill="#CFCBC2"/>
+  <polygon points="52,110.4 170,169.4 170,176.4 52,117.4" fill="#C7C2B6"/>
+  <polygon points="52,133.28 170,192.28 170,199.28 52,140.28" fill="#C7C2B6"/>
+  </g>
+  <g id="roof">
+  <polygon points="150,35 268,94 170,143 52,84" fill="#C9C6BE"/>
+  <polygon points="52,84 170,143 170,149 52,90" fill="#B5B2AA"/>
+  <polygon points="135,81 175,101 155,115 115,95" fill="#D8D5CE"/>
+  </g>
+  <g id="mask"/>
+</svg>

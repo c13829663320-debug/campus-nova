@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-95 -10 300 205">
+  <title>B-SE-04 三段式纯白长楼</title>
+  <desc>approximate vector rebuild from selected-campus-map.jpg; long pure-white roof bar divided into 3 panels, recessed dark doorway at front-left end; occluded faces not reconstructed</desc>
+  <!-- box: a=170 (right axis, long), b=60 (left axis), h=55. P1=(0,0) P2=(170,85) P3=(110,115) P4=(-60,30) -->
+  <g id="base">
+    <ellipse cx="55" cy="178" rx="140" ry="20" fill="#7FA85C" opacity="0.18"/>
+    <polygon points="110,115 170,85 170,98 110,128 -60,43 -60,30" fill="#86B060" opacity="0.55"/>
+  </g>
+  <g id="walls">
+    <!-- lit left wall P4 P3 P3b P4b -->
+    <polygon points="-60,30 110,115 110,170 -60,85" fill="#F5F1E8"/>
+    <!-- shadow right wall P2 P3 P3b P2b -->
+    <polygon points="170,85 110,115 110,170 170,140" fill="#D9D4C8"/>
+    <!-- long window band on lit wall -->
+    <polygon points="-17.5,55 76,101.5 76,111.5 -17.5,65" fill="#C7C2B6"/>
+    <!-- recessed dark doorway at front-left end -->
+    <polygon points="-52,78 -8,100 -8,112 -52,90" fill="#B9B4A8"/>
+  </g>
+  <g id="roof">
+    <polygon points="0,0 170,85 110,115 -60,30" fill="#FFFFFF"/>
+    <!-- two seams dividing roof into 3 panels -->
+    <polygon points="56.7,28.3 -3.3,58.3 -3.3,62.3 56.7,32.3" fill="#E4E2DC"/>
+    <polygon points="113.3,56.7 53.3,86.7 53.3,90.7 113.3,60.7" fill="#E4E2DC"/>
+    <!-- eave strip along front edge P4-P3 -->
+    <polygon points="-60,30 110,115 110,120 -60,35" fill="#E8E6E0"/>
+  </g>
+  <g id="mask"/>
+</svg>

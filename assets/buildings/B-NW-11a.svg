@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-32 16 154 223">
+  <title>B-NW-11a 蓝顶群白色高竖塔楼</title>
+  <desc>approximate vector rebuild from selected-campus-map.jpg; occluded faces not reconstructed</desc>
+  <g id="base">
+    <ellipse cx="36" cy="218.0" rx="60.0" ry="13" fill="#7FA85C" opacity="0.18"/>
+    <ellipse cx="36" cy="210.0" rx="51.0" ry="9" fill="#86B060" opacity="0.4"/>
+  </g>
+  <g id="walls">
+    <polygon points="-6,63.0 36,84.0 36,206.0 -6,185.0" fill="#F5F1E8"/>
+    <polygon points="114,45.0 36,84.0 36,206.0 114,167.0" fill="#D9D4C8"/>
+    <polygon points="5.8,81.1 8.7,82.5 8.7,180.1 5.8,178.7" fill="#C7C2B6"/>
+    <polygon points="10.8,83.6 13.7,85.1 13.7,182.7 10.8,181.2" fill="#C7C2B6"/>
+    <polygon points="6.6,144.9 10.8,147.0 10.8,161.7 6.6,159.6" fill="#E8976A"/>
+    <polygon points="114,81.6 36,120.6 36,131.6 114,92.6" fill="#BEB9AD"/>
+  </g>
+  <g id="roof">
+    <polygon points="72,24 114,45.0 36,84.0 -6,63.0" fill="#ECE9E1"/>
+    <polygon points="-6,63.0 36,84.0 36,90.0 -6,69.0" fill="#DCD8CE"/>
+  </g>
+  <g id="mask"/>
+</svg>

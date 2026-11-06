@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="48.8 47 199.2 165">
+  <title>B-NE-14 橙顶小楼</title>
+  <desc>Small coral-orange roof block, cream walls</desc>
+  <g id="base">
+  <ellipse cx="127" cy="190" rx="70.2" ry="14" fill="#7FA85C" opacity="0.18"/>
+  <polygon points="82,89 82,101 172,182 172,194 240,160 240,148" fill="#86B060" opacity="0.5"/>
+  </g>
+  <g id="walls">
+  <polygon points="82,89 172,134 172,182 82,137" fill="#F5F1E8"/>
+  <polygon points="240,100 172,134 172,182 240,148" fill="#D9D4C8"/>
+  <polygon points="82,103.4 172,148.4 172,155.4 82,110.4" fill="#C7C2B6"/>
+  </g>
+  <g id="roof">
+  <polygon points="150,55 240,100 172,134 82,89" fill="#E8976A"/>
+  <polygon points="82,89 172,134 172,140 82,95" fill="#D4825A"/>
+  </g>
+  <g id="mask"/>
+</svg>

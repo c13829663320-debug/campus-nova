@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>2.5D 校园导览地图 · 星图校园</title>
+<link rel="icon" type="image/svg+xml" href="assets/logo-mark.svg?v=2">
+<style>
+  :root {
+    --bg: #F8F8F8;
+    --ink: #121212;
+    --sub: #7A7A7A;
+    --line: rgba(18, 18, 18, .1);
+    --accent: #1FFD91;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--bg); color: var(--ink); font-family: "PingFang SC", "Microsoft YaHei", system-ui, sans-serif; }
+  .page { max-width: 1180px; margin: 0 auto; padding: 40px 28px 56px; }
+  .eyebrow { color: var(--sub); font-size: 11px; letter-spacing: 2.4px; text-transform: uppercase; }
+  h1 { margin: 10px 0 6px; font-size: 30px; letter-spacing: -.03em; }
+  .lead { margin: 0 0 22px; color: var(--sub); font-size: 13px; }
+
+  /* 顶部分类导航 */
+  .cats { display: flex; gap: 8px; flex-wrap: wrap; margin: 0 0 14px; }
+  .cats button { padding: 8px 15px; border: 1px solid var(--line); border-radius: 999px; background: #fff; color: var(--sub); font-size: 12px; font-family: inherit; cursor: pointer; transition: background .16s ease, color .16s ease, border-color .16s ease; }
+  .cats button:hover { color: var(--ink); }
+  .cats button.active { background: var(--ink); color: #fff; border-color: var(--ink); }
+
+  .map-shell { position: relative; overflow: hidden; border-radius: 22px; background: #EFF3EC; border: 1px solid var(--line); }
+  .map-stage { position: relative; width: 100%; height: min(62vh, 560px); touch-action: none; cursor: grab; }
+  .map-stage.is-dragging { cursor: grabbing; }
+  .map3d-canvas { display: block; width: 100%; height: 100%; }
+
+  .badge { position: absolute; left: 16px; top: 16px; z-index: 3; display: flex; align-items: center; gap: 10px; padding: 7px 13px 7px 7px; border-radius: 14px; background: rgba(255,255,255,.82); border: 1px solid var(--line); }
+  .badge span { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 10px; background: var(--ink); color: var(--accent); font-size: 10px; font-weight: 800; letter-spacing: .5px; }
+  .badge strong { display: block; font-size: 12.5px; }
+  .badge small { display: block; margin-top: 1px; color: var(--sub); font-size: 9.5px; letter-spacing: 1px; }
+
+  .zoom { position: absolute; right: 16px; top: 16px; z-index: 3; display: grid; gap: 4px; padding: 5px; border-radius: 14px; background: rgba(255,255,255,.82); border: 1px solid var(--line); }
+  .zoom button { display: grid; place-items: center; width: 32px; height: 32px; padding: 0; border: 0; border-radius: 9px; background: transparent; color: var(--ink); cursor: pointer; font-size: 16px; line-height: 1; transition: background .16s ease; }
+  .zoom button:hover { background: #F0F0F0; }
+
+  .hint { position: absolute; left: 16px; bottom: 14px; z-index: 3; display: flex; align-items: center; gap: 6px; padding: 5px 10px; border-radius: 999px; background: rgba(255,255,255,.82); border: 1px solid var(--line); color: var(--sub); font-size: 10px; }
+  .hint i { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+
+  /* 悬浮图标层：DOM 覆盖在 canvas 上，坐标由 3D 投影反算 */
+  .map3d-labels { position: absolute; inset: 0; z-index: 2; pointer-events: none; }
+  .map3d-label { position: absolute; left: 0; top: 0; display: flex; align-items: center; gap: 5px; padding: 5px 7px 5px 8px; border: 1px solid rgba(18,18,18,.08); border-radius: 11px; background: #fff; color: var(--ink); font-family: inherit; cursor: pointer; pointer-events: auto; box-shadow: 0 6px 18px rgba(18,18,18,.1); transition: background .16s ease, opacity .16s ease; will-change: transform; }
+  .map3d-label:hover { background: var(--accent); }
+  .map3d-label.is-out { opacity: 0; pointer-events: none; }
+  .map3d-label.is-muted { opacity: 0; pointer-events: none; }
+  .map3d-label__icon { display: block; width: 15px; height: 15px; }
+  .map3d-label__icon svg { display: block; width: 15px; height: 15px; }
+  .map3d-label__badge { display: grid; place-items: center; min-width: 15px; height: 15px; padding: 0 3px; border-radius: 999px; background: var(--ink); color: var(--accent); font-size: 9px; font-weight: 700; line-height: 1; }
+
+  .legend { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 16px; }
+  .legend button { padding: 7px 13px; border: 1px solid var(--line); border-radius: 999px; background: #fff; color: var(--sub); font-size: 11px; font-family: inherit; cursor: pointer; transition: background .16s ease, color .16s ease, border-color .16s ease; }
+  .legend button:hover { color: var(--ink); }
+  .legend button.active { background: var(--ink); color: #fff; border-color: var(--ink); }
+
+  /* WebGL 不可用时的降级画面 */
+  .map3d-fallback { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; padding: 20px; text-align: center; }
+  .map3d-fallback img { max-width: 82%; max-height: 60%; border-radius: 14px; border: 1px solid var(--line); }
+  .map3d-fallback__copy strong { font-size: 13px; }
+  .map3d-fallback__copy p { margin: 4px 0 0; color: var(--sub); font-size: 11.5px; }
+
+  @media (max-width: 720px) {
+    .page { padding: 24px 16px 40px; }
+    h1 { font-size: 22px; }
+    .map-stage { height: min(58vh, 440px); }
+    .cats, .legend { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
+    .cats button, .legend button { flex: 0 0 auto; }
+    .badge { padding: 5px 10px 5px 5px; }
+    .badge small { display: none; }
+    .map3d-label { padding: 4px 5px; gap: 4px; border-radius: 9px; -webkit-tap-highlight-color: transparent; }
+    .map3d-label__icon, .map3d-label__icon svg { width: 13px; height: 13px; }
+    .map3d-label__badge { min-width: 13px; height: 13px; font-size: 8px; }
+    .zoom { top: auto; bottom: 12px; right: 12px; grid-auto-flow: column; }
+    .hint { max-width: 52%; }
+  }
+</style>
+<script type="importmap">
+{ "imports": { "three": "./vendor/three/three.module.js" } }
+</script>
+</head>
+<body>
+<div class="page">
+  <p class="eyebrow">Campus Nova · Interactive Map</p>
+  <h1>2.5D 校园导览地图</h1>
+  <p class="lead">拖动探索校园，点击地点图标查看地点详情。</p>
+
+  <nav class="cats" id="cats" aria-label="地点分类"></nav>
+
+  <div class="map-shell">
+    <div class="map-stage" id="stage">
+      <div class="badge"><span>3D</span><div><strong>东莞职业技术学院</strong><small>校本部 · 等距导览</small></div></div>
+      <div class="zoom">
+        <button type="button" id="zoom-in" aria-label="放大">+</button>
+        <button type="button" id="zoom-out" aria-label="缩小">−</button>
+        <button type="button" id="zoom-reset" aria-label="重置视角">⟲</button>
+      </div>
+      <div class="hint"><i></i>拖动平移 · 滚轮 / 双指缩放</div>
+    </div>
+  </div>
+
+  <div class="legend" id="legend"></div>
+</div>
+
+<script type="module">
+  import { mountCampusMap } from "./js/map3d/index.js";
+
+  const data = await fetch("./data/campus-map.json").then(response => response.json());
+  const stage = document.getElementById("stage");
+  const map = mountCampusMap(stage, { data });
+
+  /* 无 WebGL：只保留平面示意图，去掉所有 3D 操作控件 */
+  if (!map) {
+    document.querySelector(".zoom").remove();
+    document.querySelector(".hint").remove();
+  } else {
+    document.getElementById("zoom-in").addEventListener("click", map.zoomIn);
+    document.getElementById("zoom-out").addEventListener("click", map.zoomOut);
+    document.getElementById("zoom-reset").addEventListener("click", map.resetView);
+
+    const legend = document.getElementById("legend");
+    legend.innerHTML = [
+      `<button type="button" data-id="" class="active">全景</button>`,
+      ...data.zones.map(zone => `<button type="button" data-id="${zone.id}">${zone.name}</button>`)
+    ].join("");
+
+    const cats = document.getElementById("cats");
+    cats.innerHTML = data.categories.map((category, index) => (
+      `<button type="button" data-id="${category.id}"${index === 0 ? ` class="active"` : ""}>${category.label}</button>`
+    )).join("");
+
+    const activate = (container, target) => {
+      container.querySelectorAll("button").forEach(button => {
+        button.classList.toggle("active", button === target);
+      });
+    };
+
+    cats.addEventListener("click", event => {
+      const button = event.target.closest("button");
+      if (!button) return;
+      activate(cats, button);
+      map.setCategory(button.dataset.id);
+    });
+
+    legend.addEventListener("click", event => {
+      const button = event.target.closest("button");
+      if (!button) return;
+      activate(legend, button);
+      map.setZone(button.dataset.id || null);
+    });
+  }
+</script>
+</body>
+</html>

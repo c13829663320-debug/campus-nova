@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-100 -10 260 205">
+  <title>B-SE-02 斜顶天窗白楼</title>
+  <desc>approximate vector rebuild from selected-campus-map.jpg; white roof with coral-orange rear corner section and parallel pale-blue diagonal skylight strips; occluded faces not reconstructed</desc>
+  <!-- box: a=150 (right axis), b=90 (left axis), h=55. P1=(0,0) P2=(150,75) P3=(60,120) P4=(-90,45) -->
+  <g id="base">
+    <ellipse cx="30" cy="180" rx="120" ry="20" fill="#7FA85C" opacity="0.18"/>
+    <polygon points="60,120 150,75 150,88 60,133 -90,58 -90,45" fill="#86B060" opacity="0.55"/>
+  </g>
+  <g id="walls">
+    <!-- lit left wall -->
+    <polygon points="-90,45 60,120 60,175 -90,100" fill="#F5F1E8"/>
+    <!-- shadow right wall -->
+    <polygon points="150,75 60,120 60,175 150,130" fill="#D9D4C8"/>
+    <!-- ground floor window band on lit wall -->
+    <polygon points="-60,85 40,135 40,145 -60,95" fill="#C7C2B6"/>
+  </g>
+  <g id="roof">
+    <polygon points="0,0 150,75 60,120 -90,45" fill="#ECE9E1"/>
+    <!-- coral-orange rear corner roof section -->
+    <polygon points="0,0 -90,45 -55,62 -5,25" fill="#E8976A"/>
+    <!-- pale-blue diagonal skylight strips -->
+    <polygon points="15,16 105,61 102,67 12,22" fill="#A9C6DB"/>
+    <polygon points="-10,29 80,74 77,80 -13,35" fill="#A9C6DB"/>
+    <polygon points="-35,42 55,87 52,93 -38,48" fill="#A9C6DB"/>
+    <polygon points="-60,55 30,100 27,106 -63,61" fill="#A9C6DB"/>
+    <!-- eave strip along front edge -->
+    <polygon points="-90,45 60,120 60,125 -90,50" fill="#DCD8CE"/>
+  </g>
+  <g id="mask"/>
+</svg>

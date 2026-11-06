@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-145 -10 330 260">
+  <title>B-SE-01 湖边蓝顶长楼</title>
+  <desc>approximate vector rebuild from selected-campus-map.jpg; L-shaped two-wing light-blue roof building standing on the lake edge, multi-story long window bands, small white flat-roof box at the left end; occluded faces not reconstructed</desc>
+  <g id="base">
+    <ellipse cx="20" cy="235" rx="160" ry="24" fill="#7FA85C" opacity="0.18"/>
+  </g>
+  <g id="walls">
+    <!-- upper long wing A: lit wall -->
+    <polygon points="-55,27.5 95,102.5 95,167.5 -55,92.5" fill="#F5F1E8"/>
+    <!-- upper long wing A: shadow wall -->
+    <polygon points="150,75 95,102.5 95,167.5 150,140" fill="#D9D4C8"/>
+    <!-- wing A long window bands -->
+    <polygon points="-30,42 80,97 80,106 -30,51" fill="#C7C2B6"/>
+    <polygon points="-30,62 80,117 80,126 -30,71" fill="#C7C2B6"/>
+    <!-- small white flat box: lit wall -->
+    <polygon points="-87,43.5 -42,66 -42,106 -87,83.5" fill="#F5F1E8"/>
+    <!-- small white flat box: shadow wall -->
+    <polygon points="-10,50 -42,66 -42,106 -10,90" fill="#D9D4C8"/>
+    <!-- lower wing B: lit wall -->
+    <polygon points="-65,95 65,170 65,230 -65,155" fill="#F5F1E8"/>
+    <!-- lower wing B: shadow wall -->
+    <polygon points="115,135 65,170 65,230 115,195" fill="#D9D4C8"/>
+    <!-- dark recessed openings on wing B lit wall -->
+    <polygon points="-40,110 0,132 0,148 -40,126" fill="#8A9AA5"/>
+    <polygon points="20,142 55,160 55,176 20,158" fill="#8A9AA5"/>
+  </g>
+  <g id="roof">
+    <!-- upper long wing A roof -->
+    <polygon points="0,0 150,75 95,102.5 -55,27.5" fill="#7FB2D9"/>
+    <!-- roof strip divisions on wing A -->
+    <polygon points="50,25 -5,52.5 -6,56.5 49,29" fill="#5E96C0"/>
+    <polygon points="100,50 45,77.5 44,81.5 99,54" fill="#5E96C0"/>
+    <!-- small white flat box roof -->
+    <polygon points="-55,27.5 -10,50 -42,66 -87,43.5" fill="#ECE9E1"/>
+    <!-- lower wing B roof -->
+    <polygon points="-15,70 115,135 65,170 -65,95" fill="#7FB2D9"/>
+    <!-- roof strip division on wing B -->
+    <polygon points="50,102.5 0,127.5 -1,131.5 49,106.5" fill="#5E96C0"/>
+  </g>
+  <g id="mask"/>
+</svg>

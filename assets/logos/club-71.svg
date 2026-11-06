@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128" role="img" aria-label="美丽乡村彩绘团 社标">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="hsl(193 46% 53%)"/>
+      <stop offset="1" stop-color="hsl(201 50% 31%)"/>
+    </linearGradient>
+    <radialGradient id="gl" cx="28%" cy="18%" r="82%">
+      <stop offset="0" stop-color="#fff" stop-opacity=".34"/>
+      <stop offset="1" stop-color="#fff" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="128" height="128" rx="30" fill="url(#bg)"/>
+  <rect width="128" height="128" rx="30" fill="url(#gl)"/>
+  <rect x="6" y="6" width="116" height="116" rx="25" fill="none" stroke="#fff" stroke-opacity=".18" stroke-width="1.4"/>
+  <g transform="translate(64 64) scale(2.42) translate(-12 -12)" fill="none" stroke="#fff" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" opacity=".97"><path d="M12 3.4a8.6 8.6 0 000 17.2c1.4 0 2-.8 2-1.8 0-1.4-1.4-1.8-1.4-3 0-1 .8-1.8 1.8-1.8h1.8a4.4 4.4 0 004.4-4.4c0-3.4-3.8-6.2-8.6-6.2z"/><circle cx="8.2" cy="9.4" r="1.1"/><circle cx="12" cy="7.4" r="1.1"/><circle cx="15.8" cy="9.4" r="1.1"/><circle cx="8.6" cy="13.6" r="1.1"/></g>
+</svg>

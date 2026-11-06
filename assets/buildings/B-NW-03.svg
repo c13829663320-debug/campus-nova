@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="14 12 183 182">
+  <title>B-NW-03 顶带蓝色水池的公寓楼</title>
+  <desc>approximate vector rebuild from selected-campus-map.jpg; occluded faces not reconstructed</desc>
+  <g id="base">
+    <ellipse cx="114" cy="173.0" rx="75.0" ry="13" fill="#7FA85C" opacity="0.18"/>
+    <ellipse cx="114" cy="165.0" rx="63.75" ry="9" fill="#86B060" opacity="0.4"/>
+  </g>
+  <g id="walls">
+    <polygon points="22,49.0 114,95.0 114,161.0 22,115.0" fill="#F5F1E8"/>
+    <polygon points="172,66.0 114,95.0 114,161.0 172,132.0" fill="#D9D4C8"/>
+    <polygon points="22,65.5 114,111.5 114,117.4 22,71.4" fill="#C7C2B6"/>
+    <polygon points="22,85.3 114,131.3 114,137.2 22,91.2" fill="#C7C2B6"/>
+    <polygon points="172,82.5 114,111.5 114,117.4 172,88.4" fill="#BEB9AD"/>
+    <polygon points="172,102.3 114,131.3 114,137.2 172,108.2" fill="#BEB9AD"/>
+  </g>
+  <g id="roof">
+    <polygon points="80,20 172,66.0 114,95.0 22,49.0" fill="#ECE9E1"/>
+    <polygon points="22,49.0 114,95.0 114,101.0 22,55.0" fill="#DCD8CE"/>
+    <polygon points="89.6,31.8 140.2,57.1 108.3,73.0 57.7,47.7" fill="#7FB2D9"/>
+  </g>
+  <g id="mask"/>
+</svg>

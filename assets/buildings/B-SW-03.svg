@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 30 320 270">
+  <title>B-SW-03 西南蓝顶长楼1</title>
+  <desc>approximate vector rebuild from selected-campus-map.jpg; occluded faces not reconstructed</desc>
+  <g id="base">
+    <ellipse cx="140" cy="282" rx="130" ry="18" fill="#7FA85C" opacity="0.18"/>
+  </g>
+  <g id="walls">
+    <polygon points="85,68 140,198 140,273 85,143" fill="#F5F1E8"/>
+    <polygon points="300,120 140,198 140,273 300,195" fill="#D9D4C8"/>
+    <polygon points="85,88 140,218 140,226 85,96" fill="#C7C2B6"/>
+    <polygon points="85,110 140,240 140,248 85,118" fill="#C7C2B6"/>
+    <polygon points="85,132 140,262 140,270 85,140" fill="#C7C2B6"/>
+  </g>
+  <g id="roof">
+    <polygon points="140,40 300,120 140,198 85,68" fill="#7FB2D9"/>
+    <polygon points="85,68 140,198 140,204 85,74" fill="#5E96C0"/>
+  </g>
+  <g id="mask"/>
+</svg>

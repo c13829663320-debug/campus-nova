@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="30 22 174 151">
+  <title>B-NW-06 公寓群右前低层长楼</title>
+  <desc>approximate vector rebuild from selected-campus-map.jpg; occluded faces not reconstructed</desc>
+  <g id="base">
+    <ellipse cx="126" cy="152.0" rx="70.0" ry="13" fill="#7FA85C" opacity="0.18"/>
+    <ellipse cx="126" cy="144.0" rx="59.5" ry="9" fill="#86B060" opacity="0.4"/>
+  </g>
+  <g id="walls">
+    <polygon points="38,56.0 126,100.0 126,140.0 38,96.0" fill="#F5F1E8"/>
+    <polygon points="178,74.0 126,100.0 126,140.0 178,114.0" fill="#D9D4C8"/>
+    <polygon points="38,70.0 126,114.0 126,117.6 38,73.6" fill="#C7C2B6"/>
+    <polygon points="178,88.0 126,114.0 126,117.6 178,91.6" fill="#BEB9AD"/>
+  </g>
+  <g id="roof">
+    <polygon points="90,30 178,74.0 126,100.0 38,56.0" fill="#ECE9E1"/>
+    <polygon points="38,56.0 126,100.0 126,106.0 38,62.0" fill="#DCD8CE"/>
+    <polygon points="100.8,51.0 140.4,70.8 124.8,78.6 85.2,58.8" fill="#D8D5CD"/>
+  </g>
+  <g id="mask"/>
+</svg>

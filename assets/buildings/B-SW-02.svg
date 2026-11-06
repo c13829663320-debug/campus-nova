@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="25 30 385 230">
+  <title>B-SW-02 西南U型围合教学楼群</title>
+  <desc>approximate vector rebuild from selected-campus-map.jpg; occluded faces not reconstructed</desc>
+  <g id="base">
+    <ellipse cx="215" cy="238" rx="180" ry="26" fill="#7FA85C" opacity="0.18"/>
+  </g>
+  <g id="walls">
+    <polygon points="190,40 166,52 166,117 190,105" fill="#F5F1E8"/>
+    <polygon points="322,106 214,160 214,225 322,171" fill="#D9D4C8"/>
+    <polygon points="214,160 106,106 106,171 214,225" fill="#F5F1E8"/>
+    <polygon points="106,106 130,94 130,159 106,171" fill="#F5F1E8"/>
+    <polygon points="166,52 298,118 298,183 166,117" fill="#CFCBC0"/>
+    <polygon points="298,94 190,148 190,213 298,159" fill="#CFCBC0"/>
+    <polygon points="130,94 238,148 238,213 130,159" fill="#CFCBC0"/>
+    <polygon points="214,178 106,124 106,132 214,186" fill="#C7C2B6"/>
+    <polygon points="214,200 106,146 106,154 214,208" fill="#C7C2B6"/>
+    <polygon points="190,129 274,171 214,201 130,159" fill="#A8A397"/>
+  </g>
+  <g id="roof">
+    <polygon points="190,40 322,106 298,118 166,52" fill="#ECE9E1"/>
+    <polygon points="298,94 322,106 214,160 190,148" fill="#ECE9E1"/>
+    <polygon points="130,94 238,148 214,160 106,106" fill="#ECE9E1"/>
+  </g>
+  <g id="mask"/>
+</svg>

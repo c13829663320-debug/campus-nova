@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-120 -5 330 285">
+  <title>B-SE-03 U型蓝顶教学楼</title>
+  <desc>approximate vector rebuild from selected-campus-map.jpg; three wings around an inner courtyard, light-blue roofs on east and south wings, pale roof strip on west connecting wing, beige flat annex; courtyard shown as shadow polygon; occluded faces not reconstructed</desc>
+  <g id="base">
+    <ellipse cx="30" cy="255" rx="150" ry="24" fill="#7FA85C" opacity="0.18"/>
+    <!-- inner courtyard shadow -->
+    <polygon points="-10,60 70,88 25,135 -55,108" fill="#7FA85C" opacity="0.25"/>
+  </g>
+  <g id="walls">
+    <!-- east wing A (back): lit wall -->
+    <polygon points="22,34 142,74 142,146 22,106" fill="#F5F1E8"/>
+    <!-- east wing A: shadow wall -->
+    <polygon points="190,70 142,74 142,146 190,142" fill="#D9D4C8"/>
+    <!-- east wing window bands on lit wall -->
+    <polygon points="30,42 134,76 134,86 30,52" fill="#C7C2B6"/>
+    <polygon points="30,64 134,98 134,106 30,72" fill="#C7C2B6"/>
+    <!-- west wing B: lit wall -->
+    <polygon points="-88,89 -42,112 -42,172 -88,149" fill="#F5F1E8"/>
+    <!-- west wing B: shadow wall -->
+    <polygon points="68,57 -42,112 -42,172 68,117" fill="#D9D4C8"/>
+    <!-- south wing C: lit wall -->
+    <polygon points="-88,135 22,190 22,248 -88,193" fill="#F5F1E8"/>
+    <!-- south wing C: shadow wall -->
+    <polygon points="68,167 22,190 22,248 68,225" fill="#D9D4C8"/>
+    <!-- south wing window band -->
+    <polygon points="-70,148 10,188 10,198 -70,158" fill="#C7C2B6"/>
+    <!-- beige annex: lit wall -->
+    <polygon points="28,187 78,212 78,257 28,232" fill="#EFE8DA"/>
+    <!-- beige annex: shadow wall -->
+    <polygon points="118,192 78,212 78,257 118,237" fill="#D9D0C0"/>
+  </g>
+  <g id="roof">
+    <!-- east wing A roof -->
+    <polygon points="70,10 190,70 142,74 22,34" fill="#7FB2D9"/>
+    <polygon points="22,34 142,74 142,78 22,38" fill="#5E96C0"/>
+    <!-- west wing B roof -->
+    <polygon points="22,34 68,57 -42,112 -88,89" fill="#ECE9E1"/>
+    <polygon points="5.5,50.5 -71.5,72.5 -72.5,76.5 4.5,54.5" fill="#B7D4E8"/>
+    <!-- south wing C roof -->
+    <polygon points="-42,112 68,167 22,190 -88,135" fill="#7FB2D9"/>
+    <polygon points="-88,135 22,190 22,194 -88,139" fill="#5E96C0"/>
+    <!-- beige annex roof -->
+    <polygon points="68,167 118,192 78,212 28,187" fill="#D8CBB8"/>
+  </g>
+  <g id="mask"/>
+</svg>

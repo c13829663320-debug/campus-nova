@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="29.36 12 216.64 295">
+  <title>B-NE-05 东北高层白楼</title>
+  <desc>Tall square white tower, 4 floor bands, flat light roof</desc>
+  <g id="base">
+  <ellipse cx="106" cy="266" rx="68.64" ry="33" fill="#7FA85C" opacity="0.18"/>
+  <polygon points="62,64 62,76 150,258 150,270 238,226 238,214" fill="#86B060" opacity="0.5"/>
+  </g>
+  <g id="walls">
+  <polygon points="62,64 150,108 150,258 62,214" fill="#F5F1E8"/>
+  <polygon points="238,64 150,108 150,258 238,214" fill="#D9D4C8"/>
+  <polygon points="62,109 150,153 150,160 62,116" fill="#C7C2B6"/>
+  <polygon points="62,148 150,192 150,199 62,155" fill="#C7C2B6"/>
+  </g>
+  <g id="roof">
+  <polygon points="150,20 238,64 150,108 62,64" fill="#ECE9E1"/>
+  <polygon points="62,64 150,108 150,114 62,70" fill="#DCD8CE"/>
+  </g>
+  <g id="mask"/>
+</svg>
