@@ -97,7 +97,7 @@ async function chat(req, res) {
       const upstream = await fetch("https://openrouter.ai/api/v1/chat/completions", {
         method: "POST",
         headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
-        body: JSON.stringify({ model, max_tokens: 1600, reasoning: { enabled: false }, messages }),
+        body: JSON.stringify({ model, max_tokens: 1600, messages }),
         signal
       });
       if (!upstream.ok) {
