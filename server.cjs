@@ -19,7 +19,7 @@ const campusData = JSON.stringify({
 const instructions = [
   "你是星图校园的中文助手，服务东莞职业技术学院的校园探索。",
   "根据下列项目资料回答地点和社团问题，优先给出站内能搜索到的确切名称和下一步建议。用简洁纯文本，不使用 Markdown。",
-  "地点时间和社团状态来自项目演示资料，提及时请注明以学校公告为准。资料不全时说明缺什么，不推测实时开放、招新时间、行走路线或联系方式。",
+  "地点时间和社团状态以学校公告为准。地点未收录开放时间时，请引导查看校方公告或现场指引。地图地标不一定能点亮。不要推测实时开放、招新时间、行走路线或联系方式。",
   "站内可用功能有地点搜索、地图位置、地点点亮、社团图鉴。站内没有从当前位置出发的步行路线、实时定位、实时开放查询或通用在线报名。组局和论坛是本机体验。只建议实际支持的操作。超出校园探索和站内功能的问题请引导回校园主题。",
   campusData
 ].join("\n");
@@ -50,7 +50,7 @@ async function chat(req, res) {
   if (!/^application\/json(?:;|$)/i.test(req.headers["content-type"] ?? "")) {
     return json(res, 415, { error: "请提交 JSON 数据。" });
   }
-  if (!key) return json(res, 503, { error: "AI 服务暂未配置 OpenRouter 密钥。" });
+  if (!key) return json(res, 503, { error: "校园助手暂时不可用，请稍后再试。" });
 
   let body;
   try {
@@ -102,12 +102,9 @@ async function chat(req, res) {
       });
       if (!upstream.ok) {
         await upstream.body?.cancel();
-        if (upstream.status === 429) return json(res, 429, { error: "OpenRouter 请求已达限制，请稍后再试。" });
+        if (upstream.status === 429) return json(res, 429, { error: "校园助手请求较多，请稍后再试。" });
         console.warn(`OpenRouter HTTP ${upstream.status}`);
-        const error = upstream.status === 401 || upstream.status === 403
-          ? "OpenRouter 未接受当前密钥，请联系项目维护者检查配置。"
-          : "OpenRouter 暂时无法提供回答，请稍后再试。";
-        return json(res, 502, { error });
+        return json(res, 502, { error: "校园助手暂时无法回答，请稍后再试。" });
       }
       const result = await upstream.json();
       const answer = result.choices?.[0]?.message?.content;
@@ -118,7 +115,7 @@ async function chat(req, res) {
     return json(res, 502, { error: "校园助手没有返回回答，请重试。" });
   } catch (error) {
     console.warn(`OpenRouter 请求失败 (${error.name})`);
-    return json(res, 502, { error: "连接 OpenRouter 失败，请稍后重试。" });
+    return json(res, 502, { error: "连接校园助手失败，请稍后重试。" });
   } finally {
     inFlight--;
   }

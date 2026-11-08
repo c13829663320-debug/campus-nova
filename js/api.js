@@ -123,7 +123,7 @@
     // POST /api/v1/places/:placeId/checkins → { result }
     checkIn(placeId) {
       return resolve(() => {
-        if (!window.NovaStore.getPlace(placeId)) throw new Error("打卡地点不存在");
+        if (!window.NovaStore.getPlace(placeId)) throw new Error("这个地点无法点亮");
         return window.NovaStore.checkIn(placeId);
       }, `/places/${placeId}/checkins`, { method: "POST" }, 480);
     },
@@ -223,20 +223,27 @@
       return resolve(() => {
         const DB = window.NovaDB;
         const Store = window.NovaStore;
+        const stats = Store.getStats();
         return {
           user: Store.getProfile(),
-          stats: Store.getStats(),
+          stats,
           places: DB.places,
           checkins: Store.state.checkins,
           applications: Store.state.applications.map(application => ({
             ...application,
             clubName: (DB.clubs.find(club => club.id === application.clubId) || {}).name || "社团"
           })),
-          badges: DB.badges.map(badge => ({
-            ...badge,
-            progress: Math.min(Store.getBadgeCount(badge.type), badge.target),
-            unlocked: Store.getBadgeCount(badge.type) >= badge.target
-          }))
+          badges: DB.badges.map(badge => {
+            const target = badge.target ?? DB.places.length;
+            const count = badge.type === "posts" ? Store.state.forumPosts.length : stats[badge.type];
+            return {
+              ...badge,
+              target,
+              description: badge.description ?? (badge.target == null ? `点亮全部 ${target} 个可探索地点` : `点亮 ${target} 个不同地点`),
+              progress: Math.min(count, target),
+              unlocked: target > 0 && count >= target
+            };
+          }).filter(badge => badge.target > 0 && (badge.type !== "lit" || badge.target <= DB.places.length))
         };
       }, "/me");
     }

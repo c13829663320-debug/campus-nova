@@ -48,24 +48,24 @@ const novaData = {
     },
     {
       id: "dorm", name: "宿舍生活区", en: "RESIDENTIAL QUARTER", color: "#CE8B6B",
-      summary: "东北宿舍群与西北教工公寓组成的生活区，菜鸟驿站、洗衣房和便利店都在步行三分钟内。",
+      summary: "生活区收录学生宿舍、教师公寓和周边服务点。",
       focus: { x: 560, y: 240 }, zoom: 1.32,
       paths: [
         "M 690 60 Q 790 42 900 46 Q 942 54 944 112 L 934 188 Q 926 222 860 228 L 716 232 Q 690 212 688 158 Z",
         "M 72 234 Q 140 224 212 230 L 234 264 Q 238 296 210 312 L 130 318 Q 78 314 66 284 Z"
       ],
       spots: [
-        { id: "dor-community", name: "学生宿舍区", note: "1–18 栋 · 四人间", x: 800, y: 135, placeId: "dormitory" },
+        { id: "dor-community", name: "学生宿舍区", note: "学生住宿", x: 800, y: 135, placeId: "dormitory" },
         { id: "dor-cainiao", name: "菜鸟驿站", note: "快递代收 · 3栋旁", x: 712, y: 212, accent: true },
         { id: "dor-young", name: "青年教师公寓", note: "单身教工宿舍", x: 150, y: 262 },
         { id: "dor-teacher", name: "教师公寓", note: "教职工生活区", x: 100, y: 295 },
-        { id: "dor-court1", name: "1号篮球场", note: "晚间开放", x: 900, y: 200 },
-        { id: "dor-court2", name: "2号羽毛球场", note: "需自带球拍", x: 928, y: 158 }
+        { id: "dor-court1", name: "1号篮球场", note: "运动场地", x: 900, y: 200 },
+        { id: "dor-court2", name: "2号羽毛球场", note: "运动场地", x: 928, y: 158 }
       ]
     },
     {
       id: "sports", name: "运动健康区", en: "SPORTS & FITNESS", color: "#76A97C",
-      summary: "田径场、体育馆、游泳池与各类球场集中在东侧，夜间灯光覆盖到 22:00。",
+      summary: "运动区收录田径场、体育馆、游泳池和各类球场，使用安排以现场指引为准。",
       focus: { x: 1040, y: 440 }, zoom: 1.7,
       paths: [
         "M 850 230 Q 918 218 984 228 L 1000 300 Q 994 328 938 332 L 862 328 Q 840 300 844 262 Z",
@@ -74,9 +74,9 @@ const novaData = {
       spots: [
         { id: "spt-track", name: "田径场", note: "400 米跑道", x: 1095, y: 420, placeId: "stadium" },
         { id: "spt-gym", name: "体育馆", note: "室内综合馆", x: 915, y: 205 },
-        { id: "spt-pool", name: "游泳池", note: "夏季开放", x: 862, y: 258 },
+        { id: "spt-pool", name: "游泳池", note: "开放安排见现场指引", x: 862, y: 258 },
         { id: "spt-basket5", name: "5号篮球场", note: "灯光球场", x: 1024, y: 330 },
-        { id: "spt-tennis1", name: "1号网球场", note: "需预约", x: 890, y: 510 },
+        { id: "spt-tennis1", name: "1号网球场", note: "运动场地", x: 890, y: 510 },
         { id: "spt-volley", name: "排球场", note: "沙地排球场", x: 960, y: 545 }
       ]
     },
@@ -105,7 +105,7 @@ const novaData = {
         "M 636 238 Q 672 230 706 238 L 710 264 Q 704 282 672 284 L 642 276 Q 630 256 636 246 Z"
       ],
       spots: [
-        { id: "din-canteen", name: "滋兰餐厅 · 一饭", note: "双楼层 · 06:30–21:00", x: 815, y: 340, placeId: "cafeteria" },
+        { id: "din-canteen", name: "滋兰餐厅 · 一饭", note: "营业安排见现场公示", x: 815, y: 340, placeId: "cafeteria" },
         { id: "din-hub", name: "修远楼 · 学生活动中心", note: "社团与演出", x: 975, y: 335, placeId: "student-center" },
         { id: "din-market", name: "超市 · 医务室", note: "生活补给", x: 672, y: 258 }
       ]
@@ -158,7 +158,7 @@ const novaData = {
     { id: "SE-06", file: "B-SE-06.svg", name: "球场旁白色方楼", region: "se", floors: 2, note: "球场旁纯白立方体方盒，平顶", x: 86.08, y: 54.69 },
   ],
 
-  /* 全校 58 个地点，type 为四大分类：teach 教学楼 / dorm 宿舍 / life 生活服务 / other 其他 */
+  /* 地图点位分类：teach 教学楼 / dorm 宿舍 / life 生活服务 / other 其他 */
   campusPois: [
     { id: "library", name: "图书馆", x: 42, y: 35, type: "life", zone: "湖景文化区", placeId: "library" },
     { id: "lake", name: "映月湖", x: 41.5, y: 47.5, type: "other", zone: "湖景文化区", placeId: "lake" },
@@ -223,128 +223,95 @@ const novaData = {
   places: [
     {
       id: "library", name: "图书馆", shortName: "图书馆", en: "DGPT LIBRARY", category: "study", categoryLabel: "学习成长",
-      icon: "book-open", x: 55.9, y: 39.1, isoX: 42, isoY: 35, open: true, hours: "08:00–22:30", distance: "步行 6 分钟",
-      description: "校园里最安静的知识星球。除了丰富的藏书，这里还有 24 小时自习区、研讨间和能看到湖景的窗边座位。",
-      images: ["assets/library.jpg", "assets/reading-room.jpg"], imageLabels: ["图书馆中庭", "三楼自习区"],
-      tips: [
-        { title: "插座最多的区域", text: "三楼东侧自习区，每个座位都有独立插座与阅读灯。" },
-        { title: "安静学习首选", text: "四楼北侧为静音区，建议大家把讨论留在二楼研讨间。" },
-        { title: "研讨间预约", text: "可提前一天在校园服务号预约，四人同行即可使用。" }
-      ],
+      icon: "book-open", x: 55.9, y: 39.1, isoX: 42, isoY: 35, hours: null,
+      description: "图书馆是校园阅读与学习空间。",
+      images: ["assets/library.jpg", "assets/reading-room.jpg"], imageLabels: ["图书馆示意", "自习区示意"],
+      tips: [],
       menu: []
     },
     {
       id: "cafeteria", name: "滋兰餐厅（一饭）", shortName: "滋兰餐厅", en: "ZHILAN CANTEEN", category: "life", categoryLabel: "校园生活",
-      icon: "utensils", x: 65.1, y: 50.2, isoX: 81.71, isoY: 46.22, open: true, hours: "06:30–21:00", distance: "步行 3 分钟",
-      description: "两层空间汇聚南北风味，早餐的现磨豆浆和二楼川湘窗口最受欢迎，支持校园卡与移动支付。",
-      images: ["assets/cafeteria.jpg", "assets/teaching.jpg"], imageLabels: ["一楼风味档口", "食堂东侧入口"],
-      tips: [
-        { title: "错峰吃饭更从容", text: "11:40 前或 12:30 后到店，热门窗口排队时间更短。" },
-        { title: "隐藏平价窗口", text: "一楼最内侧设有 6 元营养套餐，每天更换两道主菜。" }
-      ],
-      menu: [
-        { name: "招牌辣椒炒肉", stall: "二楼 · 川湘风味", price: "14 元", status: "供应中" },
-        { name: "藤椒鸡拌面", stall: "一楼 · 手工面食", price: "12 元", status: "供应中" },
-        { name: "番茄牛腩套餐", stall: "二楼 · 营养套餐", price: "16 元", status: "仅剩 8 份" }
-      ],
-      sponsor: { title: "二楼新叶茶饮 · 新生见面礼", text: "完成食堂打卡后，可向店员出示星图徽章领取 5 元券。", action: "查看新生福利" }
+      icon: "utensils", x: 65.1, y: 50.2, isoX: 81.71, isoY: 46.22, hours: null,
+      description: "滋兰餐厅也叫一饭。各窗口的营业安排、菜品和价格以现场公示为准。",
+      images: ["assets/cafeteria.jpg"], imageLabels: ["餐厅示意"],
+      tips: [],
+      menu: []
     },
     {
       id: "stadium", name: "田径场", shortName: "田径场", en: "ATHLETIC FIELD", category: "sports", categoryLabel: "运动活力",
-      icon: "trophy", x: 87.5, y: 62, isoX: 89.57, isoY: 72.38, open: true, hours: "06:00–22:00", distance: "步行 8 分钟",
-      description: "足球、夜跑、飞盘和草坪音乐会的共同据点。夜间灯光覆盖全场，新手也能快速找到同水平的运动搭子。",
-      images: ["assets/stadium.jpg", "assets/lake.jpg"], imageLabels: ["傍晚的足球场", "操场东侧步道"],
-      tips: [
-        { title: "器材借用", text: "东南门器材室可凭校园卡借用足球、跳绳和飞盘。" },
-        { title: "夜跑推荐路线", text: "外圈跑道单圈 400 米，21:00 后人流较少。" },
-        { title: "新手集合点", text: "飞盘与足球新手局通常在北侧球门旁集合。" }
-      ],
+      icon: "trophy", x: 87.5, y: 62, isoX: 89.57, isoY: 72.38, hours: null,
+      description: "田径场可用于跑步等运动。场地开放和活动安排请查看现场指引。",
+      images: ["assets/stadium.jpg"], imageLabels: ["田径场示意"],
+      tips: [],
       menu: []
     },
     {
       id: "student-center", name: "修远楼 · 学生活动中心", shortName: "修远楼", en: "XIUYUAN STUDENT HUB", category: "social", categoryLabel: "社交活动",
-      icon: "users", x: 77.9, y: 49.5, isoX: 66, isoY: 25, open: true, hours: "09:00–22:00", distance: "步行 5 分钟",
-      description: "社团活动、桌游聚会和校园演出的发生地。一楼开放共享空间，二楼设有多功能活动室与排练厅。",
-      images: ["assets/club-fair.jpg", "assets/reading-room.jpg"], imageLabels: ["社团开放日现场", "共享活动空间"],
-      tips: [
-        { title: "活动室使用方式", text: "社团认证负责人可在线预约，普通同学可直接使用一楼共享区。" },
-        { title: "本周桌游之夜", text: "每周五 19:00，桌游社会在一楼准备新手教学桌。" }
-      ],
+      icon: "users", x: 77.9, y: 49.5, isoX: 66, isoY: 25, hours: null,
+      description: "修远楼是校园活动地点之一。参加活动时，请按主办方通知确认楼层和房间。",
+      images: ["assets/club-fair.jpg"], imageLabels: ["校园活动示意"],
+      tips: [],
       menu: []
     },
     {
       id: "teaching", name: "笃行楼 · 教二", shortName: "笃行楼", en: "DUXING HALL", category: "study", categoryLabel: "学习成长",
-      icon: "school", x: 47, y: 31.9, isoX: 61.86, isoY: 37.75, open: true, hours: "07:00–22:30", distance: "步行 2 分钟",
-      description: "日常课程的主要阵地，智慧教室与开放式讨论区并存。没课的教室会在门口电子屏实时标记。",
-      images: ["assets/teaching.jpg", "assets/reading-room.jpg"], imageLabels: ["笃行楼正门", "空闲教室自习区"],
-      tips: [
-        { title: "快速找到教室", text: "第一位数字代表楼层，奇数教室在东侧，偶数教室在西侧。" },
-        { title: "空教室查询", text: "一楼大厅屏幕每日同步课表，可查找当天空闲教室。" }
-      ],
+      icon: "school", x: 47, y: 31.9, isoX: 61.86, isoY: 37.75, hours: null,
+      description: "笃行楼也叫教二。上课或参加活动时，请按课表或活动通知确认教室。",
+      images: ["assets/teaching.jpg"], imageLabels: ["教学楼示意"],
+      tips: [],
       menu: []
     },
     {
       id: "dormitory", name: "学生宿舍区", shortName: "学生宿舍", en: "STUDENT RESIDENCE", category: "life", categoryLabel: "校园生活",
-      icon: "bed", x: 63.9, y: 19.9, isoX: 70, isoY: 20, open: true, hours: "全天开放", distance: "步行 10 分钟",
-      description: "四人间上床下桌，楼下配有洗衣房、饮水机和共享厨房。每栋一层都有可交流、观影的公共客厅。",
-      images: ["assets/dormitory.jpg", "assets/club-fair.jpg"], imageLabels: ["宿舍区中央庭院", "一层共享客厅"],
-      tips: [
-        { title: "洗衣高峰提醒", text: "工作日 18:00 前使用人数较少，可在宿管台查看空闲设备。" },
-        { title: "报修与代收", text: "水电问题在一层宿管台登记，快递代收点位于 3 栋旁。" }
-      ],
+      icon: "bed", x: 63.9, y: 19.9, isoX: 70, isoY: 20, hours: null,
+      description: "学生宿舍区供在校学生住宿。访客通行、设施和报修流程请咨询宿舍管理人员。",
+      images: ["assets/dormitory.jpg"], imageLabels: ["宿舍区示意"],
+      tips: [],
       menu: []
     },
     {
       id: "lake", name: "映月湖", shortName: "映月湖", en: "YINGYUE LAKE", category: "social", categoryLabel: "社交活动",
-      icon: "waves", x: 28, y: 52.4, isoX: 41.5, isoY: 47.5, open: true, hours: "全天开放", distance: "步行 12 分钟",
-      description: "沿湖木栈道全长约 900 米，是晨读、散步和看日落的好去处。湖心亭常举办小规模音乐与朗诵活动。",
-      images: ["assets/lake.jpg", "assets/stadium.jpg"], imageLabels: ["映月湖木栈道", "湖畔夕阳"],
-      tips: [
-        { title: "最佳日落机位", text: "晴天 17:30 左右，在西南侧栈道可以拍到湖面金色倒影。" },
-        { title: "晨读集合点", text: "英语角每周二、周四 07:20 在湖心亭集合。" }
-      ],
+      icon: "waves", x: 28, y: 52.4, isoX: 41.5, isoY: 47.5, hours: null,
+      description: "映月湖是校园地标。沿湖活动请留意现场安全提示。",
+      images: ["assets/lake.jpg"], imageLabels: ["湖景示意"],
+      tips: [],
       menu: []
     },
     {
       id: "east-gate", name: "东门", shortName: "东门", en: "EAST GATE", category: "life", categoryLabel: "校园生活",
-      icon: "store", x: 93.5, y: 70.9, isoX: 93, isoY: 48, open: true, hours: "07:00–23:00", distance: "步行 4 分钟",
-      description: "连接校园与城市生活的入口，文具、打印、水果和日常餐饮一应俱全，新生采购生活用品很方便。",
-      images: ["assets/teaching.jpg", "assets/cafeteria.jpg"], imageLabels: ["东门入口", "生活街区餐饮店"],
-      tips: [
-        { title: "打印更省时", text: "东门内侧图文店支持线上传文件，到店即可领取。" },
-        { title: "夜间返校", text: "23:00 后请从南侧门禁刷脸入校，记得携带校园卡。" }
-      ],
+      icon: "store", x: 93.5, y: 70.9, isoX: 93, isoY: 48, hours: null,
+      description: "东门是校本部的出入口之一。进出校园请遵守现场门岗指引。",
+      images: ["assets/campus-bg.webp"], imageLabels: ["校园地图示意"],
+      tips: [],
       menu: []
     }
   ],
 
   groups: [
-    { id: "g-frisbee", placeId: "stadium", title: "今晚飞盘，新手友好局", category: "飞盘", host: "阿澈", hostMajor: "体育教育 · 大二", hostInitial: "澈", time: "今天 20:00", day: "05", month: "11月", joined: 4, total: 6, description: "有学长带规则教学，零基础也欢迎。穿舒适运动鞋即可，飞盘已经准备好。", duration: "约 1.5 小时" },
-    { id: "g-football", placeId: "stadium", title: "快乐足球，不卷比分", category: "足球", host: "周队", hostMajor: "机械工程 · 大三", hostInitial: "周", time: "明天 18:30", day: "06", month: "11月", joined: 5, total: 8, description: "八人制友谊局，足球社同学现场分队，以熟悉新朋友为主。", duration: "约 2 小时" },
-    { id: "g-english", placeId: "library", title: "英语听力安静共学", category: "自习", host: "许言", hostMajor: "英语 · 大一", hostInitial: "言", time: "今天 19:00", day: "05", month: "11月", joined: 2, total: 4, description: "三楼东侧集合，各自完成 40 分钟精听后互相分享一篇材料。", duration: "约 1 小时" },
-    { id: "g-math", placeId: "library", title: "高数第三章互助小组", category: "互助", host: "宋知", hostMajor: "数学与应用数学 · 大二", hostInitial: "宋", time: "周六 14:00", day: "07", month: "11月", joined: 3, total: 5, description: "一起梳理导数应用典型题，欢迎带着错题来，不讲课只互助。", duration: "约 2 小时" },
-    { id: "g-board", placeId: "student-center", title: "桌游社新手教学桌", category: "桌游", host: "阿洛", hostMajor: "心理学 · 大二", hostInitial: "洛", time: "周五 19:00", day: "06", month: "11月", joined: 5, total: 8, description: "从合作类轻策桌游开始，现场有社长教学，不需要自带任何道具。", duration: "约 2 小时" },
-    { id: "g-script", placeId: "student-center", title: "校园推理本，还差两人", category: "剧本杀", host: "江禾", hostMajor: "汉语言文学 · 大三", hostInitial: "江", time: "周六 18:00", day: "07", month: "11月", joined: 4, total: 6, description: "欢乐还原向剧本，预计三小时，已预约二楼活动室。", duration: "约 3 小时" },
-    { id: "g-food", placeId: "cafeteria", title: "找位饭搭子尝新窗口", category: "饭搭子", host: "可可", hostMajor: "新闻传播 · 大一", hostInitial: "可", time: "今天 17:40", day: "05", month: "11月", joined: 2, total: 4, description: "想打卡二楼川湘窗口，边吃边聊专业和社团，结束后可以一起逛校园。", duration: "约 45 分钟" },
-    { id: "g-run", placeId: "lake", title: "湖畔轻松晨跑 3 公里", category: "晨跑", host: "向北", hostMajor: "计算机科学 · 大二", hostInitial: "北", time: "明天 07:00", day: "06", month: "11月", joined: 3, total: 6, description: "七分半配速，以看日出和轻松聊天为主，结束后在东门买早餐。", duration: "约 40 分钟" },
-    { id: "g-speaking", placeId: "teaching", title: "雅思口语互练一小时", category: "口语", host: "Mia", hostMajor: "国际经济与贸易 · 大二", hostInitial: "M", time: "周日 16:00", day: "08", month: "11月", joined: 2, total: 4, description: "围绕本季 Part 2 题库两两互练，互相记录一处亮点和一处建议。", duration: "约 1 小时" },
-    { id: "g-movie", placeId: "dormitory", title: "公共客厅治愈系观影", category: "观影", host: "小满", hostMajor: "动画 · 大一", hostInitial: "满", time: "周五 20:00", day: "06", month: "11月", joined: 4, total: 6, description: "二栋一层公共客厅，影片现场投票，欢迎带自己的靠垫和无气味零食。", duration: "约 2 小时" }
+    { id: "g-frisbee", placeId: "stadium", title: "校园飞盘新手局", category: "飞盘", host: "阿澈", hostMajor: "体育教育 · 大二", hostInitial: "澈", time: "11月05日 20:00", day: "05", month: "11月", joined: 4, total: 6, description: "有学长带规则教学，零基础也欢迎。穿舒适运动鞋即可，飞盘已经准备好。", duration: "约 1.5 小时" },
+    { id: "g-football", placeId: "stadium", title: "快乐足球，不卷比分", category: "足球", host: "周队", hostMajor: "机械工程 · 大三", hostInitial: "周", time: "11月06日 18:30", day: "06", month: "11月", joined: 5, total: 8, description: "八人制友谊局，足球社同学现场分队，以熟悉新朋友为主。", duration: "约 2 小时" },
+    { id: "g-english", placeId: "library", title: "英语听力安静共学", category: "自习", host: "许言", hostMajor: "英语 · 大一", hostInitial: "言", time: "11月05日 19:00", day: "05", month: "11月", joined: 2, total: 4, description: "三楼东侧集合，各自完成 40 分钟精听后互相分享一篇材料。", duration: "约 1 小时" },
+    { id: "g-math", placeId: "library", title: "高数第三章互助小组", category: "互助", host: "宋知", hostMajor: "数学与应用数学 · 大二", hostInitial: "宋", time: "11月07日 14:00", day: "07", month: "11月", joined: 3, total: 5, description: "一起梳理导数应用典型题，欢迎带着错题来，不讲课只互助。", duration: "约 2 小时" },
+    { id: "g-board", placeId: "student-center", title: "桌游社新手教学桌", category: "桌游", host: "阿洛", hostMajor: "心理学 · 大二", hostInitial: "洛", time: "11月06日 19:00", day: "06", month: "11月", joined: 5, total: 8, description: "从合作类轻策桌游开始，现场有社长教学，不需要自带任何道具。", duration: "约 2 小时" },
+    { id: "g-script", placeId: "student-center", title: "校园推理桌游", category: "剧本杀", host: "江禾", hostMajor: "汉语言文学 · 大三", hostInitial: "江", time: "11月07日 18:00", day: "07", month: "11月", joined: 4, total: 6, description: "欢乐还原向剧本，预计三小时。", duration: "约 3 小时" },
+    { id: "g-food", placeId: "cafeteria", title: "找位饭搭子尝新窗口", category: "饭搭子", host: "可可", hostMajor: "新闻传播 · 大一", hostInitial: "可", time: "11月05日 17:40", day: "05", month: "11月", joined: 2, total: 4, description: "想打卡二楼川湘窗口，边吃边聊专业和社团，结束后可以一起逛校园。", duration: "约 45 分钟" },
+    { id: "g-run", placeId: "lake", title: "湖畔轻松晨跑 3 公里", category: "晨跑", host: "向北", hostMajor: "计算机科学 · 大二", hostInitial: "北", time: "11月06日 07:00", day: "06", month: "11月", joined: 3, total: 6, description: "七分半配速，以看日出和轻松聊天为主，结束后在东门买早餐。", duration: "约 40 分钟" },
+    { id: "g-speaking", placeId: "teaching", title: "雅思口语互练一小时", category: "口语", host: "Mia", hostMajor: "国际经济与贸易 · 大二", hostInitial: "M", time: "11月08日 16:00", day: "08", month: "11月", joined: 2, total: 4, description: "围绕本季 Part 2 题库两两互练，互相记录一处亮点和一处建议。", duration: "约 1 小时" },
+    { id: "g-movie", placeId: "dormitory", title: "公共客厅治愈系观影", category: "观影", host: "小满", hostMajor: "动画 · 大一", hostInitial: "满", time: "11月06日 20:00", day: "06", month: "11月", joined: 4, total: 6, description: "二栋一层公共客厅，影片现场投票，欢迎带自己的靠垫和无气味零食。", duration: "约 2 小时" }
   ],
 
   forumPosts: [
     {
       id: "post-library-night",
       category: "吃瓜",
-      title: "图书馆四楼真的要改成通宵自习区了吗？",
-      body: "今天路过看到工人在量尺寸，听宿管阿姨说期末前会开放。如果是真的，我的通宵复习有救了，但也有点担心会变成新的卷王集中营。有知道内情的同学吗？",
+      title: "如果图书馆延长开放，你最希望增加什么？",
+      body: "想聊聊你理想中的晚间自习空间。安静、座位和插座，你会先选哪一个？",
       anonymous: true,
       author: "匿名 · 夜航星",
       authorInitial: "匿",
-      minutesAgo: 18,
-      likes: 42,
       comments: [
-        { id: "c-library-1", author: "匿名 · 纸飞机", authorInitial: "匿", anonymous: true, body: "问了在图书馆勤工的同学，说是先试运行两周，只开放东侧自习区。", minutesAgo: 11 },
-        { id: "c-library-2", author: "阿澈", authorInitial: "澈", anonymous: false, body: "希望插座能多几个，现在带插排的座位根本抢不到。", minutesAgo: 6 }
+        { id: "c-library-1", author: "匿名 · 纸飞机", authorInitial: "匿", anonymous: true, body: "我会优先选安静的座位，容易专注。" },
+        { id: "c-library-2", author: "阿澈", authorInitial: "澈", anonymous: false, body: "希望插座能多几个，现在带插排的座位根本抢不到。" }
       ]
     },
     {
@@ -355,12 +322,10 @@ const novaData = {
       anonymous: true,
       author: "匿名 · 半糖去冰",
       authorInitial: "匿",
-      minutesAgo: 47,
-      likes: 96,
       comments: [
-        { id: "c-canteen-1", author: "可可", authorInitial: "可", anonymous: false, body: "我上次鼓起勇气说“阿姨多一点”，她真的多给了！", minutesAgo: 32 },
-        { id: "c-canteen-2", author: "匿名 · 北门路灯", authorInitial: "匿", anonymous: true, body: "建议错峰去，十一点半之前阿姨的手最稳。", minutesAgo: 20 },
-        { id: "c-canteen-3", author: "匿名 · 云层观察员", authorInitial: "匿", anonymous: true, body: "笑死，这不比开盲盒刺激。", minutesAgo: 9 }
+        { id: "c-canteen-1", author: "可可", authorInitial: "可", anonymous: false, body: "我上次鼓起勇气说“阿姨多一点”，她真的多给了！" },
+        { id: "c-canteen-2", author: "匿名 · 北门路灯", authorInitial: "匿", anonymous: true, body: "建议错峰去，十一点半之前阿姨的手最稳。" },
+        { id: "c-canteen-3", author: "匿名 · 云层观察员", authorInitial: "匿", anonymous: true, body: "笑死，这不比开盲盒刺激。" }
       ]
     },
     {
@@ -371,12 +336,10 @@ const novaData = {
       anonymous: true,
       author: "匿名 · 晚风信箱",
       authorInitial: "匿",
-      minutesAgo: 88,
-      likes: 67,
       comments: [
-        { id: "c-dorm-1", author: "小满", authorInitial: "满", anonymous: false, body: "特别正常，我大一时也这样。从一起点外卖、借个充电线开始就好，不用急着变得很外向。", minutesAgo: 61 },
-        { id: "c-dorm-2", author: "匿名 · 橘子汽水", authorInitial: "匿", anonymous: true, body: "可以先在宿舍群里分享一个好笑的视频，真的很有用。", minutesAgo: 40 },
-        { id: "c-dorm-3", author: "匿名 · 无名小熊", authorInitial: "匿", anonymous: true, body: "抱抱你，慢热不是缺点，别有压力。", minutesAgo: 22 }
+        { id: "c-dorm-1", author: "小满", authorInitial: "满", anonymous: false, body: "特别正常，我大一时也这样。从一起点外卖、借个充电线开始就好，不用急着变得很外向。" },
+        { id: "c-dorm-2", author: "匿名 · 橘子汽水", authorInitial: "匿", anonymous: true, body: "可以先在宿舍群里分享一个好笑的视频，真的很有用。" },
+        { id: "c-dorm-3", author: "匿名 · 无名小熊", authorInitial: "匿", anonymous: true, body: "抱抱你，慢热不是缺点，别有压力。" }
       ]
     },
     {
@@ -387,11 +350,9 @@ const novaData = {
       anonymous: false,
       author: "许言",
       authorInitial: "言",
-      minutesAgo: 133,
-      likes: 28,
       comments: [
-        { id: "c-math-1", author: "宋知", authorInitial: "宋", anonymous: false, body: "先例题后习题，每道题写清楚用了哪个定理。周六图书馆有互助小组，可以直接来。", minutesAgo: 95 },
-        { id: "c-math-2", author: "匿名 · 夜航星", authorInitial: "匿", anonymous: true, body: "强烈建议整理错题，比反复看网课有用。", minutesAgo: 70 }
+        { id: "c-math-1", author: "宋知", authorInitial: "宋", anonymous: false, body: "先例题后习题，每道题写清楚用了哪个定理。" },
+        { id: "c-math-2", author: "匿名 · 夜航星", authorInitial: "匿", anonymous: true, body: "强烈建议整理错题，比反复看网课有用。" }
       ]
     },
     {
@@ -402,25 +363,21 @@ const novaData = {
       anonymous: false,
       author: "向北",
       authorInitial: "北",
-      minutesAgo: 190,
-      likes: 12,
       comments: [
-        { id: "c-lamp-1", author: "匿名 · 纸飞机", authorInitial: "匿", anonymous: true, body: "台灯单出吗？我室友正好缺一个。", minutesAgo: 150 }
+        { id: "c-lamp-1", author: "匿名 · 纸飞机", authorInitial: "匿", anonymous: true, body: "台灯单出吗？我室友正好缺一个。" }
       ]
     },
     {
       id: "post-drone",
       category: "吃瓜",
-      title: "昨晚操场那场无人机表演是谁搞的？",
-      body: "十点多从图书馆出来，看到操场上空排出了一个巨大的星星图案，持续了大概五分钟。是社团活动还是有人在表白？现场没赶上，好想知道完整版。",
+      title: "如果能设计一场无人机表演，你会选什么图案？",
+      body: "我想看一张从星星变成校园轮廓的动画。大家还有什么点子？",
       anonymous: true,
       author: "匿名 · 云层观察员",
       authorInitial: "匿",
-      minutesAgo: 260,
-      likes: 154,
       comments: [
-        { id: "c-drone-1", author: "阿洛", authorInitial: "洛", anonymous: false, body: "是摄影社和无人机社联合做的夜航测试，据说周末还会再飞一次。", minutesAgo: 210 },
-        { id: "c-drone-2", author: "匿名 · 夜航星", authorInitial: "匿", anonymous: true, body: "周末蹲一个，希望这次别错过。", minutesAgo: 180 }
+        { id: "c-drone-1", author: "阿洛", authorInitial: "洛", anonymous: false, body: "可以从一本打开的书变成一只鸟。" },
+        { id: "c-drone-2", author: "匿名 · 夜航星", authorInitial: "匿", anonymous: true, body: "我想看映月湖倒影的图案。" }
       ]
     },
     {
@@ -431,11 +388,9 @@ const novaData = {
       anonymous: true,
       author: "匿名 · 北门路灯",
       authorInitial: "匿",
-      minutesAgo: 340,
-      likes: 58,
       comments: [
-        { id: "c-rollcall-1", author: "周队", authorInitial: "周", anonymous: false, body: "可以帮，但最好还是提醒他跟老师请假，长期代答对他没好处。", minutesAgo: 280 },
-        { id: "c-rollcall-2", author: "匿名 · 半糖去冰", authorInitial: "匿", anonymous: true, body: "我更愿意帮他带份早餐，点名这事还是别冒险。", minutesAgo: 240 }
+        { id: "c-rollcall-1", author: "周队", authorInitial: "周", anonymous: false, body: "可以帮，但最好还是提醒他跟老师请假，长期代答对他没好处。" },
+        { id: "c-rollcall-2", author: "匿名 · 半糖去冰", authorInitial: "匿", anonymous: true, body: "我更愿意帮他带份早餐，点名这事还是别冒险。" }
       ]
     }
   ],
@@ -1067,30 +1022,28 @@ const novaData = {
   ],
 
   badges: [
-    { id: "first-light", name: "初次点亮", description: "完成第 1 次打卡", icon: "sparkles", type: "lit", target: 1 },
-    { id: "explorer", name: "校园漫游者", description: "点亮 4 个地点", icon: "compass", type: "lit", target: 4 },
-    { id: "connector", name: "搭子联络员", description: "加入或发起 1 次组局", icon: "handshake", type: "groups", target: 1 },
-    { id: "club-friend", name: "同好召集人", description: "提交首份社团申请", icon: "users", type: "clubs", target: 1 },
-    { id: "checkin-three", name: "足迹收藏家", description: "累计打卡 3 个地点", icon: "map-pin", type: "lit", target: 3 },
-    { id: "nova-master", name: "星图收藏家", description: "点亮全部 8 个地点", icon: "crown", type: "lit", target: 8 }
+    { id: "first-light", name: "初次点亮", icon: "sparkles", type: "lit", target: 1 },
+    { id: "checkin-three", name: "足迹收藏家", icon: "map-pin", type: "lit", target: 3 },
+    { id: "explorer", name: "校园漫游者", icon: "compass", type: "lit", target: 4 },
+    { id: "nova-master", name: "星图收藏家", icon: "crown", type: "lit" },
+    { id: "connector", name: "搭子联络员", description: "本机组局中有 1 场已加入或已发起的活动", icon: "handshake", type: "groups", target: 1 },
+    { id: "first-post", name: "校园分享者", description: "在本机论坛发布并保留 1 条话题", icon: "message-square", type: "posts", target: 1 }
   ],
 
   clubEvents: [
-    { id: "event-1", clubId: "club-52", kind: "回顾", title: "第十六届校园十大歌手大赛初赛", date: "10月25日", weekday: "周六", time: "19:00", place: "修远楼报告厅", signup: "阅读 718 · 6 赞", image: "assets/activities/singer-live.webp", desc: "青春“歌”会，以歌启程，声遇初心。初赛现场四十余位选手登台，决赛名单已通过校团委公众号公布。" },
-    { id: "event-2", clubId: "club-57", kind: "赛况", title: "第二届“东超杯”足球赛运动防护保障纪实", date: "11月02日", weekday: "周日", time: "16:30", place: "田径场", signup: "8 支队伍参赛", image: "assets/stadium.jpg", desc: "赛事医疗与运动防护由卫生健康学院志愿队全程驻场，从赛前贴扎到赛后拉伸，把专业带到球场边。" },
-    { id: "event-3", clubId: "club-49", kind: "招新", title: "2026 社团招新 · 松山湖主会场", date: "10月21–22日", weekday: "周三/周四", time: "11:30–13:30 / 17:30–19:00", place: "修远楼校道 · 一栋宿舍门口校道", signup: "56 个社团 · 2000+ 人次", image: "assets/activities/recruit-1.webp", cta: { label: "浏览 89 个社团", href: "#clubs" }, desc: "思想政治、学术科技、创新创业、文化体育、志愿公益、自律互助六大板块 56 个社团出摊，道滘校区 19 个社团同步在卫生健康学院篮球场开展。" },
-    { id: "event-4", clubId: "club-53", kind: "体验", title: "一盏秋茶 · 茶艺体验开放日", date: "11月14日", weekday: "周六", time: "15:00", place: "学生活动中心 204", signup: "限 30 人", image: "assets/activities/tea.webp", desc: "从温杯、投茶到出汤，社团成员带你完整走一遍工夫茶流程，现场提供茶点与茶样。" },
-    { id: "event-5", clubId: "club-30", kind: "实训", title: "航拍校园 · 无人机实操课", date: "11月18日", weekday: "周三", time: "16:00", place: "田径场东侧草坪", signup: "限 12 人", image: "assets/activities/drone.jpg", desc: "起飞前检查、航线规划与基础运镜各讲一遍，每位同学都有一次实际操控与航拍的机会。" },
-    { id: "event-6", clubId: "club-61", kind: "回顾", title: "醒狮夜场 · 社团文化节现场", date: "4月16日", weekday: "周四", time: "19:30", place: "道滘校区中心广场", signup: "现场 3000+ 观众", image: "assets/activities/lion.webp", desc: "八十余个社团参与的文化节上，醒狮社的夜场采青与喷火表演成为当晚人气最高的节目。" },
+    { id: "event-1", clubId: "club-52", kind: "回顾", title: "第十六届校园十大歌手大赛初赛", date: "10月25日", time: "19:00", place: "修远楼报告厅", signup: "往期资料", image: "assets/activities/singer-live.webp", desc: "校园十大歌手大赛初赛资料。" },
+    { id: "event-2", clubId: "club-57", kind: "赛况", title: "第二届“东超杯”足球赛运动防护保障纪实", date: "11月02日", time: "16:30", place: "田径场", signup: "往期资料", image: "assets/stadium.jpg", desc: "足球赛事的运动防护与志愿服务资料。" },
+    { id: "event-3", clubId: "club-49", kind: "招新回顾", title: "2026 社团招新 · 松山湖主会场", date: "10月21–22日", weekday: "周三/周四", time: "11:30–13:30 / 17:30–19:00", place: "修远楼校道 · 一栋宿舍门口校道", signup: "往期资料", image: "assets/activities/recruit-1.webp", cta: { label: "查看社团目录", directory: true }, desc: "松山湖主会场往期招新资料。各社团当前报名方式见社团通知。" },
+    { id: "event-6", clubId: "club-61", kind: "回顾", title: "醒狮夜场 · 社团文化节现场", date: "4月16日", weekday: "周四", time: "19:30", place: "道滘校区中心广场", signup: "往期资料", image: "assets/activities/lion.webp", desc: "社团文化节醒狮表演资料。" },
     { id: "event-7", clubId: "club-39", kind: "讲座", title: "元启・AI Talk Workshop", date: "11月04日", weekday: "周三", time: "15:00–17:00", place: "教二 303", signup: "技能特长 · 已结束", image: "assets/activities/ai-talk.jpg", desc: "元启AI社在到梦空间发布的技能特长类活动，围绕 AI 工具的实际用法展开，两小时工作坊形式。" },
-    { id: "event-8", clubId: "club-30", kind: "放映", title: "“魅力电影，精彩故事”主题电影放映", date: "06月17日", weekday: "周三", time: "14:30–17:00", place: "崇德楼（教一）107", signup: "思想成长 · 已结束", image: "assets/activities/movie-night.jpg", desc: "东职院无人机协会在到梦空间发起的放映活动，同步开放工作人员岗位报名，负责签到与场地维护。" },
-    { id: "event-9", clubId: "club-16", kind: "系列", title: "工业软件赋能未来工程师 · 校园系列活动", date: "06月18日", weekday: "周四", time: "08:00–12:00", place: "8B206", signup: "智能制造学院团学组织", image: "assets/activities/industry-software.jpg", desc: "智能制造学院团学组织连开多场，6月18日至22日覆盖 8B206 与培训楼一楼，内容围绕工业软件实操。" }
+    { id: "event-8", clubId: "club-30", kind: "放映", title: "“魅力电影，精彩故事”主题电影放映", date: "06月17日", weekday: "周三", time: "14:30–17:00", place: "崇德楼（教一）107", signup: "思想成长 · 已结束", image: "assets/activities/movie-night.jpg", desc: "东职院无人机协会在到梦空间发布的往期放映活动。" },
+    { id: "event-9", clubId: "club-16", kind: "系列", title: "工业软件赋能未来工程师 · 校园系列活动", date: "06月18日", weekday: "周四", time: "08:00–12:00", place: "8B206", signup: "往期资料", image: "assets/activities/industry-software.jpg", desc: "智能制造学院团学组织连开多场，6月18日至22日覆盖 8B206 与培训楼一楼，内容围绕工业软件实操。" }
   ]
 };
 
 novaData.clubEvents.forEach(event => {
   const club = novaData.clubs.find(item => item.id === event.clubId);
-  if (club) club.activities.push({ date: `${event.date} ${event.weekday}`, title: event.title, desc: `${event.time} · ${event.place}｜${event.desc}` });
+  if (club) club.activities.push({ date: [event.date, event.weekday].filter(Boolean).join(" "), title: event.title, desc: `${event.time} · ${event.place}｜${event.desc}` });
 });
 
 if (typeof module === "object" && module.exports) module.exports = novaData;

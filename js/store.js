@@ -34,6 +34,7 @@
       { placeId: "library", time: "11月3日 16:20" }
     ],
     joinedGroupIds: [],
+    rewardedGroupIds: [],
     createdGroups: [],
     applications: [],
     forumPosts: [],
@@ -46,6 +47,7 @@
     try {
       const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
       if (!saved || saved.version !== 1) return fallback;
+      const joinedGroupIds = Array.isArray(saved.joinedGroupIds) ? saved.joinedGroupIds : [];
       return {
         ...fallback,
         ...saved,
@@ -55,7 +57,8 @@
         },
         litPlaceIds: Array.isArray(saved.litPlaceIds) ? saved.litPlaceIds : fallback.litPlaceIds,
         checkins: Array.isArray(saved.checkins) ? saved.checkins : fallback.checkins,
-        joinedGroupIds: Array.isArray(saved.joinedGroupIds) ? saved.joinedGroupIds : [],
+        joinedGroupIds,
+        rewardedGroupIds: Array.isArray(saved.rewardedGroupIds) ? saved.rewardedGroupIds : [...joinedGroupIds],
         createdGroups: Array.isArray(saved.createdGroups) ? saved.createdGroups : [],
         applications: Array.isArray(saved.applications) ? saved.applications : [],
         forumPosts: Array.isArray(saved.forumPosts) ? saved.forumPosts : [],
@@ -139,7 +142,10 @@
       if (group.isJoined) return group;
       if (group.joined >= group.total) throw new Error("这场组局已经满员，看看其他活动吧");
       this.state.joinedGroupIds.push(groupId);
-      this.state.points += 10;
+      if (!this.state.rewardedGroupIds.includes(groupId)) {
+        this.state.rewardedGroupIds.push(groupId);
+        this.state.points += 10;
+      }
       this.save();
       return this.getGroup(groupId);
     },
@@ -184,10 +190,10 @@
       if (isNew) {
         this.state.litPlaceIds.push(placeId);
         this.state.points += 20;
-        this.state.checkins.unshift({ placeId, time: "今天 · 刚刚" });
+        this.state.checkins.unshift({ placeId, createdAt: Date.now() });
         this.save();
       }
-      return { isNew, points: this.state.points, litCount: this.state.litPlaceIds.length };
+      return { isNew, points: this.state.points, litCount: this.getStats().lit };
     },
 
     applyClub(payload) {
@@ -211,13 +217,12 @@
     },
 
     hydrateForumPost(post) {
-      const createdAt = post.createdAt || Date.now() - (post.minutesAgo || 0) * 60000;
+      const createdAt = post.createdAt || 0;
       const profile = this.getProfile();
       const withProfileName = item => (!item.anonymous && item.authorId === profile.id ? { ...item, author: profile.name, authorInitial: profile.initial } : item);
       const seedComments = (post.comments || []).map(comment => ({
         ...withProfileName(comment),
-        createdAt: comment.createdAt || Date.now() - (comment.minutesAgo || 0) * 60000,
-        time: relativeTime(comment.createdAt || Date.now() - (comment.minutesAgo || 0) * 60000)
+        time: comment.createdAt ? relativeTime(comment.createdAt) : "示例回复"
       }));
       const userComments = (this.state.forumComments[post.id] || []).map(comment => ({
         ...withProfileName(comment),
@@ -230,7 +235,7 @@
         author: isOwn ? profile.name : post.author,
         authorInitial: isOwn ? profile.initial : post.authorInitial,
         createdAt,
-        time: relativeTime(createdAt),
+        time: createdAt ? relativeTime(createdAt) : "示例话题",
         comments: [...seedComments, ...userComments],
         commentCount: seedComments.length + userComments.length,
         liked,
@@ -315,19 +320,11 @@
 
     getStats() {
       return {
-        lit: this.state.litPlaceIds.length,
+        lit: window.NovaDB.places.filter(place => this.state.litPlaceIds.includes(place.id)).length,
         points: this.state.points,
-        groups: this.state.joinedGroupIds.length + this.state.createdGroups.length,
+        groups: this.getGroups().filter(group => group.isJoined).length,
         clubs: this.state.applications.length
       };
-    },
-
-    getBadgeCount(type) {
-      const stats = this.getStats();
-      if (type === "lit") return stats.lit;
-      if (type === "groups") return stats.groups;
-      if (type === "clubs") return stats.clubs;
-      return 0;
     },
 
     reset() {

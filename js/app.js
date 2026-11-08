@@ -248,6 +248,9 @@
         const mapBundle = await API.fetchMap();
         if (request !== routeRequest) return;
         ui.mapData = mapBundle;
+        if (route.id && route.id !== "browse" && !mapBundle.pois?.some(poi => encodeURIComponent(poi.id) === route.id)) {
+          throw new Error("没有找到这个地图点位。可返回星图后按地点名称搜索。");
+        }
         if (route.id) {
           mapIntroVisible = false;
           ui.activeRegion = ui.activeBuilding = null;
@@ -314,7 +317,7 @@
     const profile = Store.getProfile();
     const isMine = group.hostId === profile.id;
     const remaining = Math.max(group.total - group.joined, 0);
-    let button = `<button class="button button-small" data-action="join-group" data-id="${group.id}">加入组局 ${icon("plus")}</button>`;
+    let button = `<button class="button button-small" data-action="join-group" data-id="${group.id}">${isDemo() ? "体验加入" : "加入组局"} ${icon("plus")}</button>`;
     if (group.isOwner) button = `<button class="button button-small button-ghost" disabled>我发起的</button>`;
     else if (group.isJoined) button = `<button class="button button-small button-outline" data-action="leave-group" data-id="${group.id}">退出组局</button>`;
     else if (remaining === 0) button = `<button class="button button-small button-ghost" disabled>已经满员</button>`;
@@ -323,7 +326,7 @@
       <div class="group-top">
         ${isMine ? avatarMarkup(profile, "host-avatar") : `<span class="avatar host-avatar">${escapeHTML(group.hostInitial)}</span>`}
         <div class="host-info"><strong>${escapeHTML(isMine ? profile.name : group.host)}</strong><span>${escapeHTML(group.hostMajor)}</span></div>
-        <span class="tag tag-secondary">${escapeHTML(group.category)}</span>
+        <span class="tag tag-secondary">${escapeHTML(group.category)}${isDemo() ? group.isOwner ? " · 本机记录" : " · 示例" : ""}</span>
       </div>
       <h3>${escapeHTML(group.title)}</h3>
       <p class="group-description">${escapeHTML(group.description)}</p>
@@ -504,7 +507,7 @@
   }
 
   function focusMapPoint(id) {
-    const pin = [...view.querySelectorAll(".map-pill")].find(item => item.dataset.poiId === id);
+    const pin = [...view.querySelectorAll(".map-pill")].find(item => encodeURIComponent(item.dataset.poiId) === id);
     if (!pin) return;
     view.querySelectorAll(".map-pill.is-open").forEach(item => item.classList.remove("is-open"));
     pin.classList.add("is-open");
@@ -636,7 +639,7 @@
           <a class="button button-small button-secondary map-panorama-link" href="panorama.html">${icon("camera")}校园导览</a>
           <div class="map-toolbar">
             <div class="filter-chips" aria-label="地点分类">${categories}</div>
-            <span class="map-scale">${icon("navigation")}${pois.length} 个地点 · 4 类标注</span>
+            <span class="map-scale">${icon("navigation")}${pois.length} 个地图点位 · ${new Set(pois.map(poi => poi.type)).size} 类标注</span>
           </div>
           <div class="map-frame">
             <div class="map-scroll">
@@ -656,7 +659,7 @@
         </section>
         <aside class="map-side">
           ${selectedBuilding ? buildingCard(selectedBuilding) : buildingGuideCard(buildings)}
-          <section class="next-card card"><div class="next-card-header"><h3>接下来，去哪儿？</h3><span class="live-label">${isDemo() ? "组局示例" : "组局活动"}</span></div>${upcoming}</section>
+          <section class="next-card card"><div class="next-card-header"><h3>${isDemo() ? "体验校园组局" : "接下来，去哪儿？"}</h3><span class="live-label">${isDemo() ? "仅当前浏览器" : "组局活动"}</span></div>${upcoming}</section>
         </aside>
       </div>
       <section class="section-block">
@@ -713,25 +716,24 @@
     const lit = Store.state.litPlaceIds.includes(place.id);
     const index = Math.max(0, Math.min(ui.galleryIndex, place.images.length - 1));
     ui.galleryIndex = index;
-    const guideContent = place.menu.length ? `
-      <section class="guide-card card"><div class="card-heading"><h3>${icon("utensils")}参考菜单</h3><span>供应和价格以现场为准</span></div><div class="menu-list">${place.menu.map(item => `<div class="menu-item"><span class="menu-icon">${icon("utensils")}</span><div><strong>${item.name}</strong><small>${item.stall}</small></div><span class="menu-price">${item.price}</span></div>`).join("")}</div></section>
-      <section class="guide-card card"><div class="card-heading"><h3>${icon("lightbulb")}学长学姐的隐藏攻略</h3><span>${place.tips.length} 条实用经验</span></div><div class="tip-list">${place.tips.map((tip, i) => `<div class="tip-item"><span class="tip-number">0${i + 1}</span><div><strong>${tip.title}</strong><p>${tip.text}</p></div></div>`).join("")}</div></section>` : `
-      <section class="guide-card card"><div class="card-heading"><h3>${icon("lightbulb")}学长学姐的隐藏攻略</h3><span>${place.tips.length} 条实用经验</span></div><div class="tip-list">${place.tips.map((tip, i) => `<div class="tip-item"><span class="tip-number">0${i + 1}</span><div><strong>${tip.title}</strong><p>${tip.text}</p></div></div>`).join("")}</div></section>`;
+    const guideContent = `
+      ${place.menu?.length ? `<section class="guide-card card"><div class="card-heading"><h3>${icon("utensils")}参考菜单</h3><span>供应和价格以现场为准</span></div><div class="menu-list">${place.menu.map(item => `<div class="menu-item"><span class="menu-icon">${icon("utensils")}</span><div><strong>${escapeHTML(item.name)}</strong><small>${escapeHTML(item.stall)}</small></div><span class="menu-price">${escapeHTML(item.price)}</span></div>`).join("")}</div></section>` : ""}
+      ${place.tips?.length ? `<section class="guide-card card"><div class="card-heading"><h3>${icon("lightbulb")}地点提示</h3></div><div class="tip-list">${place.tips.map((tip, i) => `<div class="tip-item"><span class="tip-number">${i + 1}</span><div><strong>${escapeHTML(tip.title)}</strong><p>${escapeHTML(tip.text)}</p></div></div>`).join("")}</div></section>` : ""}`;
     const groupContent = groups.length ? `<div class="group-list">${groups.map(groupCard).join("")}</div>` : `<div class="empty-state">${icon("users")}<h3>这里还很安静</h3><p>成为第一个发起组局的人，让同好知道你现在想做什么。</p><button class="button button-small" data-action="open-create-group" data-place="${place.id}">${icon("plus")}发起第一场组局</button></div>`;
 
     return `<div class="view-enter">
       <nav class="breadcrumb" aria-label="面包屑"><a href="${mapLink}">${icon("arrow-left")}${point ? "在地图上查看" : "返回校园地图"}</a><span>/</span><span>${place.categoryLabel}</span><span>/</span><strong>${place.name}</strong></nav>
       <div class="place-hero stagger">
-        <div class="place-gallery" aria-label="${place.name}实景画廊">
+        <div class="place-gallery" aria-label="${place.name}地点图片">
           <img src="${place.images[index]}" alt="${place.name} · ${place.imageLabels[index]}" decoding="async" fetchpriority="high">
-          <div class="gallery-shade"></div><span class="gallery-label">${icon("camera")}实景 · ${place.imageLabels[index]}</span>
-          <div class="gallery-dots">${place.images.map((_, i) => `<button class="gallery-dot ${i === index ? "active" : ""}" data-action="gallery-goto" data-index="${i}" aria-label="查看第 ${i + 1} 张实景"></button>`).join("")}</div>
-          <div class="gallery-controls"><button class="icon-button" data-action="gallery-prev" aria-label="上一张实景">${icon("chevron-left")}</button><span class="gallery-count">${index + 1} / ${place.images.length}</span><button class="icon-button" data-action="gallery-next" aria-label="下一张实景">${icon("chevron-right")}</button></div>
+          <div class="gallery-shade"></div><span class="gallery-label">${icon("camera")}${place.imageLabels[index]}</span>
+          ${place.images.length > 1 ? `<div class="gallery-dots">${place.images.map((_, i) => `<button class="gallery-dot ${i === index ? "active" : ""}" data-action="gallery-goto" data-index="${i}" aria-label="查看第 ${i + 1} 张图片"></button>`).join("")}</div>
+          <div class="gallery-controls"><button class="icon-button" data-action="gallery-prev" aria-label="上一张图片">${icon("chevron-left")}</button><span class="gallery-count">${index + 1} / ${place.images.length}</span><button class="icon-button" data-action="gallery-next" aria-label="下一张图片">${icon("chevron-right")}</button></div>` : ""}
         </div>
         <section class="place-summary card">
-          <div class="place-summary-top"><span class="tag tag-primary">${place.categoryLabel}</span><span class="tag">开放信息待核实</span></div>
+          <div class="place-summary-top"><span class="tag tag-primary">${place.categoryLabel}</span></div>
           <h2>${place.name}</h2><p class="place-en">${place.en}</p><p class="place-description">${place.description}</p>
-          <div class="place-facts"><div>${icon("clock")}参考开放时间 · ${place.hours}，以学校公告为准</div>${point ? `<div>${icon("map-pin")}<a href="${mapLink}">在地图上定位 ${escapeHTML(place.shortName || place.name)}</a></div>` : ""}</div>
+          <div class="place-facts"><div>${icon("clock")}${place.hours ? `参考开放时间 · ${escapeHTML(place.hours)}，以学校公告为准` : "开放与通行安排以学校公告或现场指引为准。"}</div>${point ? `<div>${icon("map-pin")}<a href="${mapLink}">在地图上定位 ${escapeHTML(place.shortName || place.name)}</a></div>` : ""}</div>
           ${lit ? `<div class="checkin-success">${icon("circle-check")}已点亮此地，探索积分已收入档案</div>` : ""}
           <div class="place-actions" style="margin-top:16px"><button class="button ${lit ? "button-ghost" : "button-secondary"}" data-action="check-in" data-id="${place.id}" ${lit ? "disabled" : ""}>${icon(lit ? "check" : "map-pin")}${lit ? "已点亮地点" : "点亮地点 +20"}</button><button class="button" data-action="open-create-group" data-place="${place.id}">${icon("plus")}${isDemo() ? "体验组局" : "一键组局"}</button></div>
           ${isDemo() ? '<p class="muted">点亮记录保存在当前浏览器。</p>' : ""}
@@ -740,15 +742,14 @@
       <div class="detail-grid">
         <div class="detail-main">${guideContent}<section class="groups-panel card"><div class="card-heading"><h3>${icon("users")}${isDemo() ? "地点组局示例" : "地点组局"}</h3><span class="live-label">${groups.length} 场组局</span></div>${groupContent}</section></div>
         <aside class="detail-aside">
-          <section class="next-card card"><div class="next-card-header"><h3>地点资料</h3><span class="tag">校园指南</span></div><p class="muted">地点图片和攻略来自项目资料。发现入口、开放时间或位置有误，可通过页面上的「用户反馈」告诉我们。</p></section>
-          ${place.sponsor ? `<section class="sponsor-card card"><span class="sponsor-label">${icon("ticket")}福利示例</span><h3>${place.sponsor.title}</h3><p>${place.sponsor.text}</p><button class="button button-small" data-action="show-sponsor" data-place="${place.id}">${place.sponsor.action} ${icon("arrow-right")}</button></section>` : ""}
+          <section class="next-card card"><div class="next-card-header"><h3>地点资料</h3><span class="tag">校园指南</span></div><p class="muted">图片供识别地点时参考。发现位置有误或有最新的开放通知，可通过「用户反馈」告诉我们。</p></section>
         </aside>
       </div>
     </div>`;
   }
 
   function changeGallery(direction) {
-    if (!ui.placeData) return;
+    if (!ui.placeData || ui.placeData.place.images.length < 2) return;
     const total = ui.placeData.place.images.length;
     ui.galleryIndex = (ui.galleryIndex + direction + total) % total;
     view.innerHTML = renderPlace();
@@ -831,7 +832,7 @@
     if (!place) return;
     const category = place.category === "sports" ? "运动" : place.category === "study" ? "自习" : place.id === "cafeteria" ? "饭搭子" : "兴趣社交";
     const categoryOptions = [...new Set([category, "运动", "自习", "饭搭子", "桌游", "兴趣社交"])].map(option => `<option>${option}</option>`).join("");
-    openModal(`${modalHeader("CREATE A MEETUP", "一键发起组局", `组局将绑定到 ${place.name}，只对同场景同学展示。`)}
+    openModal(`${modalHeader("CREATE A MEETUP", isDemo() ? "体验发起组局" : "发起组局", `集合地点为 ${place.name}。`)}
       <form id="group-form" data-place="${place.id}" novalidate>
         <div class="form-note">${icon("info")}${isDemo() ? "体验组局仅保存在当前浏览器，其他同学不会收到通知。" : "请发布真实的校园活动。"}</div>
         <div class="field"><label for="group-title">想做什么？<span> *</span></label><input id="group-title" name="title" maxlength="30" placeholder="例如：今晚飞盘，新手友好局">${fieldError("title")}</div>
@@ -902,15 +903,6 @@
     }
   }
 
-  function openSponsor(placeId) {
-    const place = Store.getPlace(placeId);
-    if (!place || !place.sponsor) return;
-    openModal(`${modalHeader("NOVA BENEFIT · 场景福利", "把地理位置，变成真实福利", "基于当前地点精准出现，不打扰其他探索场景。")}
-      <div class="sponsor-card card"><span class="sponsor-label">${icon("ticket")}滋兰餐厅 · 新生限定</span><h3>${place.sponsor.title}</h3><p>${place.sponsor.text}</p><div class="divider"></div><div class="place-facts" style="margin:0;border:0;padding:0"><div>${icon("clock")}11月1日–11月15日，每天 10:00–20:00</div><div>${icon("map-pin")}滋兰餐厅二楼新叶茶饮档口</div></div></div>
-      <div class="form-note" style="margin-top:16px">${icon("info")}这是 LBS 原生商业化演示。优惠仅在同学主动进入食堂场景后展示。</div>
-      <div class="form-actions"><button class="button button-ghost" data-action="close-modal">稍后再看</button><button class="button" data-action="claim-sponsor">${icon("ticket")}领取 5 元券</button></div>`, true);
-  }
-
   /* 社团类别配色：用类别底图 + 程序化徽标替代重复的场景照片 */
   const clubTones = {
     "思想政治类": ["#C4695F", "#7B3A44"],
@@ -931,7 +923,7 @@
     return seed;
   }
 
-  /* 按社团名称语义匹配实拍图，越具体的规则越靠前；未命中再回落到同类别素材 */
+  /* 按社团名称匹配主题封面，未命中时使用同类别素材 */
   const clubPhotos = [
     // 传统文化 / 非遗
     { test: /醒狮|龙狮|舞狮/, src: "assets/activities/recruit-3.webp" },
@@ -990,7 +982,7 @@
   };
   const defaultFallbacks = ["assets/activities/recruit.webp", "assets/ai/seminar.jpg", "assets/ai/volunteer.jpg", "assets/ai/startup.jpg", "assets/ai/mutual-aid.jpg", "assets/clubs/racket-hall.jpg"];
 
-  /* 专属实拍封面：以下社团各独占一张 assets/clubs/<id>.jpg，优先于语义规则，保证 89 个社团封面互不重复 */
+  /* 专属主题封面优先于名称匹配 */
   const clubOwnPhotos = new Set([
     "club-3", "club-5", "club-6", "club-7", "club-8", "club-10",
     "club-12", "club-13", "club-16", "club-18", "club-19", "club-21",
@@ -1018,7 +1010,7 @@
 
   function clubCard(club) {
     const applied = !isDemo() && club.id !== pilotClubId && Store.state.applications.some(item => item.clubId === club.id);
-    return `<article class="club-card card"><a href="#club/${club.id}" aria-label="查看${club.name}"><div class="club-card-image"><img class="club-card-photo" src="${clubPhoto(club)}" alt="${club.id === "club-1" ? "编辑部封面插画" : `${escapeHTML(club.name)}活动照片`}" loading="lazy" decoding="async"><span class="tag">${club.category}</span></div></a><div class="club-card-body"><div class="club-title-row">${clubLogo(club)}<div><h3>${club.name}</h3><span>${club.slogan}</span></div></div><p>${club.description}</p><div class="club-stats"><span>${icon("shield-check")}${club.status}</span><span>${icon("school")}${club.unit}</span></div><div class="club-card-footer"><span>${applied ? "申请已提交" : club.recruit}</span><a href="#club/${club.id}">${applied ? "查看申请" : "了解社团"}${icon("arrow-right")}</a></div></div></article>`;
+    return `<article class="club-card card"><a href="#club/${club.id}" aria-label="查看${club.name}"><div class="club-card-image"><img class="club-card-photo" src="${clubPhoto(club)}" alt="${club.id === "club-1" ? "编辑部封面插画" : `${escapeHTML(club.name)}主题配图`}" loading="lazy" decoding="async"><span class="tag">${club.category}</span></div></a><div class="club-card-body"><div class="club-title-row">${clubLogo(club)}<div><h3>${club.name}</h3><span>${club.slogan}</span></div></div><p>${club.description}</p><div class="club-stats"><span>${icon("shield-check")}${club.status}</span><span>${icon("school")}${club.unit}</span></div><div class="club-card-footer"><span>${applied ? "申请已提交" : club.recruit}</span><a href="#club/${club.id}">${applied ? "查看申请" : "了解社团"}${icon("arrow-right")}</a></div></div></article>`;
   }
 
   function renderClubGrid(clubs) {
@@ -1032,15 +1024,15 @@
     const event = events[index];
     const club = (ui.clubCatalog.clubs || []).find(item => item.id === event.clubId);
     if (!club) return "";
-    const ctaHref = event.cta ? event.cta.href : `#club/${club.id}`;
+    const ctaHref = event.cta?.href || `#club/${club.id}`;
     const ctaLabel = event.cta ? event.cta.label : `${club.name} · 查看详情`;
-    return `<section class="club-feature club-carousel" id="club-carousel" aria-label="近期社团活动轮播">
+    return `<section class="club-feature club-carousel" id="club-carousel" aria-label="${isDemo() ? "往期社团活动轮播" : "近期社团活动轮播"}">
       <div class="club-feature-copy club-slide">
-        <span class="eyebrow">CLUB EVENTS · 近期社团动态</span>
-        <div class="club-slide-meta"><span class="club-slide-tag">${event.kind}</span><span>${icon("calendar")}${event.date} ${event.weekday} ${event.time}</span><span>${icon("map-pin")}${event.place}</span></div>
+        <span class="eyebrow">CLUB EVENTS · ${isDemo() ? "往期社团活动" : "近期社团动态"}</span>
+        <div class="club-slide-meta"><span class="club-slide-tag">${event.kind}</span><span>${icon("calendar")}${[event.date, event.weekday, event.time].filter(Boolean).join(" ")}</span><span>${icon("map-pin")}${event.place}</span></div>
         <h2>${event.title}</h2>
         <p>${event.desc}</p>
-        <a class="button" href="${ctaHref}">${ctaLabel} ${icon("arrow-right")}</a>
+        ${event.cta?.directory ? `<button class="button" data-action="show-club-directory">${ctaLabel} ${icon("arrow-right")}</button>` : `<a class="button" href="${ctaHref}">${ctaLabel} ${icon("arrow-right")}</a>`}
         <div class="club-carousel-controls">
           <button class="icon-button" data-action="club-slide-prev" aria-label="上一个活动">${icon("chevron-left")}</button>
           <div class="club-carousel-dots">${events.map((item, i) => `<button class="club-dot ${i === index ? "active" : ""}" data-action="club-slide-goto" data-index="${i}" aria-label="第 ${i + 1} 个活动：${item.title}"></button>`).join("")}</div>
@@ -1077,6 +1069,7 @@
       <section class="card pilot-card"><div><span class="eyebrow">社团试点</span><h2>元启AI社</h2><p>查看活动日程、报名方式和往期活动。</p></div><a class="button button-secondary" href="#club/${pilotClubId}">查看元启AI社 ${icon("arrow-right")}</a></section>
       ${renderClubCarousel()}
       <div class="club-tools"><div class="filter-chips">${categories.map(category => `<button class="chip ${ui.clubFilter === category ? "active" : ""}" data-action="filter-clubs" data-filter="${category}">${category === "all" ? "全部社团" : `<span class="chip-dot" style="background:${clubTone(category)[0]}"></span>${category}`}</button>`).join("")}</div><form class="search-box" id="club-search-form"><label class="sr-only" for="club-search" style="position:absolute;left:-9999px">搜索社团</label>${icon("search")}<input id="club-search" type="search" placeholder="搜索社团或兴趣…" value="${escapeHTML(ui.clubQuery)}" autocomplete="off"></form></div>
+      ${isDemo() ? '<p class="muted">社团资料来自项目名录，封面为主题配图。最新招新安排以校方或社团通知为准。</p>' : ""}
       <div id="club-grid-container">${renderClubGrid(clubs)}</div></div>`;
   }
 
@@ -1107,9 +1100,9 @@
       ? (window.NovaDB.clubEvents || []).filter(event => event.clubId === pilotClubId && event.signup.includes("已结束"))
       : club.activities;
     return `<div class="view-enter"><nav class="breadcrumb" aria-label="面包屑"><a href="#clubs">${icon("arrow-left")}返回社团矩阵</a><span>/</span><span>${club.category}</span><span>/</span><strong>${club.name}</strong></nav>
-      <section class="club-hero"><img class="club-hero-photo" src="${clubPhoto(club)}" alt="${club.id === "club-1" ? "编辑部封面插画" : `${escapeHTML(club.name)}活动现场`}" decoding="async"><div class="club-hero-copy">${clubLogo(club)}<span class="eyebrow" style="color:#B9E1D5">${club.category} · ${club.recruit}</span><h2>${club.name}</h2><p>${club.slogan}</p><div class="club-hero-meta"><span>${icon("shield-check")}${club.status}</span><span>${icon("school")}指导教师 ${club.advisor}</span><span>${icon("map-pin")}${place.name}</span></div></div></section>
+      <section class="club-hero"><img class="club-hero-photo" src="${clubPhoto(club)}" alt="${club.id === "club-1" ? "编辑部封面插画" : `${escapeHTML(club.name)}主题配图`}" decoding="async"><div class="club-hero-copy">${clubLogo(club)}<span class="eyebrow" style="color:#B9E1D5">${club.category} · ${club.recruit}</span><h2>${club.name}</h2><p>${club.slogan}</p><div class="club-hero-meta"><span>${icon("shield-check")}${club.status}</span><span>${icon("school")}指导教师 ${club.advisor}</span>${!isDemo() && place ? `<span>${icon("map-pin")}${place.name}</span>` : ""}</div></div></section>
       <div class="club-detail-grid"><div class="club-detail-main">${isPilot ? renderPilotSchedule() : ""}<section class="club-content-card card"><div class="card-heading"><h3>关于我们</h3><span>CLUB STORY</span></div><p>${club.detail}</p></section><section class="club-content-card card"><div class="card-heading"><h3>${isPilot ? "活动回顾" : "活动资料"}</h3><span>${isPilot ? "已结束" : "安排以社团通知为准"}</span></div>${events.length ? `<div class="activity-timeline">${events.map(activity => `<div class="activity-item"><time>${activity.date}</time><div><strong>${activity.title}</strong><p>${isPilot ? `${activity.place} · ` : ""}${activity.desc}</p></div></div>`).join("")}</div>` : `<p class="muted">暂无公开活动资料。</p>`}</section></div>
-      <aside class="club-detail-aside"><section class="apply-card card"><div class="card-heading"><h3>报名方式</h3><span class="tag">${isPilot ? "社团试点" : "招新信息"}</span></div>${applyContent}</section><section class="club-content-card card"><div class="card-heading"><h3>${isPilot ? "往期活动地点" : "地点参考"}</h3><span>以活动通知为准</span></div><div class="compact-list"><a class="compact-list-item" href="#place/${place.id}">${icon("map-pin")}<div><strong>${place.name}</strong><small>打开校园地点指南</small></div>${icon("chevron-right")}</a></div></section></aside></div></div>`;
+      <aside class="club-detail-aside"><section class="apply-card card"><div class="card-heading"><h3>报名方式</h3><span class="tag">${isPilot ? "社团试点" : "招新信息"}</span></div>${applyContent}</section>${!isDemo() && place ? `<section class="club-content-card card"><div class="card-heading"><h3>地点参考</h3><span>以活动通知为准</span></div><div class="compact-list"><a class="compact-list-item" href="#place/${place.id}">${icon("map-pin")}<div><strong>${place.name}</strong><small>打开校园地点指南</small></div>${icon("chevron-right")}</a></div></section>` : ""}</aside></div></div>`;
   }
 
   function renderPilotSchedule() {
@@ -1118,10 +1111,11 @@
       <p>面向全校师生。活动安排和报名截止时间以社团通知为准。</p>
       <div class="activity-timeline">${pilotSchedule.map(event => {
         const [year, month, day] = event.date.split("-").map(Number);
+        const endsAt = Date.parse(`${event.date}T${event.time.split("–")[1]}:00+08:00`);
         return `<div class="activity-item">
           <time datetime="${event.date}">${month}月${day}日</time>
           <div><strong>${event.title}</strong>
-            <p>${year}年 · ${event.time} · <a href="#map/${event.mapPoint}">${event.venue}</a></p>
+            <p>${year}年 · ${event.time} · <a href="#map/${event.mapPoint}">${event.venue}</a>${Date.now() >= endsAt ? " · 计划时间已过" : ""}</p>
             <p>${event.summary}</p>
           </div>
         </div>`;
@@ -1314,21 +1308,24 @@
     const profileStats = [
       { label: "已点亮地点", value: stats.lit, icon: "map-pin" },
       { label: "我的组局", value: stats.groups, icon: "users" },
-      { label: "社团申请", value: stats.clubs, icon: "user-plus" },
+      { label: isDemo() ? "历史申请示例" : "社团申请", value: stats.clubs, icon: "user-plus" },
       { label: "探索积分", value: stats.points, icon: "star" }
     ];
     const myGroups = Store.getGroups().filter(group => group.isJoined);
     const groupList = myGroups.length ? myGroups.map(group => {
       const place = Store.getPlace(group.placeId) || placeMap.get(group.placeId);
       return `<a class="compact-list-item" href="#place/${group.placeId}">${icon("calendar")}<div><strong>${escapeHTML(group.title)}</strong><small>${escapeHTML(group.time)} · ${escapeHTML(place ? place.name : "校园地点")}</small></div>${icon("chevron-right")}</a>`;
-    }).join("") : `<div class="empty-state" style="padding:22px">${icon("users")}<p>加入或发起一场组局后，会在这里生成你的赴约清单。</p><a class="text-button" href="#map">去星图看看</a></div>`;
+    }).join("") : `<div class="empty-state" style="padding:22px">${icon("users")}<p>${isDemo() ? "加入或发起组局后，本机记录会显示在这里。" : "加入或发起组局后，你的活动会显示在这里。"}</p><a class="text-button" href="#map/browse">去星图看看</a></div>`;
     const applicationList = applications.length ? applications.map(application => {
       return `<a class="compact-list-item" href="#club/${application.clubId}">${icon("heart")}<div><strong>${escapeHTML(application.clubName || "社团")}</strong><small>${escapeHTML(application.time)} · ${isDemo() ? "本机历史示例" : escapeHTML(application.status)}</small></div>${icon("chevron-right")}</a>`;
-    }).join("") : `<div class="empty-state" style="padding:22px">${icon("heart")}<p>还没有社团申请，先去认识一群同好吧。</p><a class="text-button" href="#clubs">探索社团</a></div>`;
-    const checkinList = checkins.length ? checkins.slice(0, 5).map(checkin => {
+    }).join("") : `<div class="empty-state" style="padding:22px">${icon("heart")}<p>${isDemo() ? "没有本机历史申请记录。报名请使用社团公布的渠道。" : "还没有社团申请。"}</p><a class="text-button" href="#clubs">探索社团</a></div>`;
+    const recentCheckins = checkins.filter(checkin => placeMap.has(checkin.placeId)).slice(0, 5);
+    const checkinDate = new Intl.DateTimeFormat("zh-CN", { timeZone: "Asia/Shanghai", dateStyle: "medium", timeStyle: "short" });
+    const checkinList = recentCheckins.length ? recentCheckins.map(checkin => {
       const place = placeMap.get(checkin.placeId);
-      if (!place) return "";
-      return `<a class="compact-list-item" href="#place/${place.id}">${icon(place.icon)}<div><strong>${escapeHTML(place.name)}</strong><small>${escapeHTML(checkin.time)} · +20 探索积分</small></div>${icon("circle-check")}</a>`;
+      const time = Number.isFinite(checkin.createdAt) ? checkinDate.format(checkin.createdAt)
+        : checkin.time === "今天 · 刚刚" ? "历史点亮记录" : checkin.time;
+      return `<a class="compact-list-item" href="#place/${place.id}">${icon(place.icon)}<div><strong>${escapeHTML(place.name)}</strong><small>${escapeHTML(time)} · +20 探索积分</small></div>${icon("circle-check")}</a>`;
     }).join("") : `<p class="muted">还没有足迹，从地图上的新地点开始吧。</p>`;
 
     return `<div class="view-enter">
@@ -1359,7 +1356,14 @@
         </div>`).join("")}</dl>
       </section>
       <div class="profile-grid"><div class="profile-main"><section class="profile-card card"><div class="card-heading"><h3>校园点亮进度</h3><span>${stats.lit} / ${places.length} · ${progress}%</span></div><div class="progress-track" style="margin-bottom:18px"><span style="width:${progress}%"></span></div><div class="explore-grid">${places.map(place => `<a class="explore-place ${Store.state.litPlaceIds.includes(place.id) ? "is-lit" : ""}" href="#place/${place.id}">${icon(place.icon)}<span>${escapeHTML(place.shortName || place.name)}</span></a>`).join("")}</div></section>
-      <section class="profile-card card"><div class="card-heading"><h3>成就徽章</h3><span>${badges.filter(badge => badge.unlocked).length} / ${badges.length} 已解锁</span></div><div class="badge-grid">${badges.map(badge => `<div class="badge-card ${badge.unlocked ? "" : "is-locked"}"><span class="badge-icon">${icon(badge.icon)}</span><strong>${badge.name}</strong><small>${badge.unlocked ? badge.description : `${badge.progress}/${badge.target} · ${badge.description}`}</small></div>`).join("")}</div></section>
+      <section class="profile-card card">
+        <div class="card-heading"><h3>成就徽章</h3><span>已解锁 ${badges.filter(badge => badge.unlocked).length} / ${badges.length}</span></div>
+        ${isDemo() ? '<p class="muted badge-note">按本机记录计算，初始档案含示例足迹。可点亮地点见「校园点亮进度」。</p>' : ""}
+        <div class="badge-grid">${badges.map(badge => `<div class="badge-card ${badge.unlocked ? "" : "is-locked"}">
+          <span class="badge-icon">${icon(badge.icon)}</span><strong>${escapeHTML(badge.name)}</strong>
+          <small>${escapeHTML(badge.description)}</small><small class="badge-status">${badge.unlocked ? "已解锁" : `进度 ${badge.progress} / ${badge.target}`}</small>
+        </div>`).join("")}</div>
+      </section>
       <section class="profile-card card"><div class="card-heading"><h3>我的组局</h3><span>${myGroups.length} 场</span></div><div class="compact-list">${groupList}</div><div class="divider"></div><div class="card-heading"><h3>${isDemo() ? "历史申请示例" : "社团申请"}</h3><span>${applications.length} 份</span></div><div class="compact-list">${applicationList}</div></section></div>
       <aside class="profile-aside"><section class="profile-card card"><div class="card-heading"><h3>最近足迹</h3><span>CHECK-INS</span></div><div class="compact-list">${checkinList}</div></section><section class="profile-card card"><div class="card-heading"><h3>偏好与演示</h3><span>SETTINGS</span></div><div class="settings-list"><button class="setting-item" data-action="edit-profile">${icon("edit")}<span>编辑个人资料</span>${icon("chevron-right", "chevron")}</button><div class="setting-item">${icon("phone")}<span>手机号</span><small>${user.phone ? maskPhone(user.phone) : "未填写"}</small></div><button class="setting-item" data-action="toggle-theme">${icon("moon")}<span>深色主题</span><i class="switch ${Store.state.theme === "dark" ? "on" : ""}" data-theme-switch></i></button><div class="setting-item">${icon("shield-check")}<span>学生身份认证</span><small>${isDemo() ? "体验模式" : user.verified ? "已认证" : "未认证"}</small></div><button class="setting-item" data-action="reset-data">${icon("rotate-ccw")}<span>重置演示数据</span>${icon("chevron-right", "chevron")}</button></div></section></aside></div></div>`;
   }
@@ -1409,11 +1413,11 @@
       <div class="composer-head">
         ${avatarMarkup(profile, "avatar-small")}
         <div><strong>${escapeHTML(profile.name)}，说点什么吧</strong><span>${isDemo() ? "论坛体验 · 帖子和评论仅保存在当前浏览器。" : "可选择匿名发布。"}</span></div>
-        <span class="tag tag-secondary composer-badge">${icon("shield-check")}实名社区</span>
+        <span class="tag tag-secondary composer-badge">${icon("shield-check")}${isDemo() ? "本机体验" : "校园社区"}</span>
       </div>
       <input class="composer-title" id="forum-title" name="title" maxlength="40" placeholder="起个标题，让大家一眼看懂…" autocomplete="off" aria-label="话题标题">
       <p class="field-error" data-error-for="title"></p>
-      <textarea class="composer-body" id="forum-body" name="body" maxlength="500" placeholder="吃瓜、吐槽、树洞、求助…… 只要真诚，就有人回应。" aria-label="话题正文"></textarea>
+      <textarea class="composer-body" id="forum-body" name="body" maxlength="500" placeholder="写下想分享的校园见闻或想讨论的问题…" aria-label="话题正文"></textarea>
       <p class="field-error" data-error-for="body"></p>
       <div class="composer-foot">
         <select class="composer-category" name="category" aria-label="话题分类">${options}</select>
@@ -1437,7 +1441,7 @@
         <div class="forum-hero-copy">
           <span class="eyebrow">CAMPUS TALK · 校园论坛</span>
           <h2>课堂之外，<br>也值得被听见。</h2>
-          <p>吃瓜、吐槽、树洞、求助和闲置，都可以放在这里。开启匿名后，你的姓名与头像不会出现在话题和评论中。</p>
+          <p>${isDemo() ? "这里有示例话题。你发布的内容、点赞和回复只保存在当前浏览器。" : "吃瓜、吐槽、树洞、求助和闲置，都可以放在这里。"}开启匿名后，相关话题或回复只显示匿名昵称。</p>
         </div>
         <div class="forum-hero-stats">
           <div><strong>${allPosts.length}</strong><span>个话题</span></div>
@@ -1470,7 +1474,7 @@
             <p class="forum-side-note">${icon("eye-off")}匿名话题不会展示你的姓名、头像与年级专业；自己发布的话题仍可在列表和详情中删除。</p>
           </section>
           <section class="forum-side-card card">
-            <div class="card-heading"><h3>${icon("flame")}正在热议</h3><span>TOP 3</span></div>
+            <div class="card-heading"><h3>${icon("flame")}${isDemo() ? "话题推荐" : "正在热议"}</h3><span>TOP 3</span></div>
             <div class="forum-hot-list">${hotList}</div>
           </section>
         </aside>
@@ -1602,7 +1606,7 @@
       const post = await API.addForumComment(form.dataset.post, { body, anonymous });
       ui.threadData = post;
       view.innerHTML = renderThread(post);
-      showToast("评论已发表", anonymous ? "已使用匿名身份回复。" : "已使用校园身份回复。");
+      showToast("评论已发表", isDemo() ? "这条评论仅在当前浏览器可见。" : anonymous ? "已使用匿名身份回复。" : "已使用校园身份回复。");
     } catch (error) {
       showToast("评论未发送", error.message, "error");
       button.disabled = false;
@@ -1648,7 +1652,7 @@
   }
 
   function openResetConfirm() {
-    openModal(`<div class="confirm-visual">${icon("rotate-ccw")}</div><h2>重置演示数据？</h2><p class="muted" style="margin-top:10px">将恢复初始的 2 个点亮地点，并清除你发布的组局、论坛话题、点赞、加入记录和社团申请。当前主题与个人资料会保留。</p><div class="form-actions"><button class="button button-ghost" data-action="close-modal">保留记录</button><button class="button" data-action="confirm-reset">确认重置</button></div>`, true);
+    openModal(`<div class="confirm-visual">${icon("rotate-ccw")}</div><h2>重置演示数据？</h2><p class="muted" style="margin-top:10px">将恢复初始足迹和探索积分，并清除本机的组局、论坛互动与历史申请。当前主题与个人资料会保留。</p><div class="form-actions"><button class="button button-ghost" data-action="close-modal">保留记录</button><button class="button" data-action="confirm-reset">确认重置</button></div>`, true);
   }
 
   function showToast(title, message, type = "success") {
@@ -1666,7 +1670,7 @@
     const mapResult = event.target.closest("a[data-map-point]");
     if (mapResult && mapResult.hash === location.hash) {
       event.preventDefault();
-      focusMapPoint(mapResult.dataset.mapPoint);
+      focusMapPoint(encodeURIComponent(mapResult.dataset.mapPoint));
       return;
     }
     if (event.target.matches("[data-modal-backdrop]")) {
@@ -1753,11 +1757,6 @@
     } else if (action === "gallery-goto") {
       ui.galleryIndex = Number(trigger.dataset.index);
       view.innerHTML = renderPlace();
-    } else if (action === "show-sponsor") {
-      openSponsor(trigger.dataset.place);
-    } else if (action === "claim-sponsor") {
-      closeModal(false);
-      showToast("5 元券已放入卡包", "这是演示福利，到店出示星图徽章即可体验完整流程。");
     } else if (action === "filter-forum") {
       ui.forumCategory = trigger.dataset.filter;
       document.querySelectorAll('[data-action="filter-forum"]').forEach(chip => chip.classList.toggle("active", chip.dataset.filter === ui.forumCategory));
@@ -1773,6 +1772,8 @@
       openDeletePostConfirm(trigger.dataset.id);
     } else if (action === "confirm-delete-post") {
       handleDeletePost(trigger.dataset.id);
+    } else if (action === "show-club-directory") {
+      document.getElementById("club-search")?.focus();
     } else if (action === "filter-clubs") {
       ui.clubFilter = trigger.dataset.filter;
       document.querySelectorAll('[data-action="filter-clubs"]').forEach(chip => chip.classList.toggle("active", chip.dataset.filter === ui.clubFilter));

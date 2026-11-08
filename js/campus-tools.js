@@ -26,9 +26,9 @@
       send.disabled = false;
       return;
     }
-    status.textContent = config
-      ? "AI 服务暂未配置 OpenRouter 密钥。"
-      : "请通过项目的 Node 服务启动网页，即可连接校园助手。";
+    status.textContent = served
+      ? "校园助手暂时不可用，请稍后再试。"
+      : "请打开星图校园网站后使用校园助手。";
   });
   ai.querySelectorAll(".campus-prompts button").forEach(button => {
     button.addEventListener("click", () => {
