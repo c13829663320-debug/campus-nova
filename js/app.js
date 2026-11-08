@@ -7,6 +7,26 @@
   const toastRegion = document.getElementById("toast-region");
   const pilotClubId = "club-39";
   const pilotSignup = { contact: "小明", wechat: "CMH5123" };
+  const pilotSchedule = [
+    {
+      title: "第二期 · 元启 · AI Talk Workshop",
+      date: "2026-11-11", time: "15:00–17:00",
+      venue: "笃行楼（教二）303", mapPoint: "teach-2",
+      summary: "现场练习用 AI 写文稿、做视觉素材和整理信息，并为「百校造百岛」作品构思创意、写脚本和生成素材。"
+    },
+    {
+      title: "元启 · 实战工坊｜WorkBuddy 小程序开发实战",
+      date: "2026-11-11", time: "19:00–21:00",
+      venue: "笃行楼（教二）303", mapPoint: "teach-2",
+      summary: "从一个点子出发，用自然语言描述需求，跟练微信小程序的生成、预览、修改和试用版发布。零代码基础也可参加。"
+    },
+    {
+      title: "抖音校园 WowLand「百校造百岛」AIGC 3D 世界创作训练营",
+      date: "2026-11-14", time: "08:30–18:00",
+      venue: "创新楼（教三）304、305", mapPoint: "teach-3",
+      summary: "线下分会场学习 3D 场景和互动玩法创作，分组制作并试玩作品，后续在线完善和提交。签到教室以分场通知为准。"
+    }
+  ];
   const isDemo = () => API.mode === "demo";
 
   const ui = {
@@ -1053,7 +1073,7 @@
   function renderClubs(clubs) {
     const categories = ["all", ...(ui.clubCatalog.categories || [])];
     return `<div class="view-enter">
-      <section class="card pilot-card"><div><span class="eyebrow">社团试点</span><h2>元启AI社</h2><p>了解社团和过往活动，或联系负责人报名。</p></div><a class="button button-secondary" href="#club/${pilotClubId}">查看元启AI社 ${icon("arrow-right")}</a></section>
+      <section class="card pilot-card"><div><span class="eyebrow">社团试点</span><h2>元启AI社</h2><p>查看活动日程、报名方式和往期活动。</p></div><a class="button button-secondary" href="#club/${pilotClubId}">查看元启AI社 ${icon("arrow-right")}</a></section>
       ${renderClubCarousel()}
       <div class="club-tools"><div class="filter-chips">${categories.map(category => `<button class="chip ${ui.clubFilter === category ? "active" : ""}" data-action="filter-clubs" data-filter="${category}">${category === "all" ? "全部社团" : `<span class="chip-dot" style="background:${clubTone(category)[0]}"></span>${category}`}</button>`).join("")}</div><form class="search-box" id="club-search-form"><label class="sr-only" for="club-search" style="position:absolute;left:-9999px">搜索社团</label>${icon("search")}<input id="club-search" type="search" placeholder="搜索社团或兴趣…" value="${escapeHTML(ui.clubQuery)}" autocomplete="off"></form></div>
       <div id="club-grid-container">${renderClubGrid(clubs)}</div></div>`;
@@ -1087,13 +1107,30 @@
       : club.activities;
     return `<div class="view-enter"><nav class="breadcrumb" aria-label="面包屑"><a href="#clubs">${icon("arrow-left")}返回社团矩阵</a><span>/</span><span>${club.category}</span><span>/</span><strong>${club.name}</strong></nav>
       <section class="club-hero"><img class="club-hero-photo" src="${clubPhoto(club)}" alt="${escapeHTML(club.name)}活动现场" decoding="async"><div class="club-hero-copy">${clubLogo(club)}<span class="eyebrow" style="color:#B9E1D5">${club.category} · ${club.recruit}</span><h2>${club.name}</h2><p>${club.slogan}</p><div class="club-hero-meta"><span>${icon("shield-check")}${club.status}</span><span>${icon("school")}指导教师 ${club.advisor}</span><span>${icon("map-pin")}${place.name}</span></div></div></section>
-      <div class="club-detail-grid"><div class="club-detail-main"><section class="club-content-card card"><div class="card-heading"><h3>关于我们</h3><span>CLUB STORY</span></div><p>${club.detail}</p></section><section class="club-content-card card"><div class="card-heading"><h3>${isPilot ? "活动回顾" : "活动资料"}</h3><span>${isPilot ? "已结束" : "安排以社团通知为准"}</span></div>${events.length ? `<div class="activity-timeline">${events.map(activity => `<div class="activity-item"><time>${activity.date}</time><div><strong>${activity.title}</strong><p>${isPilot ? `${activity.place} · ` : ""}${activity.desc}</p></div></div>`).join("")}</div>` : `<p class="muted">暂无公开活动资料。</p>`}</section></div>
+      <div class="club-detail-grid"><div class="club-detail-main">${isPilot ? renderPilotSchedule() : ""}<section class="club-content-card card"><div class="card-heading"><h3>关于我们</h3><span>CLUB STORY</span></div><p>${club.detail}</p></section><section class="club-content-card card"><div class="card-heading"><h3>${isPilot ? "活动回顾" : "活动资料"}</h3><span>${isPilot ? "已结束" : "安排以社团通知为准"}</span></div>${events.length ? `<div class="activity-timeline">${events.map(activity => `<div class="activity-item"><time>${activity.date}</time><div><strong>${activity.title}</strong><p>${isPilot ? `${activity.place} · ` : ""}${activity.desc}</p></div></div>`).join("")}</div>` : `<p class="muted">暂无公开活动资料。</p>`}</section></div>
       <aside class="club-detail-aside"><section class="apply-card card"><div class="card-heading"><h3>报名方式</h3><span class="tag">${isPilot ? "社团试点" : "招新信息"}</span></div>${applyContent}</section><section class="club-content-card card"><div class="card-heading"><h3>${isPilot ? "往期活动地点" : "地点参考"}</h3><span>以活动通知为准</span></div><div class="compact-list"><a class="compact-list-item" href="#place/${place.id}">${icon("map-pin")}<div><strong>${place.name}</strong><small>打开校园地点指南</small></div>${icon("chevron-right")}</a></div></section></aside></div></div>`;
+  }
+
+  function renderPilotSchedule() {
+    return `<section class="club-content-card card">
+      <div class="card-heading"><h3>活动日程</h3><span>拟定安排</span></div>
+      <p>面向全校师生。活动安排和报名截止时间以社团通知为准。</p>
+      <div class="activity-timeline">${pilotSchedule.map(event => {
+        const [year, month, day] = event.date.split("-").map(Number);
+        return `<div class="activity-item">
+          <time datetime="${event.date}">${month}月${day}日</time>
+          <div><strong>${event.title}</strong>
+            <p>${year}年 · ${event.time} · <a href="#map/${event.mapPoint}">${event.venue}</a></p>
+            <p>${event.summary}</p>
+          </div>
+        </div>`;
+      }).join("")}</div>
+    </section>`;
   }
 
   function renderPilotSignup() {
     return `<div class="pilot-signup">
-      <p>在微信搜索并添加报名联系人「${pilotSignup.contact}」，备注「星图校园 + 元启AI社报名」。时间和报名结果由负责人在微信确认。</p>
+      <p>在微信搜索并添加报名联系人「${pilotSignup.contact}」。社团报名请备注「星图校园 + 元启AI社报名」。咨询活动报名时，请附上活动名称。</p>
       <label for="pilot-wechat">微信号</label>
       <div><input id="pilot-wechat" value="${pilotSignup.wechat}" readonly><button class="button button-small" type="button" data-action="copy-pilot-wechat">复制微信号</button></div>
       <p id="pilot-copy-status" class="muted" role="status"></p>
