@@ -12,7 +12,7 @@
   async function readFeatures() {
     if (!served) return null;
     try {
-      const response = await fetch("/api/features", { signal: AbortSignal.timeout(5000) });
+      const response = await fetch("./api/features", { signal: AbortSignal.timeout(5000) });
       if (response.ok) return await response.json();
     } catch {}
     return null;
@@ -57,7 +57,7 @@
     send.disabled = input.readOnly = true;
     status.textContent = "正在查询校园资料…";
     try {
-      const response = await fetch("/api/campus-ai", {
+      const response = await fetch("./api/campus-ai", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ question, history: history.slice(-4) }),
