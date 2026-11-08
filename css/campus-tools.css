@@ -39,6 +39,7 @@
   font-size: 16px;
 }
 .place-search-shortcuts { display: flex; flex-wrap: wrap; gap: 6px; }
+.place-search-shortcuts .chip { display: inline-flex; align-items: center; justify-content: center; text-align: center; }
 .place-search-results {
   margin: 4px 0 0;
   padding: 0;
