@@ -39,12 +39,13 @@ export function createLabels(stage, data) {
   }, new Map());
 
   const items = data.places.map(place => {
-    const el = document.createElement("button");
-    el.type = "button";
+    const el = document.createElement("a");
+    el.href = `./#place/${encodeURIComponent(place.id)}`;
     el.className = "map3d-label";
     el.dataset.placeId = place.id;
     el.dataset.category = place.category;
     el.title = place.name;
+    el.setAttribute("aria-label", place.name);
     el.innerHTML = `<span class="map3d-label__icon">${svg(place.icon)}</span><span class="map3d-label__badge">${categoryCount.get(place.category)}</span>`;
     layer.appendChild(el);
 

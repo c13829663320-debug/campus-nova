@@ -17,14 +17,14 @@
 }
 .campus-panorama h1 { font-size: clamp(24px, 5vw, 38px); }
 .campus-panorama p { color: var(--text-sub); }
-.campus-panorama iframe {
-  display: block;
-  width: 100%;
-  height: clamp(360px, 70dvh, 760px);
-  border: 1px solid var(--border-strong);
-  border-radius: var(--radius-lg);
-  background: var(--surface-soft);
+.campus-panorama-places, .campus-panorama footer {
+  display: grid;
+  gap: 12px;
+  justify-items: start;
+  border-top: 1px solid var(--border);
+  padding-block: 20px;
 }
+.campus-panorama-places > div { display: flex; flex-wrap: wrap; gap: 8px; }
 .campus-dialog {
   position: fixed;
   inset: 0;

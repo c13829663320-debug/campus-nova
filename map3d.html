@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>2.5D 校园导览地图 · 收尾</title>
+<title>3D 校园地图 · 星图校园</title>
 <link rel="icon" type="image/svg+xml" href="assets/logo-mark.svg?v=2">
 <style>
   :root {
@@ -85,9 +85,9 @@
 </head>
 <body>
 <div class="page">
-  <p class="eyebrow">Campus Nova · Step 7</p>
-  <h1>2.5D 校园导览地图 · 收尾</h1>
-  <p class="lead">移动端布局、像素比自适应、WebGL 不可用时的平面降级画面。</p>
+  <a class="eyebrow" href="panorama.html">← 返回校园导览</a>
+  <h1>东莞职业技术学院 · 3D 校园地图</h1>
+  <p class="lead">拖动平移，缩放查看校园建筑和地点。点击地点标记可查看详情。</p>
 
   <nav class="cats" id="cats" aria-label="地点分类"></nav>
 
@@ -113,11 +113,7 @@
   const stage = document.getElementById("stage");
   const map = mountCampusMap(stage, { data });
 
-  /* 无 WebGL：只保留平面示意图，去掉所有 3D 操作控件 */
-  if (!map) {
-    document.querySelector(".zoom").remove();
-    document.querySelector(".hint").remove();
-  } else {
+  if (map) {
     document.getElementById("zoom-in").addEventListener("click", map.zoomIn);
     document.getElementById("zoom-out").addEventListener("click", map.zoomOut);
     document.getElementById("zoom-reset").addEventListener("click", map.resetView);
