@@ -1308,8 +1308,15 @@
     const { user, stats, badges, checkins, applications, places = [] } = profile;
     const placeMap = new Map(places.map(place => [place.id, place]));
     const progress = places.length ? Math.round(stats.lit / places.length * 100) : 0;
-    const level = Math.floor(stats.points / 200) + 1;
-    const levelProgress = Math.min((stats.points % 200) / 2, 100);
+    const pointsPerLevel = 200;
+    const level = Math.floor(stats.points / pointsPerLevel) + 1;
+    const levelPoints = stats.points % pointsPerLevel;
+    const profileStats = [
+      { label: "已点亮地点", value: stats.lit, icon: "map-pin" },
+      { label: "我的组局", value: stats.groups, icon: "users" },
+      { label: "社团申请", value: stats.clubs, icon: "user-plus" },
+      { label: "探索积分", value: stats.points, icon: "star" }
+    ];
     const myGroups = Store.getGroups().filter(group => group.isJoined);
     const groupList = myGroups.length ? myGroups.map(group => {
       const place = Store.getPlace(group.placeId) || placeMap.get(group.placeId);
@@ -1324,7 +1331,33 @@
       return `<a class="compact-list-item" href="#place/${place.id}">${icon(place.icon)}<div><strong>${escapeHTML(place.name)}</strong><small>${escapeHTML(checkin.time)} · +20 探索积分</small></div>${icon("circle-check")}</a>`;
     }).join("") : `<p class="muted">还没有足迹，从地图上的新地点开始吧。</p>`;
 
-    return `<div class="view-enter"><section class="profile-hero card"><div class="profile-user"><button type="button" class="profile-avatar-hit" data-action="edit-profile" aria-label="更换头像">${avatarMarkup(user, "profile-avatar")}</button><div><h2>${escapeHTML(user.name)}</h2><p>${user.grade} · ${user.major}</p><span class="tag">${icon("shield-check")}${isDemo() ? "本机体验档案" : user.verified ? "已认证" : "未认证"} · ${user.title}</span></div></div><div class="profile-level"><div><strong>NOVA LV.${level}</strong><span>${stats.points} 成长值</span></div><div class="progress-track"><span style="width:${levelProgress}%"></span></div></div><div class="profile-stats"><div class="profile-stat"><strong>${stats.lit}</strong><span>已点亮地点</span></div><div class="profile-stat"><strong>${stats.groups}</strong><span>我的组局</span></div><div class="profile-stat"><strong>${stats.clubs}</strong><span>社团申请</span></div><div class="profile-stat"><strong>${stats.points}</strong><span>探索积分</span></div></div></section>
+    return `<div class="view-enter">
+      <section class="profile-hero card" aria-labelledby="profile-name">
+        <div class="profile-user">
+          <button type="button" class="profile-avatar-hit" data-action="edit-profile" aria-label="更换头像">
+            ${avatarMarkup(user, "profile-avatar")}<span class="profile-avatar-edit">${icon("edit")}</span>
+          </button>
+          <div class="profile-identity">
+            <span class="profile-kicker">校园探索档案</span>
+            <h2 id="profile-name">${escapeHTML(user.name)}</h2>
+            <p>${escapeHTML(user.grade)} · ${escapeHTML(user.major)}</p>
+            <span class="tag">${isDemo() ? "本机体验档案" : user.verified ? "已认证" : "未认证"} · ${escapeHTML(user.title)}</span>
+          </div>
+        </div>
+        <div class="profile-level">
+          <div class="profile-level-heading">
+            <span class="profile-level-title">${icon("compass")}探索等级</span>
+            <strong>Lv. ${level}</strong>
+          </div>
+          <div class="progress-track" role="progressbar" aria-label="升级进度" aria-valuemin="0" aria-valuemax="${pointsPerLevel}" aria-valuenow="${levelPoints}">
+            <span style="width:${levelPoints / pointsPerLevel * 100}%"></span>
+          </div>
+          <p>距离 Lv. ${level + 1} 还差 ${pointsPerLevel - levelPoints} 积分</p>
+        </div>
+        <dl class="profile-stats">${profileStats.map(stat => `<div class="profile-stat">
+          <dt>${stat.label}</dt><dd>${icon(stat.icon)}<strong>${stat.value}</strong></dd>
+        </div>`).join("")}</dl>
+      </section>
       <div class="profile-grid"><div class="profile-main"><section class="profile-card card"><div class="card-heading"><h3>校园点亮进度</h3><span>${stats.lit} / ${places.length} · ${progress}%</span></div><div class="progress-track" style="margin-bottom:18px"><span style="width:${progress}%"></span></div><div class="explore-grid">${places.map(place => `<a class="explore-place ${Store.state.litPlaceIds.includes(place.id) ? "is-lit" : ""}" href="#place/${place.id}">${icon(place.icon)}<span>${escapeHTML(place.shortName || place.name)}</span></a>`).join("")}</div></section>
       <section class="profile-card card"><div class="card-heading"><h3>成就徽章</h3><span>${badges.filter(badge => badge.unlocked).length} / ${badges.length} 已解锁</span></div><div class="badge-grid">${badges.map(badge => `<div class="badge-card ${badge.unlocked ? "" : "is-locked"}"><span class="badge-icon">${icon(badge.icon)}</span><strong>${badge.name}</strong><small>${badge.unlocked ? badge.description : `${badge.progress}/${badge.target} · ${badge.description}`}</small></div>`).join("")}</div></section>
       <section class="profile-card card"><div class="card-heading"><h3>我的组局</h3><span>${myGroups.length} 场</span></div><div class="compact-list">${groupList}</div><div class="divider"></div><div class="card-heading"><h3>${isDemo() ? "历史申请示例" : "社团申请"}</h3><span>${applications.length} 份</span></div><div class="compact-list">${applicationList}</div></section></div>
