@@ -4,6 +4,61 @@
   margin: 18px 0;
 }
 .campus-tools .button { justify-content: flex-start; }
+.place-search {
+  display: grid;
+  gap: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+.nova-hero .place-search {
+  width: min(100%, 420px);
+  margin: 16px 0 0;
+  color: var(--text);
+  text-align: left;
+}
+.place-search label, .pilot-signup label { font-weight: 700; }
+.place-search input, .pilot-signup input {
+  width: 100%;
+  min-width: 0;
+  padding: 9px 12px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-size: 16px;
+}
+.place-search-shortcuts { display: flex; flex-wrap: wrap; gap: 6px; }
+.place-search-results {
+  margin: 4px 0 0;
+  padding: 0;
+  max-height: 230px;
+  overflow-y: auto;
+  list-style: none;
+}
+.place-search-results a {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 4px 12px;
+  padding: 8px;
+  border-bottom: 1px solid var(--border);
+}
+.place-search-results a:hover { background: var(--surface-soft); }
+.place-search-results small { color: var(--text-sub); }
+.pilot-card {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 18px;
+  margin-bottom: 16px;
+}
+.pilot-signup { display: grid; gap: 8px; }
+.pilot-signup > div { display: flex; align-items: center; gap: 8px; }
+.pilot-signup button { flex-shrink: 0; }
 .map-panorama-link { margin: 4px 4px 12px; }
 .campus-panorama {
   width: min(1120px, calc(100% - 32px));

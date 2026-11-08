@@ -5,9 +5,13 @@
   const view = document.getElementById("app-view");
   const modalRoot = document.getElementById("modal-root");
   const toastRegion = document.getElementById("toast-region");
+  const pilotClubId = "club-39";
+  const pilotSignup = { contact: "小明", wechat: "CMH5123" };
+  const isDemo = () => API.mode === "demo";
 
   const ui = {
     mapFilter: "all",
+    placeQuery: "",
     mapZoom: 1,
     activeRegion: null,
     activeBuilding: null,
@@ -123,7 +127,9 @@
     const profile = Store.getProfile();
     document.querySelectorAll("[data-shell-avatar]").forEach(element => applyAvatar(element, profile));
     document.querySelectorAll("[data-shell-name]").forEach(element => { element.textContent = profile.name; });
-    document.querySelectorAll("[data-shell-meta]").forEach(element => { element.textContent = `${profile.grade} · ${profile.verified ? "已认证" : "未认证"}`; });
+    document.querySelectorAll("[data-shell-meta]").forEach(element => {
+      element.textContent = isDemo() ? "本机体验档案" : `${profile.grade} · ${profile.verified ? "已认证" : "未认证"}`;
+    });
   }
 
   function parseRoute() {
@@ -134,12 +140,22 @@
   function applyTheme() {
     const theme = Store.state.theme;
     document.documentElement.dataset.theme = theme;
+    const hero = view.querySelector(".nova-hero-bg");
+    if (hero) {
+      hero.classList.toggle("is-light", theme !== "dark");
+      hero.classList.toggle("is-dark", theme === "dark");
+      hero.src = heroImageUrl(theme);
+    }
     document.querySelector('meta[name="theme-color"]').content = theme === "dark" ? "#04101E" : "#E7F3FD";
     if (window.NovaSky) window.NovaSky.setTheme(theme);
     document.querySelectorAll('[data-action="toggle-theme"]').forEach(button => {
       button.setAttribute("aria-label", theme === "dark" ? "切换浅色主题" : "切换深色主题");
     });
     document.querySelectorAll("[data-theme-switch]").forEach(toggle => toggle.classList.toggle("on", theme === "dark"));
+  }
+
+  function heroImageUrl(theme) {
+    return theme === "dark" ? "assets/hero/atlas-night.jpg?v=4" : "assets/hero/atlas-day.jpg?v=4";
   }
 
   function updateShell(route) {
@@ -212,10 +228,18 @@
         const mapBundle = await API.fetchMap();
         if (request !== routeRequest) return;
         ui.mapData = mapBundle;
+        if (route.id) {
+          mapIntroVisible = false;
+          ui.activeRegion = ui.activeBuilding = null;
+          ui.mapFilter = "all";
+          ui.mapZoom = 1;
+          updateShell(route);
+        }
         view.innerHTML = renderMap();
         requestAnimationFrame(() => {
           applyMapFocus();
           syncChinaNode();
+          if (request === routeRequest && route.id) focusMapPoint(route.id);
         });
       } else if (route.name === "place") {
         const [place, groups] = await Promise.all([API.fetchPlace(route.id), API.fetchGroups(route.id)]);
@@ -365,12 +389,11 @@
   }
 
   function renderMapIntro() {
-    const { places = [], groups = [] } = ui.mapData;
+    const { places = [] } = ui.mapData;
     return `<div class="nova-intro view-enter">
       <section class="nova-hero" aria-label="星图校园 · 前言">
         <div class="nova-hero-media" aria-hidden="true">
-          <img class="nova-hero-bg is-light" src="assets/hero/atlas-day.jpg?v=4" alt="" decoding="async" fetchpriority="high">
-          <img class="nova-hero-bg is-dark" src="assets/hero/atlas-night.jpg?v=4" alt="" decoding="async">
+          <img class="nova-hero-bg ${Store.state.theme === "dark" ? "is-dark" : "is-light"}" src="${heroImageUrl(Store.state.theme)}" alt="" decoding="async" fetchpriority="high">
         </div>
 
         <div class="nova-hero-inner">
@@ -382,11 +405,12 @@
 
             <div class="nova-hero-divider" aria-hidden="true"></div>
 
-            <p class="nova-hero-lead">在星图，发现你的学校，<br>连接更多校园生活。</p>
+            <p class="nova-hero-lead">找教学楼、食堂和校园地标</p>
+            ${renderPlaceSearch()}
 
             <div class="nova-hero-quick" aria-label="快速入口">
               <button class="nova-quick" type="button" data-action="enter-campus-map">${icon("map-pin")}<span>校园地图</span></button>
-              <button class="nova-quick" type="button" data-action="enter-campus-map" data-target="groups">${icon("users")}<span>活动组队</span></button>
+              <a class="nova-quick" href="#club/${pilotClubId}">${icon("users")}<span>元启AI社</span></a>
               <a class="nova-quick" href="#forum">${icon("message-square")}<span>校园论坛</span></a>
               <a class="nova-quick" href="#clubs">${icon("star")}<span>社团介绍</span></a>
               <a class="nova-quick" href="panorama.html">${icon("camera")}<span>校园导览</span></a>
@@ -417,13 +441,55 @@
                 <img class="nova-card-badge" src="assets/dgpt-badge.png?v=1" alt="东莞职业技术学院校徽">
                 <div><strong>东莞职业技术学院</strong><span>${icon("map-pin")}东莞市 · 松山湖</span></div>
               </div>
-              <p class="nova-card-note">${icon("layers")}${places.length} 个校园地标 · 此刻 ${groups.length} 场组局</p>
+              <p class="nova-card-note">${icon("layers")}${ui.mapData.pois?.length || places.length} 个校园地标 · 校本部导览</p>
               <button class="nova-card-btn" type="button" data-action="enter-campus-map">进入校园 ${icon("arrow-right")}</button>
             </div>
           </div>
         </div>
       </section>
     </div>`;
+  }
+
+  function renderPlaceSearch() {
+    return `<section class="place-search card" aria-label="地点搜索">
+      <label for="place-search">搜索校园地点</label>
+      <input id="place-search" type="search" placeholder="例如：图书馆、一饭、教二" value="${escapeHTML(ui.placeQuery)}" autocomplete="off" maxlength="60">
+      <div id="place-search-results" aria-live="polite">${renderPlaceResults()}</div>
+    </section>`;
+  }
+
+  function renderPlaceResults() {
+    const { places = [], pois = [] } = ui.mapData;
+    const query = ui.placeQuery.trim().toLowerCase();
+    if (!query) {
+      return `<div class="place-search-shortcuts">${places.slice(0, 3).map(place =>
+        `<a class="chip" href="#place/${encodeURIComponent(place.id)}">${escapeHTML(place.shortName || place.name)}</a>`
+      ).join("")}</div>`;
+    }
+    const terms = query.split(/\s+/);
+    const entries = [...pois, ...places.filter(place => !pois.some(poi => poi.placeId === place.id))
+      .map(place => ({ id: place.id, name: place.name, placeId: place.id, zone: place.categoryLabel }))];
+    const matches = entries.filter(poi => {
+      const place = places.find(item => item.id === poi.placeId);
+      const text = [poi.name, poi.zone, place?.name, place?.shortName, place?.en].join(" ").toLowerCase();
+      return terms.every(term => text.includes(term));
+    });
+    if (!matches.length) return '<p class="muted">没有找到地点。试试建筑名、简称或片区名。</p>';
+    return `<p class="muted">找到 ${matches.length} 个地点${matches.length > 8 ? "，显示前 8 个" : ""}</p>
+      <ul class="place-search-results">${matches.slice(0, 8).map(poi => {
+        const place = places.find(item => item.id === poi.placeId);
+        const route = place ? `#place/${encodeURIComponent(place.id)}` : `#map/${encodeURIComponent(poi.id)}`;
+        return `<li><a href="${route}"${place ? "" : ` data-map-point="${escapeHTML(poi.id)}"`}><strong>${escapeHTML(poi.name)}</strong><small>${escapeHTML(poi.zone)} · ${place ? "地点详情" : "地图上定位"}</small></a></li>`;
+      }).join("")}</ul>`;
+  }
+
+  function focusMapPoint(id) {
+    const pin = [...view.querySelectorAll(".map-pill")].find(item => item.dataset.poiId === id);
+    if (!pin) return;
+    view.querySelectorAll(".map-pill.is-open").forEach(item => item.classList.remove("is-open"));
+    pin.classList.add("is-open");
+    pin.focus({ preventScroll: true });
+    pin.scrollIntoView({ block: "center", inline: "center" });
   }
 
   /* 等距底图片区：坐标与缩放均按底图百分比标定 */
@@ -518,7 +584,7 @@
       const type = poiTypes[poi.type] || poiTypes.other;
       const dimmed = ui.mapFilter !== "all" && poi.type !== ui.mapFilter;
       const action = poi.placeId ? `data-action="open-place" data-id="${poi.placeId}"` : `data-action="toggle-poi"`;
-      return `<button class="map-pill ${dimmed ? "is-dimmed" : ""}" style="left:${poi.x}%;top:${poi.y}%;--pc:${type.color};--pb:${type.bg}" ${action} data-type="${poi.type}" aria-label="${escapeHTML(poi.name)}，${type.label}，${poi.zone}">
+      return `<button class="map-pill ${dimmed ? "is-dimmed" : ""}" style="left:${poi.x}%;top:${poi.y}%;--pc:${type.color};--pb:${type.bg}" ${action} data-poi-id="${escapeHTML(poi.id)}" data-type="${poi.type}" aria-label="${escapeHTML(poi.name)}，${type.label}，${poi.zone}">
         <span class="map-pill-text">${escapeHTML(poi.name)}</span>
         <span class="map-pill-tip" role="tooltip"><em>${poi.zone}</em><strong>${escapeHTML(poi.name)}</strong><small>${type.label}</small></span>
       </button>`;
@@ -536,7 +602,7 @@
     }).join("");
 
     const zoomMax = 2.4;
-    const mapStage = `<div class="campus-map-stage is-iso" style="transform:scale(${ui.mapZoom})"><img class="map-photo is-iso" src="assets/campus-bg.jpg?v=2" alt="东莞职业技术学院校本部等距校园地图" draggable="false" decoding="async" fetchpriority="high">${buildingPins}${poiPins}</div>`;
+    const mapStage = `<div class="campus-map-stage is-iso" style="transform:scale(${ui.mapZoom})"><img class="map-photo is-iso" src="assets/campus-bg.webp" alt="东莞职业技术学院校本部等距校园地图" draggable="false" decoding="async" fetchpriority="high">${buildingPins}${poiPins}</div>`;
     const mapControls = `<div class="map-zoom-controls" aria-label="地图缩放控制">
       <button type="button" data-action="map-zoom-in" aria-label="放大地图" title="放大" ${ui.mapZoom >= zoomMax ? "disabled" : ""}>${icon("zoom-in")}</button>
       <button type="button" data-action="map-zoom-out" aria-label="缩小地图" title="缩小" ${ui.mapZoom <= 1 ? "disabled" : ""}>${icon("zoom-out")}</button>
@@ -544,6 +610,7 @@
     </div>`;
 
     return `<div class="view-enter">
+      ${renderPlaceSearch()}
       <div class="map-layout stagger">
         <section class="map-card card" aria-label="校园探索地图">
           <a class="button button-small button-secondary map-panorama-link" href="panorama.html">${icon("camera")}校园导览</a>
@@ -569,11 +636,11 @@
         </section>
         <aside class="map-side">
           ${selectedBuilding ? buildingCard(selectedBuilding) : buildingGuideCard(buildings)}
-          <section class="next-card card"><div class="next-card-header"><h3>接下来，去哪儿？</h3><span class="live-label">实时</span></div>${upcoming}</section>
+          <section class="next-card card"><div class="next-card-header"><h3>接下来，去哪儿？</h3><span class="live-label">${isDemo() ? "组局示例" : "组局活动"}</span></div>${upcoming}</section>
         </aside>
       </div>
       <section class="section-block">
-        <div class="section-heading"><div><span class="eyebrow">校园现场</span><h2>此刻，校园正在发生</h2><p>按地点找到搭子，不再让需求淹没在群聊里。</p></div><button class="text-button" data-action="open-create-group" data-place="${defaultPlaceId}">发起我的组局 ${icon("plus")}</button></div>
+        <div class="section-heading"><div><span class="eyebrow">校园活动</span><h2>${isDemo() ? "校园组局体验" : "校园组局"}</h2><p>${isDemo() ? "示例活动和操作记录仅在当前浏览器可见。" : "按地点发现校园活动。"}</p></div><button class="text-button" data-action="open-create-group" data-place="${defaultPlaceId}">${isDemo() ? "体验发起组局" : "发起我的组局"} ${icon("plus")}</button></div>
         <div class="group-preview-grid stagger">${groups.slice(0, 3).map(groupCard).join("")}</div>
       </section>
     </div>`;
@@ -621,17 +688,19 @@
 
   function renderPlace() {
     const { place, groups } = ui.placeData;
+    const point = (ui.mapData?.pois || window.NovaDB.campusPois).find(poi => poi.placeId === place.id);
+    const mapLink = `#map/${point ? encodeURIComponent(point.id) : "browse"}`;
     const lit = Store.state.litPlaceIds.includes(place.id);
     const index = Math.max(0, Math.min(ui.galleryIndex, place.images.length - 1));
     ui.galleryIndex = index;
     const guideContent = place.menu.length ? `
-      <section class="guide-card card"><div class="card-heading"><h3>${icon("utensils")}今日特色菜单</h3><span>档口状态实时更新</span></div><div class="menu-list">${place.menu.map(item => `<div class="menu-item"><span class="menu-icon">${icon("utensils")}</span><div><strong>${item.name}</strong><small>${item.stall} · ${item.status}</small></div><span class="menu-price">${item.price}</span></div>`).join("")}</div></section>
+      <section class="guide-card card"><div class="card-heading"><h3>${icon("utensils")}参考菜单</h3><span>供应和价格以现场为准</span></div><div class="menu-list">${place.menu.map(item => `<div class="menu-item"><span class="menu-icon">${icon("utensils")}</span><div><strong>${item.name}</strong><small>${item.stall}</small></div><span class="menu-price">${item.price}</span></div>`).join("")}</div></section>
       <section class="guide-card card"><div class="card-heading"><h3>${icon("lightbulb")}学长学姐的隐藏攻略</h3><span>${place.tips.length} 条实用经验</span></div><div class="tip-list">${place.tips.map((tip, i) => `<div class="tip-item"><span class="tip-number">0${i + 1}</span><div><strong>${tip.title}</strong><p>${tip.text}</p></div></div>`).join("")}</div></section>` : `
       <section class="guide-card card"><div class="card-heading"><h3>${icon("lightbulb")}学长学姐的隐藏攻略</h3><span>${place.tips.length} 条实用经验</span></div><div class="tip-list">${place.tips.map((tip, i) => `<div class="tip-item"><span class="tip-number">0${i + 1}</span><div><strong>${tip.title}</strong><p>${tip.text}</p></div></div>`).join("")}</div></section>`;
     const groupContent = groups.length ? `<div class="group-list">${groups.map(groupCard).join("")}</div>` : `<div class="empty-state">${icon("users")}<h3>这里还很安静</h3><p>成为第一个发起组局的人，让同好知道你现在想做什么。</p><button class="button button-small" data-action="open-create-group" data-place="${place.id}">${icon("plus")}发起第一场组局</button></div>`;
 
     return `<div class="view-enter">
-      <nav class="breadcrumb" aria-label="面包屑"><a href="#map">${icon("arrow-left")}返回星图</a><span>/</span><span>${place.categoryLabel}</span><span>/</span><strong>${place.name}</strong></nav>
+      <nav class="breadcrumb" aria-label="面包屑"><a href="${mapLink}">${icon("arrow-left")}${point ? "在地图上查看" : "返回校园地图"}</a><span>/</span><span>${place.categoryLabel}</span><span>/</span><strong>${place.name}</strong></nav>
       <div class="place-hero stagger">
         <div class="place-gallery" aria-label="${place.name}实景画廊">
           <img src="${place.images[index]}" alt="${place.name} · ${place.imageLabels[index]}" decoding="async" fetchpriority="high">
@@ -640,18 +709,19 @@
           <div class="gallery-controls"><button class="icon-button" data-action="gallery-prev" aria-label="上一张实景">${icon("chevron-left")}</button><span class="gallery-count">${index + 1} / ${place.images.length}</span><button class="icon-button" data-action="gallery-next" aria-label="下一张实景">${icon("chevron-right")}</button></div>
         </div>
         <section class="place-summary card">
-          <div class="place-summary-top"><span class="tag tag-primary">${place.categoryLabel}</span><span class="status-pill">${place.open ? "当前开放" : "暂未开放"}</span></div>
+          <div class="place-summary-top"><span class="tag tag-primary">${place.categoryLabel}</span><span class="tag">开放信息待核实</span></div>
           <h2>${place.name}</h2><p class="place-en">${place.en}</p><p class="place-description">${place.description}</p>
-          <div class="place-facts"><div>${icon("clock")}开放时间 · ${place.hours}</div><div>${icon("navigation")}${place.distance} · 从当前位置出发</div><div>${icon("users")}当前有 ${groups.reduce((sum, group) => sum + group.joined, 0)} 位同学已加入组局</div></div>
+          <div class="place-facts"><div>${icon("clock")}参考开放时间 · ${place.hours}，以学校公告为准</div>${point ? `<div>${icon("map-pin")}<a href="${mapLink}">在地图上定位 ${escapeHTML(place.shortName || place.name)}</a></div>` : ""}</div>
           ${lit ? `<div class="checkin-success">${icon("circle-check")}已点亮此地，探索积分已收入档案</div>` : ""}
-          <div class="place-actions" style="margin-top:16px"><button class="button ${lit ? "button-ghost" : "button-secondary"}" data-action="check-in" data-id="${place.id}" ${lit ? "disabled" : ""}>${icon(lit ? "check" : "map-pin")}${lit ? "已完成打卡" : "实景打卡 +20"}</button><button class="button" data-action="open-create-group" data-place="${place.id}">${icon("plus")}一键组局</button></div>
+          <div class="place-actions" style="margin-top:16px"><button class="button ${lit ? "button-ghost" : "button-secondary"}" data-action="check-in" data-id="${place.id}" ${lit ? "disabled" : ""}>${icon(lit ? "check" : "map-pin")}${lit ? "已点亮地点" : "点亮地点 +20"}</button><button class="button" data-action="open-create-group" data-place="${place.id}">${icon("plus")}${isDemo() ? "体验组局" : "一键组局"}</button></div>
+          ${isDemo() ? '<p class="muted">点亮记录保存在当前浏览器。</p>' : ""}
         </section>
       </div>
       <div class="detail-grid">
-        <div class="detail-main">${guideContent}<section class="groups-panel card"><div class="card-heading"><h3>${icon("users")}这里的实时搭子</h3><span class="live-label">${groups.length} 场组局</span></div>${groupContent}</section></div>
+        <div class="detail-main">${guideContent}<section class="groups-panel card"><div class="card-heading"><h3>${icon("users")}${isDemo() ? "地点组局示例" : "地点组局"}</h3><span class="live-label">${groups.length} 场组局</span></div>${groupContent}</section></div>
         <aside class="detail-aside">
-          <section class="next-card card"><div class="next-card-header"><h3>地点速览</h3><span class="tag">NOVA GUIDE</span></div><div class="compact-list"><div class="compact-list-item">${icon("map-pin")}<div><strong>空间锚点社交</strong><small>只看与当前地点相关的组局</small></div></div><div class="compact-list-item">${icon("shield-check")}<div><strong>本校实名认证</strong><small>发布者均通过学生身份核验</small></div></div><div class="compact-list-item">${icon("camera")}<div><strong>真实场景共创</strong><small>实景与攻略由同学持续更新</small></div></div></div></section>
-          ${place.sponsor ? `<section class="sponsor-card card"><span class="sponsor-label">${icon("ticket")}LBS 场景福利</span><h3>${place.sponsor.title}</h3><p>${place.sponsor.text}</p><button class="button button-small" data-action="show-sponsor" data-place="${place.id}">${place.sponsor.action} ${icon("arrow-right")}</button></section>` : ""}
+          <section class="next-card card"><div class="next-card-header"><h3>地点资料</h3><span class="tag">校园指南</span></div><p class="muted">地点图片和攻略来自项目资料。发现入口、开放时间或位置有误，可通过页面上的「用户反馈」告诉我们。</p></section>
+          ${place.sponsor ? `<section class="sponsor-card card"><span class="sponsor-label">${icon("ticket")}福利示例</span><h3>${place.sponsor.title}</h3><p>${place.sponsor.text}</p><button class="button button-small" data-action="show-sponsor" data-place="${place.id}">${place.sponsor.action} ${icon("arrow-right")}</button></section>` : ""}
         </aside>
       </div>
     </div>`;
@@ -670,7 +740,7 @@
     button.textContent = leave ? "退出中…" : "加入中…";
     try {
       const group = leave ? await API.leaveGroup(groupId) : await API.joinGroup(groupId);
-      showToast(leave ? "已退出组局" : "成功加入组局", leave ? "可以继续在星图中寻找其他同好。" : `${group.time} · ${(Store.getPlace(group.placeId) || {}).name || "校园地点"}，记得准时赴约。`);
+      showToast(leave ? "已退出组局" : "已加入组局", isDemo() ? "本次操作仅保存在当前浏览器。" : leave ? "可以继续在星图中寻找其他同好。" : `${group.time} · ${(Store.getPlace(group.placeId) || {}).name || "校园地点"}，记得准时赴约。`);
       if (ui.activeRoute.name === "map" && ui.mapData) {
         ui.mapData.groups = await API.fetchGroups();
         view.innerHTML = renderMap();
@@ -687,16 +757,16 @@
 
   async function handleCheckIn(placeId, button) {
     button.disabled = true;
-    button.textContent = "正在确认位置…";
+    button.textContent = "正在点亮地点…";
     try {
       const result = await API.checkIn(placeId);
       const place = Store.getPlace(placeId);
       showToast(result.isNew ? `点亮${place.name} · +20 积分` : "这个地点已经点亮", result.isNew ? "新的校园足迹已写入你的探索档案。" : "去其他地点继续探索吧。");
       if (ui.activeRoute.name === "place") view.innerHTML = renderPlace();
     } catch (error) {
-      showToast("打卡未完成", error.message, "error");
+      showToast("未能点亮地点", error.message, "error");
       button.disabled = false;
-      button.innerHTML = `${icon("map-pin")}实景打卡 +20`;
+      button.innerHTML = `${icon("map-pin")}点亮地点 +20`;
     }
   }
 
@@ -743,7 +813,7 @@
     const categoryOptions = [...new Set([category, "运动", "自习", "饭搭子", "桌游", "兴趣社交"])].map(option => `<option>${option}</option>`).join("");
     openModal(`${modalHeader("CREATE A MEETUP", "一键发起组局", `组局将绑定到 ${place.name}，只对同场景同学展示。`)}
       <form id="group-form" data-place="${place.id}" novalidate>
-        <div class="form-note">${icon("shield-check")}你已通过校园实名认证。请发布真实、健康的校园活动，商业推广将被过滤。</div>
+        <div class="form-note">${icon("info")}${isDemo() ? "体验组局仅保存在当前浏览器，其他同学不会收到通知。" : "请发布真实的校园活动。"}</div>
         <div class="field"><label for="group-title">想做什么？<span> *</span></label><input id="group-title" name="title" maxlength="30" placeholder="例如：今晚飞盘，新手友好局">${fieldError("title")}</div>
         <div class="form-row"><div class="field"><label for="group-category">活动类型<span> *</span></label><select id="group-category" name="category">${categoryOptions}</select>${fieldError("category")}</div><div class="field"><label for="group-time">集合时间<span> *</span></label><input id="group-time" name="time" type="datetime-local" value="${defaultDateTime()}" min="${formatDateTimeValue(new Date())}">${fieldError("time")}</div></div>
         <div class="form-row"><div class="field"><label for="group-total">希望人数<span> *</span></label><input id="group-total" name="total" type="number" min="2" max="20" value="4" inputmode="numeric"><p class="field-hint">包含你自己，2–20 人</p>${fieldError("total")}</div><div class="field"><label for="group-duration">预计时长</label><select id="group-duration" name="duration"><option>约 1 小时</option><option>约 1.5 小时</option><option>约 2 小时</option><option>约 3 小时</option></select>${fieldError("duration")}</div></div>
@@ -800,7 +870,7 @@
         month: `${date.getMonth() + 1}月`
       });
       closeModal(false);
-      showToast("组局发布成功 · +15 积分", "已展示在对应地点，也加入了你的个人组局列表。");
+      showToast(isDemo() ? "组局示例已保存" : "组局发布成功 · +15 积分", isDemo() ? "本次操作仅保存在当前浏览器。" : "已展示在对应地点，也加入了你的个人组局列表。");
       ui.placeData = { place: Store.getPlace(group.placeId), groups: Store.getGroups(group.placeId) };
       ui.activeRoute = { name: "place", id: group.placeId };
       if (location.hash !== `#place/${group.placeId}`) location.hash = `place/${group.placeId}`;
@@ -926,7 +996,7 @@
   }
 
   function clubCard(club) {
-    const applied = Store.state.applications.some(item => item.clubId === club.id);
+    const applied = !isDemo() && club.id !== pilotClubId && Store.state.applications.some(item => item.clubId === club.id);
     return `<article class="club-card card"><a href="#club/${club.id}" aria-label="查看${club.name}"><div class="club-card-image"><img class="club-card-photo" src="${clubPhoto(club)}" alt="${escapeHTML(club.name)}活动照片" loading="lazy" decoding="async"><span class="tag">${club.category}</span></div></a><div class="club-card-body"><div class="club-title-row">${clubLogo(club)}<div><h3>${club.name}</h3><span>${club.slogan}</span></div></div><p>${club.description}</p><div class="club-stats"><span>${icon("shield-check")}${club.status}</span><span>${icon("school")}${club.unit}</span></div><div class="club-card-footer"><span>${applied ? "申请已提交" : club.recruit}</span><a href="#club/${club.id}">${applied ? "查看申请" : "了解社团"}${icon("arrow-right")}</a></div></div></article>`;
   }
 
@@ -982,7 +1052,9 @@
 
   function renderClubs(clubs) {
     const categories = ["all", ...(ui.clubCatalog.categories || [])];
-    return `<div class="view-enter">${renderClubCarousel()}
+    return `<div class="view-enter">
+      <section class="card pilot-card"><div><span class="eyebrow">社团试点</span><h2>元启AI社</h2><p>了解社团和过往活动，或联系负责人报名。</p></div><a class="button button-secondary" href="#club/${pilotClubId}">查看元启AI社 ${icon("arrow-right")}</a></section>
+      ${renderClubCarousel()}
       <div class="club-tools"><div class="filter-chips">${categories.map(category => `<button class="chip ${ui.clubFilter === category ? "active" : ""}" data-action="filter-clubs" data-filter="${category}">${category === "all" ? "全部社团" : `<span class="chip-dot" style="background:${clubTone(category)[0]}"></span>${category}`}</button>`).join("")}</div><form class="search-box" id="club-search-form"><label class="sr-only" for="club-search" style="position:absolute;left:-9999px">搜索社团</label>${icon("search")}<input id="club-search" type="search" placeholder="搜索社团或兴趣…" value="${escapeHTML(ui.clubQuery)}" autocomplete="off"></form></div>
       <div id="club-grid-container">${renderClubGrid(clubs)}</div></div>`;
   }
@@ -1002,16 +1074,52 @@
   }
 
   function renderClubDetail(club) {
-    const application = Store.state.applications.find(item => item.clubId === club.id);
+    const application = isDemo() ? null : Store.state.applications.find(item => item.clubId === club.id);
     const place = Store.getPlace(club.locationId);
-    const applyContent = application ? `<div class="applied-state"><span class="success-icon">${icon("circle-check")}</span><h3>申请已送达</h3><p>${escapeHTML(application.name)}，你的申请已提交给社长。当前状态：${application.status}。</p><span class="tag tag-secondary">${application.time}</span><button class="button button-block button-ghost" style="margin-top:18px" disabled>等待社团联系</button></div>` : `<p>留下基础信息，社长会通过你填写的联系方式与你沟通。</p><div class="apply-benefits"><span>${icon("check")}无门槛新生体验</span><span>${icon("check")}直接触达社团负责人</span><span>${icon("check")}信息仅用于本次招新</span></div><button class="button button-block" data-action="apply-club" data-id="${club.id}">${icon("user-plus")}申请加入社团</button>`;
+    const isPilot = club.id === pilotClubId;
+    const applyContent = isPilot ? renderPilotSignup() : isDemo()
+      ? "<p>此社团的报名渠道待核实。请留意学校或社团发布的招新通知。</p>"
+      : application
+        ? `<div class="applied-state"><h3>申请已提交</h3><p>当前状态：${escapeHTML(application.status)}。</p></div>`
+        : `<button class="button button-block" data-action="apply-club" data-id="${club.id}">${icon("user-plus")}申请加入社团</button>`;
+    const events = isPilot
+      ? (window.NovaDB.clubEvents || []).filter(event => event.clubId === pilotClubId && event.signup.includes("已结束"))
+      : club.activities;
     return `<div class="view-enter"><nav class="breadcrumb" aria-label="面包屑"><a href="#clubs">${icon("arrow-left")}返回社团矩阵</a><span>/</span><span>${club.category}</span><span>/</span><strong>${club.name}</strong></nav>
       <section class="club-hero"><img class="club-hero-photo" src="${clubPhoto(club)}" alt="${escapeHTML(club.name)}活动现场" decoding="async"><div class="club-hero-copy">${clubLogo(club)}<span class="eyebrow" style="color:#B9E1D5">${club.category} · ${club.recruit}</span><h2>${club.name}</h2><p>${club.slogan}</p><div class="club-hero-meta"><span>${icon("shield-check")}${club.status}</span><span>${icon("school")}指导教师 ${club.advisor}</span><span>${icon("map-pin")}${place.name}</span></div></div></section>
-      <div class="club-detail-grid"><div class="club-detail-main"><section class="club-content-card card"><div class="card-heading"><h3>关于我们</h3><span>CLUB STORY</span></div><p>${club.detail}</p></section><section class="club-content-card card"><div class="card-heading"><h3>近期活动与招新安排</h3><span>${club.activities.length ? `${club.activities.length} 场可参与` : "信息待发布"}</span></div>${club.activities.length ? `<div class="activity-timeline">${club.activities.map(activity => `<div class="activity-item"><time>${activity.date}</time><div><strong>${activity.title}</strong><p>${activity.desc}</p></div></div>`).join("")}</div>` : `<p class="muted">暂无公开活动安排，提交申请后由社团负责人同步。</p>`}</section></div>
-      <aside class="club-detail-aside"><section class="apply-card card"><div class="card-heading"><h3>加入我们</h3><span class="live-label">${club.recruit}</span></div>${applyContent}</section><section class="club-content-card card"><div class="card-heading"><h3>活动室信息</h3><span>OFFLINE SPACE</span></div><div class="compact-list"><a class="compact-list-item" href="#place/${place.id}">${icon("map-pin")}<div><strong>${place.name}</strong><small>查看线下空间实景与攻略</small></div>${icon("chevron-right")}</a><div class="compact-list-item">${icon("users")}<div><strong>社长 · ${club.leader}</strong><small>提交申请后由负责人联系</small></div></div><div class="compact-list-item">${icon("shield-check")}<div><strong>学校认证社团</strong><small>活动与招新内容经过审核</small></div></div></div></section></aside></div></div>`;
+      <div class="club-detail-grid"><div class="club-detail-main"><section class="club-content-card card"><div class="card-heading"><h3>关于我们</h3><span>CLUB STORY</span></div><p>${club.detail}</p></section><section class="club-content-card card"><div class="card-heading"><h3>${isPilot ? "活动回顾" : "活动资料"}</h3><span>${isPilot ? "已结束" : "安排以社团通知为准"}</span></div>${events.length ? `<div class="activity-timeline">${events.map(activity => `<div class="activity-item"><time>${activity.date}</time><div><strong>${activity.title}</strong><p>${isPilot ? `${activity.place} · ` : ""}${activity.desc}</p></div></div>`).join("")}</div>` : `<p class="muted">暂无公开活动资料。</p>`}</section></div>
+      <aside class="club-detail-aside"><section class="apply-card card"><div class="card-heading"><h3>报名方式</h3><span class="tag">${isPilot ? "社团试点" : "招新信息"}</span></div>${applyContent}</section><section class="club-content-card card"><div class="card-heading"><h3>${isPilot ? "往期活动地点" : "地点参考"}</h3><span>以活动通知为准</span></div><div class="compact-list"><a class="compact-list-item" href="#place/${place.id}">${icon("map-pin")}<div><strong>${place.name}</strong><small>打开校园地点指南</small></div>${icon("chevron-right")}</a></div></section></aside></div></div>`;
+  }
+
+  function renderPilotSignup() {
+    return `<div class="pilot-signup">
+      <p>在微信搜索并添加报名联系人「${pilotSignup.contact}」，备注「星图校园 + 元启AI社报名」。时间和报名结果由负责人在微信确认。</p>
+      <label for="pilot-wechat">微信号</label>
+      <div><input id="pilot-wechat" value="${pilotSignup.wechat}" readonly><button class="button button-small" type="button" data-action="copy-pilot-wechat">复制微信号</button></div>
+      <p id="pilot-copy-status" class="muted" role="status"></p>
+    </div>`;
+  }
+
+  async function copyPilotWechat() {
+    const field = document.getElementById("pilot-wechat");
+    const status = document.getElementById("pilot-copy-status");
+    try {
+      if (navigator.clipboard) {
+        await navigator.clipboard.writeText(field.value);
+      } else {
+        field.select();
+        if (!document.execCommand("copy")) throw new Error("Copy unavailable");
+      }
+      status.textContent = "微信号已复制，请打开微信添加。";
+    } catch {
+      field.focus();
+      field.select();
+      status.textContent = "已选中微信号，可手动复制。";
+    }
   }
 
   function openApplication(clubId) {
+    if (isDemo() || clubId === pilotClubId) return;
     const club = (ui.clubCatalog.clubs || []).find(item => item.id === clubId) || (ui.clubData && ui.clubData.id === clubId ? ui.clubData : null);
     if (!club) return;
     const profile = Store.getProfile();
@@ -1026,6 +1134,7 @@
   }
 
   async function submitApplication(form) {
+    if (isDemo() || form.dataset.club === pilotClubId) return;
     clearFormErrors(form);
     const data = new FormData(form);
     const name = String(data.get("name") || "").trim();
@@ -1070,7 +1179,7 @@
         </div>
         <input type="file" id="avatar-file" accept="image/png,image/jpeg,image/webp" hidden>
         <div class="field"><label for="profile-name">姓名<span> *</span></label><input id="profile-name" name="name" maxlength="12" value="${escapeHTML(profile.name)}" autocomplete="name">${fieldError("name")}</div>
-        <div class="field"><label for="profile-phone">手机号</label><input id="profile-phone" name="phone" type="tel" inputmode="numeric" maxlength="11" value="${escapeHTML(profile.phone)}" placeholder="选填，用于社团联系">${fieldError("phone")}<p class="field-hint">仅在本机保存，申请社团时可自动填入，展示时自动脱敏。</p></div>
+        <div class="field"><label for="profile-phone">手机号</label><input id="profile-phone" name="phone" type="tel" inputmode="numeric" maxlength="11" value="${escapeHTML(profile.phone)}" placeholder="选填">${fieldError("phone")}<p class="field-hint">当前浏览器保存，页面展示时隐藏部分号码。</p></div>
         <div class="form-actions"><button type="button" class="button button-ghost" data-action="close-modal">取消</button><button type="submit" class="button">${icon("check")}保存资料</button></div>
       </form>`);
     refreshProfilePreview();
@@ -1169,7 +1278,7 @@
       return `<a class="compact-list-item" href="#place/${group.placeId}">${icon("calendar")}<div><strong>${escapeHTML(group.title)}</strong><small>${escapeHTML(group.time)} · ${escapeHTML(place ? place.name : "校园地点")}</small></div>${icon("chevron-right")}</a>`;
     }).join("") : `<div class="empty-state" style="padding:22px">${icon("users")}<p>加入或发起一场组局后，会在这里生成你的赴约清单。</p><a class="text-button" href="#map">去星图看看</a></div>`;
     const applicationList = applications.length ? applications.map(application => {
-      return `<a class="compact-list-item" href="#club/${application.clubId}">${icon("heart")}<div><strong>${escapeHTML(application.clubName || "社团")}</strong><small>${escapeHTML(application.time)} · ${escapeHTML(application.status)}</small></div>${icon("chevron-right")}</a>`;
+      return `<a class="compact-list-item" href="#club/${application.clubId}">${icon("heart")}<div><strong>${escapeHTML(application.clubName || "社团")}</strong><small>${escapeHTML(application.time)} · ${isDemo() ? "本机历史示例" : escapeHTML(application.status)}</small></div>${icon("chevron-right")}</a>`;
     }).join("") : `<div class="empty-state" style="padding:22px">${icon("heart")}<p>还没有社团申请，先去认识一群同好吧。</p><a class="text-button" href="#clubs">探索社团</a></div>`;
     const checkinList = checkins.length ? checkins.slice(0, 5).map(checkin => {
       const place = placeMap.get(checkin.placeId);
@@ -1177,11 +1286,11 @@
       return `<a class="compact-list-item" href="#place/${place.id}">${icon(place.icon)}<div><strong>${escapeHTML(place.name)}</strong><small>${escapeHTML(checkin.time)} · +20 探索积分</small></div>${icon("circle-check")}</a>`;
     }).join("") : `<p class="muted">还没有足迹，从地图上的新地点开始吧。</p>`;
 
-    return `<div class="view-enter"><section class="profile-hero card"><div class="profile-user"><button type="button" class="profile-avatar-hit" data-action="edit-profile" aria-label="更换头像">${avatarMarkup(user, "profile-avatar")}</button><div><h2>${escapeHTML(user.name)}</h2><p>${user.grade} · ${user.major}</p><span class="tag">${icon("shield-check")}校园实名认证 · ${user.title}</span></div></div><div class="profile-level"><div><strong>NOVA LV.${level}</strong><span>${stats.points} 成长值</span></div><div class="progress-track"><span style="width:${levelProgress}%"></span></div></div><div class="profile-stats"><div class="profile-stat"><strong>${stats.lit}</strong><span>已点亮地点</span></div><div class="profile-stat"><strong>${stats.groups}</strong><span>我的组局</span></div><div class="profile-stat"><strong>${stats.clubs}</strong><span>社团申请</span></div><div class="profile-stat"><strong>${stats.points}</strong><span>探索积分</span></div></div></section>
+    return `<div class="view-enter"><section class="profile-hero card"><div class="profile-user"><button type="button" class="profile-avatar-hit" data-action="edit-profile" aria-label="更换头像">${avatarMarkup(user, "profile-avatar")}</button><div><h2>${escapeHTML(user.name)}</h2><p>${user.grade} · ${user.major}</p><span class="tag">${icon("shield-check")}${isDemo() ? "本机体验档案" : user.verified ? "已认证" : "未认证"} · ${user.title}</span></div></div><div class="profile-level"><div><strong>NOVA LV.${level}</strong><span>${stats.points} 成长值</span></div><div class="progress-track"><span style="width:${levelProgress}%"></span></div></div><div class="profile-stats"><div class="profile-stat"><strong>${stats.lit}</strong><span>已点亮地点</span></div><div class="profile-stat"><strong>${stats.groups}</strong><span>我的组局</span></div><div class="profile-stat"><strong>${stats.clubs}</strong><span>社团申请</span></div><div class="profile-stat"><strong>${stats.points}</strong><span>探索积分</span></div></div></section>
       <div class="profile-grid"><div class="profile-main"><section class="profile-card card"><div class="card-heading"><h3>校园点亮进度</h3><span>${stats.lit} / ${places.length} · ${progress}%</span></div><div class="progress-track" style="margin-bottom:18px"><span style="width:${progress}%"></span></div><div class="explore-grid">${places.map(place => `<a class="explore-place ${Store.state.litPlaceIds.includes(place.id) ? "is-lit" : ""}" href="#place/${place.id}">${icon(place.icon)}<span>${escapeHTML(place.shortName || place.name)}</span></a>`).join("")}</div></section>
       <section class="profile-card card"><div class="card-heading"><h3>成就徽章</h3><span>${badges.filter(badge => badge.unlocked).length} / ${badges.length} 已解锁</span></div><div class="badge-grid">${badges.map(badge => `<div class="badge-card ${badge.unlocked ? "" : "is-locked"}"><span class="badge-icon">${icon(badge.icon)}</span><strong>${badge.name}</strong><small>${badge.unlocked ? badge.description : `${badge.progress}/${badge.target} · ${badge.description}`}</small></div>`).join("")}</div></section>
-      <section class="profile-card card"><div class="card-heading"><h3>我的组局</h3><span>${myGroups.length} 场</span></div><div class="compact-list">${groupList}</div><div class="divider"></div><div class="card-heading"><h3>社团申请</h3><span>${applications.length} 份</span></div><div class="compact-list">${applicationList}</div></section></div>
-      <aside class="profile-aside"><section class="profile-card card"><div class="card-heading"><h3>最近足迹</h3><span>CHECK-INS</span></div><div class="compact-list">${checkinList}</div></section><section class="profile-card card"><div class="card-heading"><h3>偏好与演示</h3><span>SETTINGS</span></div><div class="settings-list"><button class="setting-item" data-action="edit-profile">${icon("edit")}<span>编辑个人资料</span>${icon("chevron-right", "chevron")}</button><div class="setting-item">${icon("phone")}<span>手机号</span><small>${user.phone ? maskPhone(user.phone) : "未填写"}</small></div><button class="setting-item" data-action="toggle-theme">${icon("moon")}<span>深色主题</span><i class="switch ${Store.state.theme === "dark" ? "on" : ""}" data-theme-switch></i></button><div class="setting-item">${icon("shield-check")}<span>学生身份认证</span><small>${user.verified ? "已认证" : "未认证"}</small></div><button class="setting-item" data-action="reset-data">${icon("rotate-ccw")}<span>重置演示数据</span>${icon("chevron-right", "chevron")}</button></div></section></aside></div></div>`;
+      <section class="profile-card card"><div class="card-heading"><h3>我的组局</h3><span>${myGroups.length} 场</span></div><div class="compact-list">${groupList}</div><div class="divider"></div><div class="card-heading"><h3>${isDemo() ? "历史申请示例" : "社团申请"}</h3><span>${applications.length} 份</span></div><div class="compact-list">${applicationList}</div></section></div>
+      <aside class="profile-aside"><section class="profile-card card"><div class="card-heading"><h3>最近足迹</h3><span>CHECK-INS</span></div><div class="compact-list">${checkinList}</div></section><section class="profile-card card"><div class="card-heading"><h3>偏好与演示</h3><span>SETTINGS</span></div><div class="settings-list"><button class="setting-item" data-action="edit-profile">${icon("edit")}<span>编辑个人资料</span>${icon("chevron-right", "chevron")}</button><div class="setting-item">${icon("phone")}<span>手机号</span><small>${user.phone ? maskPhone(user.phone) : "未填写"}</small></div><button class="setting-item" data-action="toggle-theme">${icon("moon")}<span>深色主题</span><i class="switch ${Store.state.theme === "dark" ? "on" : ""}" data-theme-switch></i></button><div class="setting-item">${icon("shield-check")}<span>学生身份认证</span><small>${isDemo() ? "体验模式" : user.verified ? "已认证" : "未认证"}</small></div><button class="setting-item" data-action="reset-data">${icon("rotate-ccw")}<span>重置演示数据</span>${icon("chevron-right", "chevron")}</button></div></section></aside></div></div>`;
   }
 
   function forumCategoryClass(category) {
@@ -1228,7 +1337,7 @@
     return `<form class="forum-composer card" id="forum-form" novalidate>
       <div class="composer-head">
         ${avatarMarkup(profile, "avatar-small")}
-        <div><strong>${escapeHTML(profile.name)}，说点什么吧</strong><span>真实身份仅用于社区安全，可随时切换匿名。</span></div>
+        <div><strong>${escapeHTML(profile.name)}，说点什么吧</strong><span>${isDemo() ? "论坛体验 · 帖子和评论仅保存在当前浏览器。" : "可选择匿名发布。"}</span></div>
         <span class="tag tag-secondary composer-badge">${icon("shield-check")}实名社区</span>
       </div>
       <input class="composer-title" id="forum-title" name="title" maxlength="40" placeholder="起个标题，让大家一眼看懂…" autocomplete="off" aria-label="话题标题">
@@ -1394,7 +1503,7 @@
     button.textContent = "正在发布…";
     try {
       const post = await API.createForumPost({ title, body, category, anonymous });
-      showToast(anonymous ? "匿名话题已发布" : "话题已发布", anonymous ? "你的真实姓名与头像不会出现在这条话题中。" : "已同步到校园论坛的最新列表。");
+      showToast(isDemo() ? "话题示例已保存" : "话题已发布", isDemo() ? "这条话题仅在当前浏览器可见。" : "已添加到校园论坛。");
       ui.forumCategory = "all";
       ui.forumQuery = "";
       location.hash = `thread/${post.id}`;
@@ -1483,6 +1592,12 @@
   }
 
   document.addEventListener("click", event => {
+    const mapResult = event.target.closest("a[data-map-point]");
+    if (mapResult && mapResult.hash === location.hash) {
+      event.preventDefault();
+      focusMapPoint(mapResult.dataset.mapPoint);
+      return;
+    }
     if (event.target.matches("[data-modal-backdrop]")) {
       closeModal();
       return;
@@ -1495,7 +1610,9 @@
     const action = trigger.dataset.action;
     event.preventDefault();
 
-    if (action === "toggle-poi") {
+    if (action === "copy-pilot-wechat") {
+      copyPilotWechat();
+    } else if (action === "toggle-poi") {
       const isOpen = trigger.classList.contains("is-open");
       view.querySelectorAll(".map-pill.is-open").forEach(item => item.classList.remove("is-open"));
       if (!isOpen) trigger.classList.add("is-open");
@@ -1661,7 +1778,10 @@
   });
 
   document.addEventListener("input", event => {
-    if (event.target.id === "club-search") {
+    if (event.target.id === "place-search") {
+      ui.placeQuery = event.target.value;
+      document.getElementById("place-search-results").innerHTML = renderPlaceResults();
+    } else if (event.target.id === "club-search") {
       ui.clubQuery = event.target.value;
       clearTimeout(searchTimer);
       searchTimer = setTimeout(loadClubResults, 260);
