@@ -1004,6 +1004,7 @@
   ]);
 
   function clubPhoto(club) {
+    if (club.id === "club-1") return "assets/clubs/club-1.webp";
     if (clubOwnPhotos.has(club.id)) return `assets/clubs/${club.id}.jpg`;
     const hit = clubPhotos.find(item => item.test.test(club.name));
     if (hit) return hit.src;
@@ -1017,7 +1018,7 @@
 
   function clubCard(club) {
     const applied = !isDemo() && club.id !== pilotClubId && Store.state.applications.some(item => item.clubId === club.id);
-    return `<article class="club-card card"><a href="#club/${club.id}" aria-label="查看${club.name}"><div class="club-card-image"><img class="club-card-photo" src="${clubPhoto(club)}" alt="${escapeHTML(club.name)}活动照片" loading="lazy" decoding="async"><span class="tag">${club.category}</span></div></a><div class="club-card-body"><div class="club-title-row">${clubLogo(club)}<div><h3>${club.name}</h3><span>${club.slogan}</span></div></div><p>${club.description}</p><div class="club-stats"><span>${icon("shield-check")}${club.status}</span><span>${icon("school")}${club.unit}</span></div><div class="club-card-footer"><span>${applied ? "申请已提交" : club.recruit}</span><a href="#club/${club.id}">${applied ? "查看申请" : "了解社团"}${icon("arrow-right")}</a></div></div></article>`;
+    return `<article class="club-card card"><a href="#club/${club.id}" aria-label="查看${club.name}"><div class="club-card-image"><img class="club-card-photo" src="${clubPhoto(club)}" alt="${club.id === "club-1" ? "编辑部封面插画" : `${escapeHTML(club.name)}活动照片`}" loading="lazy" decoding="async"><span class="tag">${club.category}</span></div></a><div class="club-card-body"><div class="club-title-row">${clubLogo(club)}<div><h3>${club.name}</h3><span>${club.slogan}</span></div></div><p>${club.description}</p><div class="club-stats"><span>${icon("shield-check")}${club.status}</span><span>${icon("school")}${club.unit}</span></div><div class="club-card-footer"><span>${applied ? "申请已提交" : club.recruit}</span><a href="#club/${club.id}">${applied ? "查看申请" : "了解社团"}${icon("arrow-right")}</a></div></div></article>`;
   }
 
   function renderClubGrid(clubs) {
@@ -1106,7 +1107,7 @@
       ? (window.NovaDB.clubEvents || []).filter(event => event.clubId === pilotClubId && event.signup.includes("已结束"))
       : club.activities;
     return `<div class="view-enter"><nav class="breadcrumb" aria-label="面包屑"><a href="#clubs">${icon("arrow-left")}返回社团矩阵</a><span>/</span><span>${club.category}</span><span>/</span><strong>${club.name}</strong></nav>
-      <section class="club-hero"><img class="club-hero-photo" src="${clubPhoto(club)}" alt="${escapeHTML(club.name)}活动现场" decoding="async"><div class="club-hero-copy">${clubLogo(club)}<span class="eyebrow" style="color:#B9E1D5">${club.category} · ${club.recruit}</span><h2>${club.name}</h2><p>${club.slogan}</p><div class="club-hero-meta"><span>${icon("shield-check")}${club.status}</span><span>${icon("school")}指导教师 ${club.advisor}</span><span>${icon("map-pin")}${place.name}</span></div></div></section>
+      <section class="club-hero"><img class="club-hero-photo" src="${clubPhoto(club)}" alt="${club.id === "club-1" ? "编辑部封面插画" : `${escapeHTML(club.name)}活动现场`}" decoding="async"><div class="club-hero-copy">${clubLogo(club)}<span class="eyebrow" style="color:#B9E1D5">${club.category} · ${club.recruit}</span><h2>${club.name}</h2><p>${club.slogan}</p><div class="club-hero-meta"><span>${icon("shield-check")}${club.status}</span><span>${icon("school")}指导教师 ${club.advisor}</span><span>${icon("map-pin")}${place.name}</span></div></div></section>
       <div class="club-detail-grid"><div class="club-detail-main">${isPilot ? renderPilotSchedule() : ""}<section class="club-content-card card"><div class="card-heading"><h3>关于我们</h3><span>CLUB STORY</span></div><p>${club.detail}</p></section><section class="club-content-card card"><div class="card-heading"><h3>${isPilot ? "活动回顾" : "活动资料"}</h3><span>${isPilot ? "已结束" : "安排以社团通知为准"}</span></div>${events.length ? `<div class="activity-timeline">${events.map(activity => `<div class="activity-item"><time>${activity.date}</time><div><strong>${activity.title}</strong><p>${isPilot ? `${activity.place} · ` : ""}${activity.desc}</p></div></div>`).join("")}</div>` : `<p class="muted">暂无公开活动资料。</p>`}</section></div>
       <aside class="club-detail-aside"><section class="apply-card card"><div class="card-heading"><h3>报名方式</h3><span class="tag">${isPilot ? "社团试点" : "招新信息"}</span></div>${applyContent}</section><section class="club-content-card card"><div class="card-heading"><h3>${isPilot ? "往期活动地点" : "地点参考"}</h3><span>以活动通知为准</span></div><div class="compact-list"><a class="compact-list-item" href="#place/${place.id}">${icon("map-pin")}<div><strong>${place.name}</strong><small>打开校园地点指南</small></div>${icon("chevron-right")}</a></div></section></aside></div></div>`;
   }
