@@ -148,9 +148,7 @@
       const group = this.getGroup(groupId);
       if (!group) throw new Error("这场组局不存在");
       if (group.isOwner) throw new Error("你发起的组局会保留在我的组局中");
-      if (!this.state.joinedGroupIds.includes(groupId)) return group;
       this.state.joinedGroupIds = this.state.joinedGroupIds.filter(id => id !== groupId);
-      this.state.points = Math.max(0, this.state.points - 10);
       this.save();
       return this.getGroup(groupId);
     },

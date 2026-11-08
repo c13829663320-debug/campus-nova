@@ -1,5 +1,5 @@
 /* 星图校园统一模拟数据：后续可由服务端同构数据替换 */
-window.NovaDB = {
+const novaData = {
   user: {
     id: "u-nova",
     name: "林小星",
@@ -158,10 +158,72 @@ window.NovaDB = {
     { id: "SE-06", file: "B-SE-06.svg", name: "球场旁白色方楼", region: "se", floors: 2, note: "球场旁纯白立方体方盒，平顶", x: 86.08, y: 54.69 },
   ],
 
+  /* 全校 58 个地点，type 为四大分类：teach 教学楼 / dorm 宿舍 / life 生活服务 / other 其他 */
+  campusPois: [
+    { id: "library", name: "图书馆", x: 42, y: 35, type: "life", zone: "湖景文化区", placeId: "library" },
+    { id: "lake", name: "映月湖", x: 41.5, y: 47.5, type: "other", zone: "湖景文化区", placeId: "lake" },
+    { id: "bridge", name: "湖心栈桥", x: 54.5, y: 61.5, type: "other", zone: "湖景文化区" },
+    { id: "waterside", name: "亲水平台", x: 68, y: 58, type: "life", zone: "湖景文化区" },
+    { id: "art", name: "艺术大楼", x: 22.43, y: 27.37, type: "teach", zone: "教学科研区" },
+    { id: "building-19", name: "19栋", x: 15, y: 28.7, type: "dorm", zone: "教学科研区" },
+    { id: "kindergarten", name: "幼儿园", x: 17.07, y: 35.84, type: "other", zone: "教学科研区" },
+    { id: "teach-2", name: "教二", x: 61.86, y: 37.75, type: "teach", zone: "教学科研区", placeId: "teaching" },
+    { id: "teach-1", name: "教一", x: 64.21, y: 44.63, type: "teach", zone: "教学科研区" },
+    { id: "teach-4", name: "教四", x: 72, y: 52, type: "teach", zone: "教学科研区" },
+    { id: "teach-3", name: "教三", x: 72, y: 58, type: "teach", zone: "教学科研区" },
+    { id: "building-6b", name: "6B", x: 12.5, y: 53.68, type: "teach", zone: "教学科研区" },
+    { id: "building-6c", name: "6C", x: 21, y: 59.21, type: "teach", zone: "教学科研区" },
+    { id: "building-6a", name: "6A", x: 20.14, y: 68.06, type: "teach", zone: "教学科研区" },
+    { id: "training", name: "培训楼", x: 33.07, y: 69.71, type: "teach", zone: "教学科研区" },
+    { id: "building-8a", name: "8A", x: 46.64, y: 64.86, type: "teach", zone: "教学科研区" },
+    { id: "building-8b", name: "8B", x: 45.79, y: 73.46, type: "teach", zone: "教学科研区" },
+    { id: "building-8c", name: "8C", x: 45.57, y: 80.45, type: "teach", zone: "教学科研区" },
+    { id: "building-8d", name: "8D", x: 51.86, y: 75.97, type: "teach", zone: "教学科研区" },
+    { id: "admin", name: "行政楼", x: 61.64, y: 79.52, type: "other", zone: "教学科研区" },
+    { id: "pool-classroom", name: "附属楼", x: 83.21, y: 53.21, type: "teach", zone: "教学科研区" },
+    { id: "cainiao", name: "菜鸟驿站", x: 47.8, y: 83.8, type: "life", zone: "教学科研区" },
+    { id: "teacher", name: "教师公寓", x: 20.43, y: 18.76, type: "other", zone: "宿舍生活区" },
+    { id: "young-teacher", name: "青年教师公寓", x: 39.93, y: 22.83, type: "other", zone: "宿舍生活区" },
+    { id: "supermarket", name: "大学生超市", x: 44.14, y: 26.38, type: "life", zone: "宿舍生活区" },
+    { id: "clinic", name: "医务室", x: 47.86, y: 29.89, type: "life", zone: "宿舍生活区" },
+    { id: "dorm-17", name: "17栋", x: 61.14, y: 8.86, type: "dorm", zone: "宿舍生活区" },
+    { id: "dorm-14", name: "14栋", x: 66.86, y: 7.6, type: "dorm", zone: "宿舍生活区" },
+    { id: "dorm-13", name: "13栋", x: 73.21, y: 7.35, type: "dorm", zone: "宿舍生活区" },
+    { id: "dorm-9", name: "9栋", x: 79.86, y: 7.35, type: "dorm", zone: "宿舍生活区" },
+    { id: "dorm-18", name: "18栋", x: 87.21, y: 7.86, type: "dorm", zone: "宿舍生活区" },
+    { id: "dorm-15", name: "15栋", x: 58.86, y: 15.87, type: "dorm", zone: "宿舍生活区" },
+    { id: "dorm-12", name: "12栋", x: 65.14, y: 14.48, type: "dorm", zone: "宿舍生活区" },
+    { id: "dorm-11", name: "11栋", x: 71.64, y: 14.35, type: "dorm", zone: "宿舍生活区" },
+    { id: "dorm-7", name: "7栋", x: 78.64, y: 13.86, type: "dorm", zone: "宿舍生活区" },
+    { id: "dorm-10", name: "10栋", x: 85.5, y: 15.62, type: "dorm", zone: "宿舍生活区" },
+    { id: "dorm-16", name: "16栋", x: 51, y: 18.37, type: "dorm", zone: "宿舍生活区" },
+    { id: "dorm-5", name: "5栋", x: 77.86, y: 21.51, type: "dorm", zone: "宿舍生活区" },
+    { id: "dorm-8", name: "8栋", x: 85.5, y: 21.89, type: "dorm", zone: "宿舍生活区" },
+    { id: "dorm-3", name: "3栋", x: 77, y: 27.65, type: "dorm", zone: "宿舍生活区" },
+    { id: "dorm-6", name: "6栋", x: 85.36, y: 28.16, type: "dorm", zone: "宿舍生活区" },
+    { id: "dorm-1", name: "1栋", x: 76.14, y: 34.03, type: "dorm", zone: "宿舍生活区" },
+    { id: "dorm-4", name: "4栋", x: 85, y: 33.9, type: "dorm", zone: "宿舍生活区" },
+    { id: "dorm-2", name: "2栋", x: 84.93, y: 39.52, type: "dorm", zone: "宿舍生活区" },
+    { id: "canteen-2", name: "二饭", x: 58, y: 25, type: "life", zone: "餐饮社交区" },
+    { id: "tea", name: "茶餐厅", x: 55, y: 29, type: "life", zone: "餐饮社交区" },
+    { id: "activity-center", name: "大学生活动中心", x: 66, y: 25, type: "life", zone: "餐饮社交区", placeId: "student-center" },
+    { id: "canteen-1", name: "一饭", x: 81.71, y: 46.22, type: "life", zone: "餐饮社交区", placeId: "cafeteria" },
+    { id: "basketball", name: "篮球场", x: 47.21, y: 22.27, type: "life", zone: "运动活力区" },
+    { id: "tennis-west", name: "网球场", x: 28.07, y: 63.13, type: "life", zone: "运动活力区" },
+    { id: "track", name: "操场", x: 89.57, y: 72.38, type: "life", zone: "运动活力区", placeId: "stadium" },
+    { id: "tennis", name: "网球场", x: 71.29, y: 80.7, type: "life", zone: "运动活力区" },
+    { id: "volleyball", name: "排球场", x: 74.5, y: 90.38, type: "life", zone: "运动活力区" },
+    { id: "gym", name: "体育馆", x: 78.86, y: 81.08, type: "life", zone: "运动活力区" },
+    { id: "pool", name: "游泳池", x: 89.29, y: 57.14, type: "life", zone: "运动活力区" },
+    { id: "west-gate", name: "西门", x: 8.57, y: 45, type: "other", zone: "校门入口区" },
+    { id: "east-gate", name: "东门", x: 93, y: 48, type: "other", zone: "校门入口区", placeId: "east-gate" },
+    { id: "southwest-gate", name: "西南门", x: 55, y: 92, type: "other", zone: "校门入口区" },
+  ],
+
   places: [
     {
       id: "library", name: "图书馆", shortName: "图书馆", en: "DGPT LIBRARY", category: "study", categoryLabel: "学习成长",
-      icon: "book-open", x: 55.9, y: 39.1, isoX: 54.2, isoY: 38.0, open: true, hours: "08:00–22:30", distance: "步行 6 分钟",
+      icon: "book-open", x: 55.9, y: 39.1, isoX: 42, isoY: 35, open: true, hours: "08:00–22:30", distance: "步行 6 分钟",
       description: "校园里最安静的知识星球。除了丰富的藏书，这里还有 24 小时自习区、研讨间和能看到湖景的窗边座位。",
       images: ["assets/library.jpg", "assets/reading-room.jpg"], imageLabels: ["图书馆中庭", "三楼自习区"],
       tips: [
@@ -173,7 +235,7 @@ window.NovaDB = {
     },
     {
       id: "cafeteria", name: "滋兰餐厅（一饭）", shortName: "滋兰餐厅", en: "ZHILAN CANTEEN", category: "life", categoryLabel: "校园生活",
-      icon: "utensils", x: 65.1, y: 50.2, isoX: 65.2, isoY: 50.0, open: true, hours: "06:30–21:00", distance: "步行 3 分钟",
+      icon: "utensils", x: 65.1, y: 50.2, isoX: 81.71, isoY: 46.22, open: true, hours: "06:30–21:00", distance: "步行 3 分钟",
       description: "两层空间汇聚南北风味，早餐的现磨豆浆和二楼川湘窗口最受欢迎，支持校园卡与移动支付。",
       images: ["assets/cafeteria.jpg", "assets/teaching.jpg"], imageLabels: ["一楼风味档口", "食堂东侧入口"],
       tips: [
@@ -189,7 +251,7 @@ window.NovaDB = {
     },
     {
       id: "stadium", name: "田径场", shortName: "田径场", en: "ATHLETIC FIELD", category: "sports", categoryLabel: "运动活力",
-      icon: "trophy", x: 87.5, y: 62, isoX: 85.5, isoY: 67.5, open: true, hours: "06:00–22:00", distance: "步行 8 分钟",
+      icon: "trophy", x: 87.5, y: 62, isoX: 89.57, isoY: 72.38, open: true, hours: "06:00–22:00", distance: "步行 8 分钟",
       description: "足球、夜跑、飞盘和草坪音乐会的共同据点。夜间灯光覆盖全场，新手也能快速找到同水平的运动搭子。",
       images: ["assets/stadium.jpg", "assets/lake.jpg"], imageLabels: ["傍晚的足球场", "操场东侧步道"],
       tips: [
@@ -201,7 +263,7 @@ window.NovaDB = {
     },
     {
       id: "student-center", name: "修远楼 · 学生活动中心", shortName: "修远楼", en: "XIUYUAN STUDENT HUB", category: "social", categoryLabel: "社交活动",
-      icon: "users", x: 77.9, y: 49.5, isoX: 77.9, isoY: 49.5, open: true, hours: "09:00–22:00", distance: "步行 5 分钟",
+      icon: "users", x: 77.9, y: 49.5, isoX: 66, isoY: 25, open: true, hours: "09:00–22:00", distance: "步行 5 分钟",
       description: "社团活动、桌游聚会和校园演出的发生地。一楼开放共享空间，二楼设有多功能活动室与排练厅。",
       images: ["assets/club-fair.jpg", "assets/reading-room.jpg"], imageLabels: ["社团开放日现场", "共享活动空间"],
       tips: [
@@ -212,7 +274,7 @@ window.NovaDB = {
     },
     {
       id: "teaching", name: "笃行楼 · 教二", shortName: "笃行楼", en: "DUXING HALL", category: "study", categoryLabel: "学习成长",
-      icon: "school", x: 47, y: 31.9, isoX: 46.5, isoY: 25.0, open: true, hours: "07:00–22:30", distance: "步行 2 分钟",
+      icon: "school", x: 47, y: 31.9, isoX: 61.86, isoY: 37.75, open: true, hours: "07:00–22:30", distance: "步行 2 分钟",
       description: "日常课程的主要阵地，智慧教室与开放式讨论区并存。没课的教室会在门口电子屏实时标记。",
       images: ["assets/teaching.jpg", "assets/reading-room.jpg"], imageLabels: ["笃行楼正门", "空闲教室自习区"],
       tips: [
@@ -223,7 +285,7 @@ window.NovaDB = {
     },
     {
       id: "dormitory", name: "学生宿舍区", shortName: "学生宿舍", en: "STUDENT RESIDENCE", category: "life", categoryLabel: "校园生活",
-      icon: "bed", x: 63.9, y: 19.9, isoX: 70.0, isoY: 18.5, open: true, hours: "全天开放", distance: "步行 10 分钟",
+      icon: "bed", x: 63.9, y: 19.9, isoX: 70, isoY: 20, open: true, hours: "全天开放", distance: "步行 10 分钟",
       description: "四人间上床下桌，楼下配有洗衣房、饮水机和共享厨房。每栋一层都有可交流、观影的公共客厅。",
       images: ["assets/dormitory.jpg", "assets/club-fair.jpg"], imageLabels: ["宿舍区中央庭院", "一层共享客厅"],
       tips: [
@@ -234,7 +296,7 @@ window.NovaDB = {
     },
     {
       id: "lake", name: "映月湖", shortName: "映月湖", en: "YINGYUE LAKE", category: "social", categoryLabel: "社交活动",
-      icon: "waves", x: 28, y: 52.4, isoX: 36.5, isoY: 55.0, open: true, hours: "全天开放", distance: "步行 12 分钟",
+      icon: "waves", x: 28, y: 52.4, isoX: 41.5, isoY: 47.5, open: true, hours: "全天开放", distance: "步行 12 分钟",
       description: "沿湖木栈道全长约 900 米，是晨读、散步和看日落的好去处。湖心亭常举办小规模音乐与朗诵活动。",
       images: ["assets/lake.jpg", "assets/stadium.jpg"], imageLabels: ["映月湖木栈道", "湖畔夕阳"],
       tips: [
@@ -245,7 +307,7 @@ window.NovaDB = {
     },
     {
       id: "east-gate", name: "东门", shortName: "东门", en: "EAST GATE", category: "life", categoryLabel: "校园生活",
-      icon: "store", x: 93.5, y: 70.9, isoX: 93.5, isoY: 52.0, open: true, hours: "07:00–23:00", distance: "步行 4 分钟",
+      icon: "store", x: 93.5, y: 70.9, isoX: 93, isoY: 48, open: true, hours: "07:00–23:00", distance: "步行 4 分钟",
       description: "连接校园与城市生活的入口，文具、打印、水果和日常餐饮一应俱全，新生采购生活用品很方便。",
       images: ["assets/teaching.jpg", "assets/cafeteria.jpg"], imageLabels: ["东门入口", "生活街区餐饮店"],
       tips: [
@@ -1026,7 +1088,10 @@ window.NovaDB = {
   ]
 };
 
-window.NovaDB.clubEvents.forEach(event => {
-  const club = window.NovaDB.clubs.find(item => item.id === event.clubId);
+novaData.clubEvents.forEach(event => {
+  const club = novaData.clubs.find(item => item.id === event.clubId);
   if (club) club.activities.push({ date: `${event.date} ${event.weekday}`, title: event.title, desc: `${event.time} · ${event.place}｜${event.desc}` });
 });
+
+if (typeof module === "object" && module.exports) module.exports = novaData;
+if (typeof window !== "undefined") window.NovaDB = novaData;

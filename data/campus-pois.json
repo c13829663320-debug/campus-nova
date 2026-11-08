@@ -1,0 +1,484 @@
+[
+  {
+    "id": "library",
+    "name": "图书馆",
+    "x": 42,
+    "y": 35,
+    "category": "学习成长",
+    "zone": "湖景文化区"
+  },
+  {
+    "id": "lake",
+    "name": "映月湖",
+    "x": 41.5,
+    "y": 47.5,
+    "category": "社交活动",
+    "zone": "湖景文化区"
+  },
+  {
+    "id": "bridge",
+    "name": "湖心栈桥",
+    "x": 54.5,
+    "y": 61.5,
+    "category": "社交活动",
+    "zone": "湖景文化区"
+  },
+  {
+    "id": "waterside",
+    "name": "亲水平台",
+    "x": 68,
+    "y": 58,
+    "category": "社交活动",
+    "zone": "湖景文化区"
+  },
+  {
+    "id": "art",
+    "name": "艺术大楼",
+    "x": 22.43,
+    "y": 27.37,
+    "category": "学习成长",
+    "zone": "教学科研区"
+  },
+  {
+    "id": "building-19",
+    "name": "19栋",
+    "x": 15,
+    "y": 28.7,
+    "category": "学习成长",
+    "zone": "教学科研区"
+  },
+  {
+    "id": "kindergarten",
+    "name": "幼儿园",
+    "x": 17.07,
+    "y": 35.84,
+    "category": "校园生活",
+    "zone": "教学科研区"
+  },
+  {
+    "id": "teach-2",
+    "name": "教二",
+    "x": 61.86,
+    "y": 37.75,
+    "category": "学习成长",
+    "zone": "教学科研区"
+  },
+  {
+    "id": "teach-1",
+    "name": "教一",
+    "x": 64.21,
+    "y": 44.63,
+    "category": "学习成长",
+    "zone": "教学科研区"
+  },
+  {
+    "id": "teach-4",
+    "name": "教四",
+    "x": 72,
+    "y": 52,
+    "category": "学习成长",
+    "zone": "教学科研区"
+  },
+  {
+    "id": "teach-3",
+    "name": "教三",
+    "x": 72,
+    "y": 58,
+    "category": "学习成长",
+    "zone": "教学科研区"
+  },
+  {
+    "id": "building-6b",
+    "name": "6B 教学楼",
+    "x": 12.5,
+    "y": 53.68,
+    "category": "学习成长",
+    "zone": "教学科研区"
+  },
+  {
+    "id": "building-6c",
+    "name": "6C 教学楼",
+    "x": 21,
+    "y": 59.21,
+    "category": "学习成长",
+    "zone": "教学科研区"
+  },
+  {
+    "id": "building-6a",
+    "name": "6A 教学楼",
+    "x": 20.14,
+    "y": 68.06,
+    "category": "学习成长",
+    "zone": "教学科研区"
+  },
+  {
+    "id": "training",
+    "name": "培训楼",
+    "x": 33.07,
+    "y": 69.71,
+    "category": "学习成长",
+    "zone": "教学科研区"
+  },
+  {
+    "id": "building-8a",
+    "name": "8A",
+    "x": 46.64,
+    "y": 64.86,
+    "category": "学习成长",
+    "zone": "教学科研区"
+  },
+  {
+    "id": "building-8b",
+    "name": "8B",
+    "x": 45.79,
+    "y": 73.46,
+    "category": "学习成长",
+    "zone": "教学科研区"
+  },
+  {
+    "id": "building-8c",
+    "name": "8C",
+    "x": 45.57,
+    "y": 80.45,
+    "category": "学习成长",
+    "zone": "教学科研区"
+  },
+  {
+    "id": "building-8d",
+    "name": "8D",
+    "x": 51.86,
+    "y": 75.97,
+    "category": "学习成长",
+    "zone": "教学科研区"
+  },
+  {
+    "id": "admin",
+    "name": "行政楼",
+    "x": 61.64,
+    "y": 79.52,
+    "category": "学习成长",
+    "zone": "教学科研区"
+  },
+  {
+    "id": "pool-classroom",
+    "name": "游泳池附属用楼",
+    "x": 83.21,
+    "y": 53.21,
+    "category": "学习成长",
+    "zone": "教学科研区"
+  },
+  {
+    "id": "cainiao",
+    "name": "菜鸟驿站",
+    "x": 47.8,
+    "y": 83.8,
+    "category": "校园生活",
+    "zone": "教学科研区"
+  },
+  {
+    "id": "teacher",
+    "name": "教师公寓",
+    "x": 20.43,
+    "y": 18.76,
+    "category": "校园生活",
+    "zone": "宿舍生活区"
+  },
+  {
+    "id": "young-teacher",
+    "name": "青年教师公寓",
+    "x": 39.93,
+    "y": 22.83,
+    "category": "校园生活",
+    "zone": "宿舍生活区"
+  },
+  {
+    "id": "supermarket",
+    "name": "大学生超市",
+    "x": 44.14,
+    "y": 26.38,
+    "category": "校园生活",
+    "zone": "宿舍生活区"
+  },
+  {
+    "id": "clinic",
+    "name": "医务室",
+    "x": 47.86,
+    "y": 29.89,
+    "category": "校园生活",
+    "zone": "宿舍生活区"
+  },
+  {
+    "id": "dorm-17",
+    "name": "17栋",
+    "x": 61.14,
+    "y": 8.86,
+    "category": "校园生活",
+    "zone": "宿舍生活区",
+    "minor": true
+  },
+  {
+    "id": "dorm-14",
+    "name": "14栋",
+    "x": 66.86,
+    "y": 7.6,
+    "category": "校园生活",
+    "zone": "宿舍生活区",
+    "minor": true
+  },
+  {
+    "id": "dorm-13",
+    "name": "13栋",
+    "x": 73.21,
+    "y": 7.35,
+    "category": "校园生活",
+    "zone": "宿舍生活区",
+    "minor": true
+  },
+  {
+    "id": "dorm-9",
+    "name": "9栋",
+    "x": 79.86,
+    "y": 7.35,
+    "category": "校园生活",
+    "zone": "宿舍生活区",
+    "minor": true
+  },
+  {
+    "id": "dorm-18",
+    "name": "18栋",
+    "x": 87.21,
+    "y": 7.86,
+    "category": "校园生活",
+    "zone": "宿舍生活区",
+    "minor": true
+  },
+  {
+    "id": "dorm-15",
+    "name": "15栋",
+    "x": 58.86,
+    "y": 15.87,
+    "category": "校园生活",
+    "zone": "宿舍生活区",
+    "minor": true
+  },
+  {
+    "id": "dorm-12",
+    "name": "12栋",
+    "x": 65.14,
+    "y": 14.48,
+    "category": "校园生活",
+    "zone": "宿舍生活区",
+    "minor": true
+  },
+  {
+    "id": "dorm-11",
+    "name": "11栋",
+    "x": 71.64,
+    "y": 14.35,
+    "category": "校园生活",
+    "zone": "宿舍生活区",
+    "minor": true
+  },
+  {
+    "id": "dorm-7",
+    "name": "7栋",
+    "x": 78.64,
+    "y": 13.86,
+    "category": "校园生活",
+    "zone": "宿舍生活区",
+    "minor": true
+  },
+  {
+    "id": "dorm-10",
+    "name": "10栋",
+    "x": 85.5,
+    "y": 15.62,
+    "category": "校园生活",
+    "zone": "宿舍生活区",
+    "minor": true
+  },
+  {
+    "id": "dorm-16",
+    "name": "16栋",
+    "x": 51,
+    "y": 18.37,
+    "category": "校园生活",
+    "zone": "宿舍生活区",
+    "minor": true
+  },
+  {
+    "id": "dorm-5",
+    "name": "5栋",
+    "x": 77.86,
+    "y": 21.51,
+    "category": "校园生活",
+    "zone": "宿舍生活区",
+    "minor": true
+  },
+  {
+    "id": "dorm-8",
+    "name": "8栋",
+    "x": 85.5,
+    "y": 21.89,
+    "category": "校园生活",
+    "zone": "宿舍生活区",
+    "minor": true
+  },
+  {
+    "id": "dorm-3",
+    "name": "3栋",
+    "x": 77,
+    "y": 27.65,
+    "category": "校园生活",
+    "zone": "宿舍生活区",
+    "minor": true
+  },
+  {
+    "id": "dorm-6",
+    "name": "6栋",
+    "x": 85.36,
+    "y": 28.16,
+    "category": "校园生活",
+    "zone": "宿舍生活区",
+    "minor": true
+  },
+  {
+    "id": "dorm-1",
+    "name": "1栋",
+    "x": 76.14,
+    "y": 34.03,
+    "category": "校园生活",
+    "zone": "宿舍生活区",
+    "minor": true
+  },
+  {
+    "id": "dorm-4",
+    "name": "4栋",
+    "x": 85,
+    "y": 33.9,
+    "category": "校园生活",
+    "zone": "宿舍生活区",
+    "minor": true
+  },
+  {
+    "id": "dorm-2",
+    "name": "2栋",
+    "x": 84.93,
+    "y": 39.52,
+    "category": "校园生活",
+    "zone": "宿舍生活区",
+    "minor": true
+  },
+  {
+    "id": "canteen-2",
+    "name": "二饭",
+    "x": 58,
+    "y": 25,
+    "category": "校园生活",
+    "zone": "餐饮社交区"
+  },
+  {
+    "id": "tea",
+    "name": "茶餐厅",
+    "x": 55,
+    "y": 29,
+    "category": "校园生活",
+    "zone": "餐饮社交区"
+  },
+  {
+    "id": "activity-center",
+    "name": "大学生活动中心",
+    "x": 66,
+    "y": 25,
+    "category": "社交活动",
+    "zone": "餐饮社交区"
+  },
+  {
+    "id": "canteen-1",
+    "name": "一饭",
+    "x": 81.71,
+    "y": 46.22,
+    "category": "校园生活",
+    "zone": "餐饮社交区"
+  },
+  {
+    "id": "basketball",
+    "name": "篮球场",
+    "x": 47.21,
+    "y": 22.27,
+    "category": "运动活力",
+    "zone": "运动活力区"
+  },
+  {
+    "id": "tennis-west",
+    "name": "网球场（西南）",
+    "x": 28.07,
+    "y": 63.13,
+    "category": "运动活力",
+    "zone": "运动活力区"
+  },
+  {
+    "id": "track",
+    "name": "操场",
+    "x": 89.57,
+    "y": 72.38,
+    "category": "运动活力",
+    "zone": "运动活力区"
+  },
+  {
+    "id": "tennis",
+    "name": "网球场",
+    "x": 71.29,
+    "y": 80.7,
+    "category": "运动活力",
+    "zone": "运动活力区"
+  },
+  {
+    "id": "volleyball",
+    "name": "排球场",
+    "x": 74.5,
+    "y": 90.38,
+    "category": "运动活力",
+    "zone": "运动活力区"
+  },
+  {
+    "id": "gym",
+    "name": "体育馆",
+    "x": 78.86,
+    "y": 81.08,
+    "category": "运动活力",
+    "zone": "运动活力区"
+  },
+  {
+    "id": "pool",
+    "name": "游泳池",
+    "x": 89.29,
+    "y": 57.14,
+    "category": "运动活力",
+    "zone": "运动活力区"
+  },
+  {
+    "id": "west-gate",
+    "name": "西门",
+    "x": 8.57,
+    "y": 45,
+    "category": "校园生活",
+    "zone": "校门入口区"
+  },
+  {
+    "id": "east-gate",
+    "name": "东门",
+    "x": 93,
+    "y": 48,
+    "category": "校园生活",
+    "zone": "校门入口区"
+  },
+  {
+    "id": "southwest-gate",
+    "name": "西南门",
+    "x": 55,
+    "y": 92,
+    "category": "校园生活",
+    "zone": "校门入口区"
+  }
+]

@@ -23,8 +23,9 @@
     })();
   </script>
   <link rel="icon" type="image/svg+xml" href="assets/logo-mark.svg?v=2">
-  <link rel="stylesheet" href="styles.css?v=7">
+  <link rel="stylesheet" href="styles.css?v=9">
   <link rel="stylesheet" href="css/atlas.css?v=3">
+  <link rel="stylesheet" href="css/campus-tools.css">
 </head>
 <body data-page="map">
   <div class="sky" id="sky" aria-hidden="true"></div>
@@ -55,6 +56,14 @@
           <span>我的</span><small>MY NOVA</small>
         </a>
       </nav>
+
+      <div class="campus-tools" aria-label="校园工具">
+        <button id="open-campus-ai" class="button button-small" type="button" aria-haspopup="dialog">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m12 2 2.5 7.5L22 12l-7.5 2.5L12 22l-2.5-7.5L2 12l7.5-2.5Z"/></svg>
+          AI 校园助手
+        </button>
+        <a id="feedback-link" class="button button-small button-ghost" href="https://ucnr583x0txz.feishu.cn/share/base/form/shrcnRNbe5UEvJtgthU7VFFDpzf" target="_blank" rel="noopener noreferrer">用户反馈</a>
+      </div>
 
       <div class="rail-bottom">
         <button class="rail-theme" type="button" data-action="toggle-theme" aria-label="切换深色主题">
@@ -92,14 +101,38 @@
   </div>
 
   <div id="modal-root"></div>
+  <dialog id="campus-ai" class="campus-dialog" aria-labelledby="campus-ai-title">
+    <div class="campus-dialog-head">
+      <div>
+        <p class="campus-dialog-kicker">CAMPUS NOVA · AI</p>
+        <h2 id="campus-ai-title">校园助手</h2>
+      </div>
+      <form method="dialog"><button class="button button-small button-ghost">关闭</button></form>
+    </div>
+    <p class="campus-dialog-note">用星图校园的资料查地点、找社团，开放时间和招新安排以校方公告为准。提问会发送至 OpenRouter，请勿输入个人信息。</p>
+    <div class="campus-prompts" aria-label="试试这样问">
+      <button type="button" class="chip">校园里哪里适合自习？</button>
+      <button type="button" class="chip">喜欢编程，可以看看哪些社团？</button>
+    </div>
+    <div id="campus-chat" class="campus-chat" role="log" aria-label="对话记录" tabindex="0"></div>
+    <p id="campus-chat-status" class="campus-dialog-note" role="status"></p>
+    <form id="campus-chat-form">
+      <label for="campus-question">你的问题</label>
+      <div class="campus-compose">
+        <textarea id="campus-question" rows="2" required maxlength="500" placeholder="例如：图书馆附近还有哪些地标？"></textarea>
+        <button class="button button-small" type="submit">发送</button>
+      </div>
+    </form>
+  </dialog>
   <div id="toast-region" class="toast-region" aria-live="polite" aria-atomic="true"></div>
   <noscript><div class="noscript">请启用 JavaScript 以体验星图校园交互原型。</div></noscript>
 
   <script src="js/sky.js?v=3" defer></script>
   <script src="js/china-map.js?v=3" defer></script>
-  <script src="js/mock.js?v=3" defer></script>
-  <script src="js/store.js?v=4" defer></script>
-  <script src="js/api.js?v=3" defer></script>
-  <script src="js/app.js?v=5" defer></script>
+  <script src="js/mock.js?v=7" defer></script>
+  <script src="js/store.js?v=3" defer></script>
+  <script src="js/api.js?v=4" defer></script>
+  <script src="js/app.js?v=8" defer></script>
+  <script src="js/campus-tools.js" defer></script>
 </body>
 </html>

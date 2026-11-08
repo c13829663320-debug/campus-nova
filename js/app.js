@@ -5,7 +5,6 @@
   const view = document.getElementById("app-view");
   const modalRoot = document.getElementById("modal-root");
   const toastRegion = document.getElementById("toast-region");
-  const appShell = document.querySelector(".app-shell");
 
   const ui = {
     mapFilter: "all",
@@ -137,11 +136,6 @@
     document.documentElement.dataset.theme = theme;
     document.querySelector('meta[name="theme-color"]').content = theme === "dark" ? "#04101E" : "#E7F3FD";
     if (window.NovaSky) window.NovaSky.setTheme(theme);
-    const heroBackground = document.querySelector("[data-hero-bg]");
-    if (heroBackground) {
-      const source = `assets/hero/atlas-${theme === "dark" ? "night" : "day"}.jpg?v=4`;
-      if (heroBackground.getAttribute("src") !== source) heroBackground.src = source;
-    }
     document.querySelectorAll('[data-action="toggle-theme"]').forEach(button => {
       button.setAttribute("aria-label", theme === "dark" ? "切换浅色主题" : "切换深色主题");
     });
@@ -375,7 +369,8 @@
     return `<div class="nova-intro view-enter">
       <section class="nova-hero" aria-label="星图校园 · 前言">
         <div class="nova-hero-media" aria-hidden="true">
-          <img class="nova-hero-bg" data-hero-bg src="assets/hero/atlas-${Store.state.theme === "dark" ? "night" : "day"}.jpg?v=4" alt="" decoding="async" fetchpriority="high">
+          <img class="nova-hero-bg is-light" src="assets/hero/atlas-day.jpg?v=4" alt="" decoding="async" fetchpriority="high">
+          <img class="nova-hero-bg is-dark" src="assets/hero/atlas-night.jpg?v=4" alt="" decoding="async">
         </div>
 
         <div class="nova-hero-inner">
@@ -493,28 +488,38 @@
 
   function renderMap() {
     if (mapIntroVisible) return renderMapIntro();
-    const { places, groups, categories: placeCategories = [], buildings = [] } = ui.mapData;
+    const { places, groups, buildings = [], pois = [] } = ui.mapData;
     const selectedBuilding = activeBuilding();
     const defaultPlaceId = (places[0] || {}).id || "";
-    const categories = placeCategories.map(category => `<button class="chip ${ui.mapFilter === category.id ? "active" : ""}" data-action="filter-map" data-filter="${category.id}">${category.label}</button>`).join("");
-    const nodes = places.map(place => {
-      const groupCount = groups.filter(group => group.placeId === place.id).length;
-      const dimmed = ui.mapFilter !== "all" && place.category !== ui.mapFilter;
-      const lit = Store.state.litPlaceIds.includes(place.id);
-      const pinX = place.isoX != null ? place.isoX : place.x;
-      const pinY = place.isoY != null ? place.isoY : place.y;
-      return `<button class="map-node ${lit ? "is-lit" : ""} ${dimmed ? "is-dimmed" : ""}" style="left:${pinX}%;top:${pinY}%" data-action="open-place" data-id="${place.id}" data-category="${place.category}" aria-label="探索${place.name}，${groupCount}场组局${lit ? "，已点亮" : ""}">
-        <span class="node-pin">${icon(place.icon)}${groupCount ? `<span class="node-count">${groupCount}</span>` : ""}</span>
-        <span class="node-label">${place.shortName || place.name}</span>
-      </button>`;
-    }).join("");
-    const buildingPins = buildings.map(building => {
-      const dimmed = ui.activeRegion && building.region !== ui.activeRegion;
+    const mapTypes = [
+      { id: "all", label: "全部地点" },
+      { id: "teach", label: "教学楼" },
+      { id: "dorm", label: "宿舍" },
+      { id: "life", label: "生活服务" },
+      { id: "other", label: "其他" }
+    ];
+    const categories = mapTypes.map(type => `<button class="chip ${ui.mapFilter === type.id ? "active" : ""}" data-action="filter-map" data-filter="${type.id}">${type.label}</button>`).join("");
+    const buildingPins = (ui.activeRegion ? buildings.filter(building => building.region === ui.activeRegion) : []).map(building => {
       const active = selectedBuilding && selectedBuilding.id === building.id;
       const color = regionMeta(building.region).color;
-      return `<button class="building-pin ${dimmed ? "is-dimmed" : ""} ${active ? "is-active" : ""}" style="left:${building.x}%;top:${building.y}%;--rc:${color}" data-action="select-building" data-id="${building.id}" aria-pressed="${active ? "true" : "false"}" aria-label="查看${escapeHTML(building.name)}建筑档案">
+      return `<button class="building-pin ${active ? "is-active" : ""}" style="left:${building.x}%;top:${building.y}%;--rc:${color}" data-action="select-building" data-id="${building.id}" aria-pressed="${active ? "true" : "false"}" aria-label="查看${escapeHTML(building.name)}建筑档案">
         <span class="building-pin-dot" aria-hidden="true"></span>
         <span class="building-pin-name">${escapeHTML(building.name)}</span>
+      </button>`;
+    }).join("");
+    const poiTypes = {
+      teach: { label: "教学楼", color: "#3E6FA8", bg: "#EAF2FB" },
+      dorm: { label: "宿舍", color: "#2F8F63", bg: "#E8F5EC" },
+      life: { label: "生活服务", color: "#C9762F", bg: "#FDF1E3" },
+      other: { label: "其他", color: "#7A5AA6", bg: "#F1ECFA" }
+    };
+    const poiPins = pois.map(poi => {
+      const type = poiTypes[poi.type] || poiTypes.other;
+      const dimmed = ui.mapFilter !== "all" && poi.type !== ui.mapFilter;
+      const action = poi.placeId ? `data-action="open-place" data-id="${poi.placeId}"` : `data-action="toggle-poi"`;
+      return `<button class="map-pill ${dimmed ? "is-dimmed" : ""}" style="left:${poi.x}%;top:${poi.y}%;--pc:${type.color};--pb:${type.bg}" ${action} data-type="${poi.type}" aria-label="${escapeHTML(poi.name)}，${type.label}，${poi.zone}">
+        <span class="map-pill-text">${escapeHTML(poi.name)}</span>
+        <span class="map-pill-tip" role="tooltip"><em>${poi.zone}</em><strong>${escapeHTML(poi.name)}</strong><small>${type.label}</small></span>
       </button>`;
     }).join("");
     const zoneBar = `<div class="map-zone-bar" aria-label="建筑片区">
@@ -530,7 +535,7 @@
     }).join("");
 
     const zoomMax = 2.4;
-    const mapStage = `<div class="campus-map-stage is-iso" style="transform:scale(${ui.mapZoom})"><img class="map-photo is-iso" src="assets/campus-isometric.webp?v=1" alt="东莞职业技术学院校本部等距校园地图" draggable="false" decoding="async" fetchpriority="high">${buildingPins}${nodes}</div>`;
+    const mapStage = `<div class="campus-map-stage is-iso" style="transform:scale(${ui.mapZoom})"><img class="map-photo is-iso" src="assets/campus-bg.jpg?v=2" alt="东莞职业技术学院校本部等距校园地图" draggable="false" decoding="async" fetchpriority="high">${buildingPins}${poiPins}</div>`;
     const mapControls = `<div class="map-zoom-controls" aria-label="地图缩放控制">
       <button type="button" data-action="map-zoom-in" aria-label="放大地图" title="放大" ${ui.mapZoom >= zoomMax ? "disabled" : ""}>${icon("zoom-in")}</button>
       <button type="button" data-action="map-zoom-out" aria-label="缩小地图" title="缩小" ${ui.mapZoom <= 1 ? "disabled" : ""}>${icon("zoom-out")}</button>
@@ -542,17 +547,22 @@
         <section class="map-card card" aria-label="校园探索地图">
           <div class="map-toolbar">
             <div class="filter-chips" aria-label="地点分类">${categories}</div>
-            <span class="map-scale">${icon("navigation")}${buildings.length} 栋建筑单元 · 点击热点查看档案</span>
+            <span class="map-scale">${icon("navigation")}${pois.length} 个地点 · 4 类标注</span>
           </div>
-          <div class="campus-map is-iso" data-region="${ui.activeRegion || "all"}">
-            ${mapStage}
-            <div class="map-campus-badge" aria-hidden="true"><span>等距</span><div><strong>东莞职业技术学院</strong><small>校本部 · 建筑图鉴</small></div></div>${mapControls}
-            <div class="map-distance" aria-hidden="true"><i></i><span>等距插画</span></div>
+          <div class="map-frame">
+            <div class="map-scroll">
+              <div class="campus-map is-iso" data-region="${ui.activeRegion || "all"}">
+                ${mapStage}
+                <div class="map-campus-badge" aria-hidden="true"><span>等距</span><div><strong>东莞职业技术学院</strong><small>校本部 · 地点导览</small></div></div>
+                <div class="map-distance" aria-hidden="true"><i></i><span>等距插画</span></div>
+              </div>
+            </div>
+            ${mapControls}
           </div>
           ${zoneBar}
           <div class="map-caption">
-            <div class="map-legend"><span><i class="legend-dot"></i>建筑热点 · 点击查看档案</span><span><i class="legend-dot amber"></i>地点入口</span></div>
-            <span>底图：校本部等距插画 · 43 个建筑单元为矢量近似重建</span>
+            <div class="map-legend"><span><i class="legend-dot" style="--lc:#3E6FA8;--lb:#EAF2FB"></i>教学楼</span><span><i class="legend-dot" style="--lc:#2F8F63;--lb:#E8F5EC"></i>宿舍</span><span><i class="legend-dot" style="--lc:#C9762F;--lb:#FDF1E3"></i>生活服务</span><span><i class="legend-dot" style="--lc:#7A5AA6;--lb:#F1ECFA"></i>其他</span></div>
+            <span>底图：校本部等距插画 · 点击标签查看所属板块${ui.activeRegion ? " · 当前片区已显示建筑热点" : ""}</span>
           </div>
         </section>
         <aside class="map-side">
@@ -608,38 +618,8 @@
   }
 
   function renderPlace() {
-    const { place: rawPlace, groups } = ui.placeData;
-    const place = {
-      ...rawPlace,
-      id: escapeHTML(rawPlace.id),
-      name: escapeHTML(rawPlace.name),
-      categoryLabel: escapeHTML(rawPlace.categoryLabel),
-      en: escapeHTML(rawPlace.en),
-      description: escapeHTML(rawPlace.description),
-      hours: escapeHTML(rawPlace.hours),
-      distance: escapeHTML(rawPlace.distance),
-      images: rawPlace.images.map(image => escapeHTML(image)),
-      imageLabels: rawPlace.imageLabels.map(label => escapeHTML(label)),
-      menu: rawPlace.menu.map(item => ({
-        ...item,
-        name: escapeHTML(item.name),
-        stall: escapeHTML(item.stall),
-        status: escapeHTML(item.status),
-        price: escapeHTML(item.price)
-      })),
-      tips: rawPlace.tips.map(tip => ({
-        ...tip,
-        title: escapeHTML(tip.title),
-        text: escapeHTML(tip.text)
-      })),
-      sponsor: rawPlace.sponsor ? {
-        ...rawPlace.sponsor,
-        title: escapeHTML(rawPlace.sponsor.title),
-        text: escapeHTML(rawPlace.sponsor.text),
-        action: escapeHTML(rawPlace.sponsor.action)
-      } : null
-    };
-    const lit = Store.state.litPlaceIds.includes(rawPlace.id);
+    const { place, groups } = ui.placeData;
+    const lit = Store.state.litPlaceIds.includes(place.id);
     const index = Math.max(0, Math.min(ui.galleryIndex, place.images.length - 1));
     ui.galleryIndex = index;
     const guideContent = place.menu.length ? `
@@ -720,15 +700,7 @@
 
   function openModal(content, small = false) {
     lastFocused = document.activeElement;
-    modalRoot.innerHTML = `<div class="modal-backdrop" data-modal-backdrop><section class="modal ${small ? "modal-small" : ""}" role="dialog" aria-modal="true" aria-label="对话框"><div class="modal-handle"></div>${content}</section></div>`;
-    const dialog = modalRoot.querySelector('[role="dialog"]');
-    const title = dialog.querySelector("h2");
-    if (title) {
-      title.id = "modal-title";
-      dialog.setAttribute("aria-labelledby", title.id);
-      dialog.removeAttribute("aria-label");
-    }
-    appShell.inert = true;
+    modalRoot.innerHTML = `<div class="modal-backdrop" data-modal-backdrop><section class="modal ${small ? "modal-small" : ""}" role="dialog" aria-modal="true"><div class="modal-handle"></div>${content}</section></div>`;
     document.body.classList.add("modal-open");
     requestAnimationFrame(() => {
       const target = modalRoot.querySelector("input, select, textarea, button");
@@ -739,13 +711,12 @@
   function closeModal(restoreFocus = true) {
     if (!modalRoot.firstChild) return;
     modalRoot.innerHTML = "";
-    appShell.inert = false;
     document.body.classList.remove("modal-open");
     if (restoreFocus && lastFocused && document.contains(lastFocused)) lastFocused.focus();
   }
 
   function modalHeader(eyebrow, title, subtitle) {
-    return `<div class="modal-header"><div><span class="eyebrow">${escapeHTML(eyebrow)}</span><h2>${escapeHTML(title)}</h2><p>${escapeHTML(subtitle)}</p></div><button class="icon-button" data-action="close-modal" aria-label="关闭弹层">${icon("x")}</button></div>`;
+    return `<div class="modal-header"><div><span class="eyebrow">${eyebrow}</span><h2>${title}</h2><p>${subtitle}</p></div><button class="icon-button" data-action="close-modal" aria-label="关闭弹层">${icon("x")}</button></div>`;
   }
 
   function fieldError(name) {
@@ -843,7 +814,7 @@
     const place = Store.getPlace(placeId);
     if (!place || !place.sponsor) return;
     openModal(`${modalHeader("NOVA BENEFIT · 场景福利", "把地理位置，变成真实福利", "基于当前地点精准出现，不打扰其他探索场景。")}
-      <div class="sponsor-card card"><span class="sponsor-label">${icon("ticket")}滋兰餐厅 · 新生限定</span><h3>${escapeHTML(place.sponsor.title)}</h3><p>${escapeHTML(place.sponsor.text)}</p><div class="divider"></div><div class="place-facts" style="margin:0;border:0;padding:0"><div>${icon("clock")}11月1日–11月15日，每天 10:00–20:00</div><div>${icon("map-pin")}滋兰餐厅二楼新叶茶饮档口</div></div></div>
+      <div class="sponsor-card card"><span class="sponsor-label">${icon("ticket")}滋兰餐厅 · 新生限定</span><h3>${place.sponsor.title}</h3><p>${place.sponsor.text}</p><div class="divider"></div><div class="place-facts" style="margin:0;border:0;padding:0"><div>${icon("clock")}11月1日–11月15日，每天 10:00–20:00</div><div>${icon("map-pin")}滋兰餐厅二楼新叶茶饮档口</div></div></div>
       <div class="form-note" style="margin-top:16px">${icon("info")}这是 LBS 原生商业化演示。优惠仅在同学主动进入食堂场景后展示。</div>
       <div class="form-actions"><button class="button button-ghost" data-action="close-modal">稍后再看</button><button class="button" data-action="claim-sponsor">${icon("ticket")}领取 5 元券</button></div>`, true);
   }
@@ -1515,12 +1486,18 @@
       return;
     }
     const trigger = event.target.closest("[data-action]");
-    if (!trigger) return;
+    if (!trigger) {
+      view.querySelectorAll(".map-pill.is-open").forEach(item => item.classList.remove("is-open"));
+      return;
+    }
     const action = trigger.dataset.action;
     event.preventDefault();
-    trigger.focus({ preventScroll: true });
 
-    if (action === "toggle-theme") {
+    if (action === "toggle-poi") {
+      const isOpen = trigger.classList.contains("is-open");
+      view.querySelectorAll(".map-pill.is-open").forEach(item => item.classList.remove("is-open"));
+      if (!isOpen) trigger.classList.add("is-open");
+    } else if (action === "toggle-theme") {
       Store.setTheme(Store.state.theme === "dark" ? "light" : "dark");
       applyTheme();
     } else if (action === "enter-campus-map") {
@@ -1694,26 +1671,7 @@
   });
 
   document.addEventListener("keydown", event => {
-    if (event.key === "Escape" && modalRoot.firstChild) {
-      closeModal();
-      return;
-    }
-    if (event.key === "Tab" && modalRoot.firstChild) {
-      const focusable = [...modalRoot.querySelectorAll('a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])')]
-        .filter(element => element.getClientRects().length);
-      const first = focusable[0];
-      const last = focusable[focusable.length - 1];
-      if (!first) {
-        event.preventDefault();
-      } else if (event.shiftKey && (document.activeElement === first || !modalRoot.contains(document.activeElement))) {
-        event.preventDefault();
-        last.focus();
-      } else if (!event.shiftKey && document.activeElement === last) {
-        event.preventDefault();
-        first.focus();
-      }
-      return;
-    }
+    if (event.key === "Escape" && modalRoot.firstChild) closeModal();
     if (!modalRoot.firstChild && ui.activeRoute.name === "place" && !["INPUT", "TEXTAREA", "SELECT"].includes(document.activeElement.tagName)) {
       if (event.key === "ArrowLeft") changeGallery(-1);
       if (event.key === "ArrowRight") changeGallery(1);

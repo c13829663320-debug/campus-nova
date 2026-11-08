@@ -1,0 +1,82 @@
+.campus-tools {
+  display: grid;
+  gap: 8px;
+  margin: 18px 0;
+}
+.campus-tools .button { justify-content: flex-start; }
+.campus-dialog {
+  position: fixed;
+  inset: 0;
+  margin: auto;
+  width: min(560px, calc(100% - 28px));
+  max-height: calc(100dvh - 28px);
+  overflow: auto;
+  padding: clamp(16px, 4vw, 28px);
+  border: 1px solid var(--border-strong);
+  border-radius: 22px;
+  color: var(--text);
+  background: var(--surface-raised);
+}
+.campus-dialog::backdrop { background: rgb(6 16 28 / 65%); }
+.campus-dialog-head, .campus-compose {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+}
+.campus-dialog-kicker {
+  color: var(--text-sub);
+  font-size: 11px;
+  letter-spacing: .14em;
+}
+.campus-dialog h2 { font-size: 24px; }
+.campus-dialog-note {
+  margin-top: 10px;
+  color: var(--text-sub);
+  font-size: 13px;
+  line-height: 1.6;
+}
+.campus-prompts { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0; }
+.campus-chat {
+  display: grid;
+  gap: 8px;
+  max-height: min(38dvh, 300px);
+  overflow-y: auto;
+}
+.campus-chat:empty { display: none; }
+.campus-message {
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: var(--surface-soft);
+  font-size: 14px;
+  line-height: 1.65;
+  overflow-wrap: anywhere;
+}
+.campus-message[data-speaker="user"] { background: var(--primary-soft); }
+.campus-message p { white-space: pre-wrap; }
+#campus-chat-form { margin-top: 12px; }
+#campus-chat-form label { display: block; margin-bottom: 6px; font-size: 13px; }
+.campus-compose textarea {
+  flex: 1;
+  min-width: 0;
+  padding: 8px 10px;
+  resize: vertical;
+  border: 1px solid var(--border-strong);
+  border-radius: 12px;
+  color: var(--text);
+  background: var(--surface);
+  font: inherit;
+  font-size: 16px;
+}
+@media (max-width: 900px) {
+  .campus-tools {
+    position: absolute;
+    right: 12px;
+    bottom: calc(100% + 8px);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    margin: 0;
+  }
+  .campus-tools .button { min-height: 44px; padding-inline: 11px; box-shadow: var(--shadow-sm); }
+}

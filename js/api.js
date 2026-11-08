@@ -81,7 +81,8 @@
         groups: window.NovaStore.getGroups(),
         zones: window.NovaDB.zones,
         categories: window.NovaDB.categories,
-        buildings: window.NovaDB.buildings || []
+        buildings: window.NovaDB.buildings || [],
+        pois: window.NovaDB.campusPois || []
       }), "/map");
     },
 

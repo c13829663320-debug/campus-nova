@@ -45,7 +45,6 @@ export function createLabels(stage, data) {
     el.dataset.placeId = place.id;
     el.dataset.category = place.category;
     el.title = place.name;
-    el.setAttribute("aria-label", `探索${place.name}`);
     el.innerHTML = `<span class="map3d-label__icon">${svg(place.icon)}</span><span class="map3d-label__badge">${categoryCount.get(place.category)}</span>`;
     layer.appendChild(el);
 
@@ -55,12 +54,6 @@ export function createLabels(stage, data) {
       zoneId: zoneByPlace.get(place.id) || null,
       anchor: new THREE.Vector3(place.x, (heightByPlace.get(place.id) || 0) + 0.9, place.z)
     };
-  });
-
-  layer.addEventListener("click", event => {
-    const button = event.target.closest("button[data-place-id]");
-    if (!button) return;
-    window.location.href = `index.html#place/${encodeURIComponent(button.dataset.placeId)}`;
   });
 
   const projected = new THREE.Vector3();

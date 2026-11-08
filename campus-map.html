@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#EEF1EC">
+  <meta name="description" content="星图校园 2.5D 校园导览图：在静态底图上按百分比坐标标注校园地点。">
+  <title>校园导览图 · 星图校园</title>
+  <link rel="icon" type="image/svg+xml" href="assets/logo-mark.svg?v=2">
+  <link rel="stylesheet" href="css/campus-map.css">
+</head>
+<body>
+  <div class="page">
+    <header class="page-head">
+      <a class="brand" href="index.html">
+        <img src="assets/logo-mark.svg?v=2" width="38" height="38" alt="">
+        <span><strong>星图校园</strong><small>CAMPUS NOVA</small></span>
+      </a>
+
+      <div class="head-copy">
+        <p class="eyebrow">CAMPUS NOVA · MAP OVERLAY</p>
+        <h1>2.5D 校园导览图</h1>
+        <p class="lead">按分类、板块或名称筛选校园地点，悬停与轻点图标查看地点信息。</p>
+      </div>
+
+      <dl class="head-stats" aria-label="地图数据概览">
+        <div><dt>地点</dt><dd id="stat-total">—</dd></div>
+        <div><dt>分类</dt><dd id="stat-categories">—</dd></div>
+        <div><dt>板块</dt><dd id="stat-zones">—</dd></div>
+      </dl>
+    </header>
+
+    <main>
+      <section class="map-card" aria-labelledby="map-title">
+        <h2 class="sr-only" id="map-title">东莞职业技术学院校本部校园地图</h2>
+
+        <div class="map-tools">
+          <div class="chips" id="category-chips" role="group" aria-label="按地点分类筛选"></div>
+          <div class="tool-right">
+            <span class="filter-summary" id="filter-summary" aria-live="polite">—</span>
+            <label class="zone-filter">
+              <span>板块</span>
+              <select id="zone-select" aria-label="按板块筛选"></select>
+            </label>
+            <label class="search-filter">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/></svg>
+              <input id="poi-search" type="search" placeholder="搜索地点" autocomplete="off">
+            </label>
+          </div>
+        </div>
+
+        <div class="map-viewport">
+          <div class="map-frame">
+            <img class="map-bg" src="assets/campus-bg.jpg" alt="东莞职业技术学院校本部 2.5D 等距校园地图" draggable="false" decoding="async" fetchpriority="high">
+            <div class="poi-layer" id="poi-layer"></div>
+
+            <div class="map-badge" aria-hidden="true">
+              <span>2.5D</span>
+              <div><strong>东莞职业技术学院</strong><small>校本部 · 校园导览</small></div>
+            </div>
+            <div class="map-hint" aria-hidden="true"><i></i><span class="hint-desktop">悬停或轻点图标查看地点</span><span class="hint-touch">左右滑动查看 · 轻点图标</span></div>
+          </div>
+        </div>
+
+        <footer class="map-foot">
+          <div class="legend" id="legend" aria-label="地点分类图例"></div>
+          <p>底图 campus-bg.jpg · 图标使用百分比坐标定位，随屏幕尺寸自适应</p>
+        </footer>
+      </section>
+    </main>
+  </div>
+
+  <noscript><p class="map-error">请启用 JavaScript 以渲染校园地点图标。</p></noscript>
+  <script src="js/campus-map.js" defer></script>
+</body>
+</html>
