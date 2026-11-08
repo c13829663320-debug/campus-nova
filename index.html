@@ -23,9 +23,9 @@
     })();
   </script>
   <link rel="icon" type="image/svg+xml" href="assets/logo-mark.svg?v=2">
-  <link rel="stylesheet" href="styles.css?v=12">
-  <link rel="stylesheet" href="css/atlas.css?v=3">
-  <link rel="stylesheet" href="css/campus-tools.css?v=4">
+  <link rel="stylesheet" href="styles.css?v=13">
+  <link rel="stylesheet" href="css/atlas.css?v=4">
+  <link rel="stylesheet" href="css/campus-tools.css?v=5">
 </head>
 <body data-page="map">
   <div class="sky" id="sky" aria-hidden="true"></div>
@@ -39,30 +39,35 @@
       </a>
 
       <nav class="primary-nav" aria-label="主导航">
+        <p class="rail-label" aria-hidden="true">校园导航</p>
         <a href="#map" data-nav="map" aria-current="page">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4 3 6.5v13L9 17l6 2.5 6-2.5v-13L15 7 9 4Z"/><path d="M9 4v13M15 7v12.5"/></svg>
-          <span>星图</span><small>CAMPUS MAP</small>
+          <span>星图</span>
         </a>
         <a href="#forum" data-nav="forum">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 11.5a8 8 0 0 1-8 8H7.2L3.5 22v-6.3a8 8 0 0 1 8.5-12.2 8 8 0 0 1 8.5 8Z"/></svg>
-          <span>论坛</span><small>CAMPUS FORUM</small>
+          <span>论坛</span>
         </a>
         <a href="#clubs" data-nav="clubs">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.4"/><path d="M2.8 20a6.2 6.2 0 0 1 12.4 0"/><path d="M16.2 5.4a3.4 3.4 0 0 1 0 5.2"/><path d="M17.6 14.6A6.2 6.2 0 0 1 21.2 20"/></svg>
-          <span>社团</span><small>CLUB MATRIX</small>
+          <span>社团</span>
         </a>
         <a href="#me" data-nav="me">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="3.6"/><path d="M4.8 20.2a7.2 7.2 0 0 1 14.4 0"/></svg>
-          <span>我的</span><small>MY NOVA</small>
+          <span>我的</span>
         </a>
       </nav>
 
-      <div class="campus-tools" aria-label="校园工具">
+      <div class="campus-tools" role="group" aria-labelledby="rail-tools-label">
+        <p class="rail-label" id="rail-tools-label">校园工具</p>
         <button id="open-campus-ai" class="button button-small" type="button" aria-haspopup="dialog">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m12 2 2.5 7.5L22 12l-7.5 2.5L12 22l-2.5-7.5L2 12l7.5-2.5Z"/></svg>
           AI 校园助手
         </button>
-        <a id="feedback-link" class="button button-small button-ghost" href="https://ucnr583x0txz.feishu.cn/share/base/form/shrcnRNbe5UEvJtgthU7VFFDpzf" target="_blank" rel="noopener noreferrer">用户反馈</a>
+        <a id="feedback-link" class="button button-small" href="https://ucnr583x0txz.feishu.cn/share/base/form/shrcnRNbe5UEvJtgthU7VFFDpzf" target="_blank" rel="noopener noreferrer">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h14a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-8l-5 4v-4H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Z"/><path d="M8 9h8m-8 4h5"/></svg>
+          用户反馈
+        </a>
       </div>
 
       <div class="rail-bottom">
@@ -70,11 +75,12 @@
           <svg class="theme-icon-light" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8Z"/></svg>
           <svg class="theme-icon-dark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.66 6.34l1.41-1.41"/></svg>
           <span>切换主题</span>
+          <span class="rail-theme-mode" aria-hidden="true"><span class="theme-icon-light">浅色</span><span class="theme-icon-dark">深色</span></span>
         </button>
         <a class="rail-user" href="#me" aria-label="进入个人中心">
           <span class="avatar avatar-small" data-shell-avatar>星</span>
           <div><strong data-shell-name>同学</strong><span data-shell-meta>校园身份核验中</span></div>
-          <span class="online-dot" aria-hidden="true"></span>
+          <svg class="rail-user-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg>
         </a>
       </div>
     </aside>

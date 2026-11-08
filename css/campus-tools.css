@@ -1,9 +1,19 @@
 .campus-tools {
   display: grid;
-  gap: 8px;
-  margin: 18px 0;
+  gap: 6px;
 }
-.campus-tools .button { justify-content: flex-start; }
+.campus-tools .button {
+  justify-content: flex-start;
+  min-height: 44px;
+  padding-inline: 12px;
+  border: 1px solid var(--feature-line);
+  border-radius: 12px;
+  background: var(--feature-panel);
+  color: var(--text);
+}
+.campus-tools .button svg { flex: 0 0 auto; color: var(--feature-ink); }
+.campus-tools button.button { background: var(--feature-tint); color: var(--feature-ink); }
+.campus-tools .button:hover { border-color: var(--feature-ink); }
 .place-search {
   display: grid;
   gap: 8px;
@@ -152,7 +162,6 @@
     display: flex;
     flex-wrap: wrap;
     justify-content: flex-end;
-    margin: 0;
   }
-  .campus-tools .button { min-height: 44px; padding-inline: 11px; box-shadow: var(--shadow-sm); }
+  .campus-tools .button { padding-inline: 11px; box-shadow: 0 4px 14px rgba(26, 66, 112, .12); }
 }
