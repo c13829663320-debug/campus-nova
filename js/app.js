@@ -995,8 +995,10 @@
     "club-84", "club-85", "club-86", "club-87", "club-89"
   ]);
 
+  const clubWebpPhotos = new Set(["club-1", "club-83"]);
+
   function clubPhoto(club) {
-    if (club.id === "club-1") return "assets/clubs/club-1.webp";
+    if (clubWebpPhotos.has(club.id)) return `assets/clubs/${club.id}.webp`;
     if (clubOwnPhotos.has(club.id)) return `assets/clubs/${club.id}.jpg`;
     const hit = clubPhotos.find(item => item.test.test(club.name));
     if (hit) return hit.src;
@@ -1035,7 +1037,7 @@
         ${event.cta?.directory ? `<button class="button" data-action="show-club-directory">${ctaLabel} ${icon("arrow-right")}</button>` : `<a class="button" href="${ctaHref}">${ctaLabel} ${icon("arrow-right")}</a>`}
         <div class="club-carousel-controls">
           <button class="icon-button" data-action="club-slide-prev" aria-label="上一个活动">${icon("chevron-left")}</button>
-          <div class="club-carousel-dots">${events.map((item, i) => `<button class="club-dot ${i === index ? "active" : ""}" data-action="club-slide-goto" data-index="${i}" aria-label="第 ${i + 1} 个活动：${item.title}"></button>`).join("")}</div>
+          <div class="club-carousel-dots">${events.map((item, i) => `<button class="club-dot" data-action="club-slide-goto" data-index="${i}" aria-current="${i === index}" aria-label="第 ${i + 1} 个活动：${item.title}"></button>`).join("")}</div>
           <button class="icon-button" data-action="club-slide-next" aria-label="下一个活动">${icon("chevron-right")}</button>
           <span class="club-slide-count">${index + 1} / ${events.length}</span>
         </div>
@@ -1440,13 +1442,13 @@
       <section class="forum-hero">
         <div class="forum-hero-copy">
           <span class="eyebrow">CAMPUS TALK · 校园论坛</span>
-          <h2>课堂之外，<br>也值得被听见。</h2>
+          <h2>课堂之外，也值得被听见。</h2>
           <p>${isDemo() ? "这里有示例话题。你发布的内容、点赞和回复只保存在当前浏览器。" : "吃瓜、吐槽、树洞、求助和闲置，都可以放在这里。"}开启匿名后，相关话题或回复只显示匿名昵称。</p>
         </div>
         <div class="forum-hero-stats">
-          <div><strong>${allPosts.length}</strong><span>个话题</span></div>
-          <div><strong>${commentTotal}</strong><span>条讨论</span></div>
-          <div><strong>${anonTotal}</strong><span>条匿名</span></div>
+          <div><strong>${allPosts.length}</strong><span>话题</span></div>
+          <div><strong>${commentTotal}</strong><span>讨论</span></div>
+          <div><strong>${anonTotal}</strong><span>匿名话题</span></div>
         </div>
       </section>
       <div class="forum-layout">
