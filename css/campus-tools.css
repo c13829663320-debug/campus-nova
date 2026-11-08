@@ -4,6 +4,27 @@
   margin: 18px 0;
 }
 .campus-tools .button { justify-content: flex-start; }
+.map-panorama-link { margin: 4px 4px 12px; }
+.campus-panorama {
+  width: min(1120px, calc(100% - 32px));
+  margin: clamp(20px, 5vw, 48px) auto;
+}
+.campus-panorama header {
+  display: grid;
+  gap: 12px;
+  margin-bottom: 16px;
+  justify-items: start;
+}
+.campus-panorama h1 { font-size: clamp(24px, 5vw, 38px); }
+.campus-panorama p { color: var(--text-sub); }
+.campus-panorama iframe {
+  display: block;
+  width: 100%;
+  height: clamp(360px, 70dvh, 760px);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-lg);
+  background: var(--surface-soft);
+}
 .campus-dialog {
   position: fixed;
   inset: 0;

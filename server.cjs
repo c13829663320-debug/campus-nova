@@ -31,7 +31,7 @@ const mime = {
   ".jpeg": "image/jpeg", ".webp": "image/webp", ".gif": "image/gif",
   ".woff": "font/woff", ".woff2": "font/woff2", ".ico": "image/x-icon"
 };
-const pages = new Set(["/index.html", "/campus-map.html", "/logo-preview.html", "/map3d.html", "/styles.css"]);
+const pages = new Set(["/index.html", "/campus-map.html", "/logo-preview.html", "/map3d.html", "/panorama.html", "/styles.css"]);
 let requests = [];
 let inFlight = 0;
 

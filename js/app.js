@@ -389,6 +389,7 @@
               <button class="nova-quick" type="button" data-action="enter-campus-map" data-target="groups">${icon("users")}<span>活动组队</span></button>
               <a class="nova-quick" href="#forum">${icon("message-square")}<span>校园论坛</span></a>
               <a class="nova-quick" href="#clubs">${icon("star")}<span>社团介绍</span></a>
+              <a class="nova-quick" href="panorama.html">${icon("camera")}<span>实景漫游</span></a>
             </div>
 
             <button class="nova-hero-scroll" type="button" data-action="enter-campus-map">
@@ -545,6 +546,7 @@
     return `<div class="view-enter">
       <div class="map-layout stagger">
         <section class="map-card card" aria-label="校园探索地图">
+          <a class="button button-small button-secondary map-panorama-link" href="panorama.html">${icon("camera")}实景漫游</a>
           <div class="map-toolbar">
             <div class="filter-chips" aria-label="地点分类">${categories}</div>
             <span class="map-scale">${icon("navigation")}${pois.length} 个地点 · 4 类标注</span>
