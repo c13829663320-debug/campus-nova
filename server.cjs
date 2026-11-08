@@ -83,37 +83,39 @@ async function chat(req, res) {
   requests.push(now);
   inFlight++;
   try {
-    const upstream = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-      method: "POST",
-      headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
-      body: JSON.stringify({
-        model, max_tokens: 800,
-        messages: [
-          { role: "system", content: instructions },
-          ...history.flatMap(turn => [
-            { role: "user", content: turn.question },
-            { role: "assistant", content: turn.answer }
-          ]),
-          { role: "user", content: question.trim() }
-        ]
-      }),
-      signal: AbortSignal.timeout(24_000)
-    });
-    if (!upstream.ok) {
-      await upstream.body?.cancel();
-      if (upstream.status === 429) return json(res, 429, { error: "OpenRouter 请求已达限制，请稍后再试。" });
-      console.warn(`OpenRouter HTTP ${upstream.status}`);
-      const error = upstream.status === 401 || upstream.status === 403
-        ? "OpenRouter 未接受当前密钥，请联系项目维护者检查配置。"
-        : "OpenRouter 暂时无法提供回答，请稍后再试。";
-      return json(res, 502, { error });
+    const messages = [
+      { role: "system", content: instructions },
+      ...history.flatMap(turn => [
+        { role: "user", content: turn.question },
+        { role: "assistant", content: turn.answer }
+      ]),
+      { role: "user", content: question.trim() }
+    ];
+    const signal = AbortSignal.timeout(24_000);
+    const maxAttempts = model === "openrouter/free" ? 2 : 1;
+    for (let attempt = 0; attempt < maxAttempts; attempt++) {
+      const upstream = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
+        body: JSON.stringify({ model, max_tokens: 1600, reasoning: { enabled: false }, messages }),
+        signal
+      });
+      if (!upstream.ok) {
+        await upstream.body?.cancel();
+        if (upstream.status === 429) return json(res, 429, { error: "OpenRouter 请求已达限制，请稍后再试。" });
+        console.warn(`OpenRouter HTTP ${upstream.status}`);
+        const error = upstream.status === 401 || upstream.status === 403
+          ? "OpenRouter 未接受当前密钥，请联系项目维护者检查配置。"
+          : "OpenRouter 暂时无法提供回答，请稍后再试。";
+        return json(res, 502, { error });
+      }
+      const result = await upstream.json();
+      const answer = result.choices?.[0]?.message?.content;
+      if (typeof answer === "string" && answer.trim()) {
+        return json(res, 200, { answer: answer.trim().slice(0, 2500) });
+      }
     }
-    const result = await upstream.json();
-    const answer = result.choices?.[0]?.message?.content;
-    if (typeof answer !== "string" || !answer.trim()) {
-      return json(res, 502, { error: "校园助手没有返回回答，请重试。" });
-    }
-    return json(res, 200, { answer: answer.trim().slice(0, 2500) });
+    return json(res, 502, { error: "校园助手没有返回回答，请重试。" });
   } catch (error) {
     console.warn(`OpenRouter 请求失败 (${error.name})`);
     return json(res, 502, { error: "连接 OpenRouter 失败，请稍后重试。" });
