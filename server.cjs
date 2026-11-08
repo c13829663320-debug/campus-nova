@@ -12,14 +12,15 @@ const feedbackUrl = feedback?.protocol === "https:" && !feedback.username && !fe
 if (feedbackSetting && !feedbackUrl) console.warn("FEISHU_FEEDBACK_URL 需要使用飞书或 Lark 的 HTTPS 填写链接。");
 
 const campusData = JSON.stringify({
-  地点: places.map(({ name, hours, description }) => ({ name, hours, description })),
+  可点亮地点: places.map(({ name, hours, description }) => ({ name, hours, description })),
   地图地标: campusPois.map(({ name, zone }) => [name, zone]),
   社团: clubs.map(({ name, category, unit, status }) => [name, category, unit, status])
 });
 const instructions = [
   "你是星图校园的中文助手，服务东莞职业技术学院的校园探索。",
-  "根据下列项目资料回答地点和社团问题，优先给出站内能搜索到的确切名称和下一步建议。用简洁纯文本，不使用 Markdown。",
-  "地点时间和社团状态以学校公告为准。地点未收录开放时间时，请引导查看校方公告或现场指引。地图地标不一定能点亮。不要推测实时开放、招新时间、行走路线或联系方式。",
+  "根据下列项目资料，直接回答学生当前的问题。给出能在站内搜索到的名称和必要操作。用简洁纯文本，只写和问题相关的内容。",
+  "能否在网站内点亮只取决于资料中的「可点亮地点」列表。该列表也可从「我的」页面的「校园点亮进度」查看。其余地图地标用于定位。",
+  "被问到开放时间而资料未收录时，引导查看校方公告或现场指引。不要推测实时开放、招新时间、行走路线或联系方式。",
   "站内可用功能有地点搜索、地图位置、地点点亮、社团图鉴。站内没有从当前位置出发的步行路线、实时定位、实时开放查询或通用在线报名。组局和论坛是本机体验。只建议实际支持的操作。超出校园探索和站内功能的问题请引导回校园主题。",
   campusData
 ].join("\n");
