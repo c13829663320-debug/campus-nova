@@ -1,8 +1,8 @@
 const { places, clubs, campusPois } = require("./js/mock.js");
 
 const key = process.env.OPENROUTER_API_KEY?.trim();
-const textModel = process.env.OPENROUTER_MODEL?.trim() || "openrouter/free";
-const visionModel = process.env.OPENROUTER_VISION_MODEL?.trim() || "google/gemma-4-26b-a4b-it:free";
+const textModel = process.env.OPENROUTER_MODEL?.trim() || "google/gemini-2.5-flash-lite";
+const visionModel = process.env.OPENROUTER_VISION_MODEL?.trim() || "google/gemini-2.5-flash-lite";
 const imageModel = process.env.OPENROUTER_IMAGE_MODEL?.trim() || "black-forest-labs/flux.2-klein-4b";
 const audioModel = process.env.OPENROUTER_AUDIO_MODEL?.trim() || "openai/whisper-large-v3";
 const maxBody = 2 * 1024 * 1024;
@@ -13,6 +13,7 @@ const budgets = {
   all: { entries: [], window: 60_000, count: 15, concurrent: 3, active: 0 },
   image: { entries: [], window: 3_600_000, count: 6, concurrent: 1, active: 0 },
   audio: { entries: [], window: 3_600_000, count: 12, concurrent: 2, active: 0 },
+  allDaily: { entries: [], window: 86_400_000, count: 300, concurrent: 3, active: 0 },
   mediaDaily: { entries: [], window: 86_400_000, count: 48, concurrent: 3, active: 0 }
 };
 
@@ -145,11 +146,11 @@ async function answerQuestion(question, history, image, documents, matches) {
   const content = image ? [{ type: "text", text: prompt }, { type: "image_url", image_url: { url: imageUrl(image) } }] : prompt;
   messages.push({ role: "user", content });
 
-  const models = [...new Set(image ? [visionModel, "openrouter/free"] : [textModel, visionModel])];
+  const models = [...new Set([image ? visionModel : textModel, "openrouter/free"])];
   for (const model of models) {
     try {
       const result = await requestModel("chat/completions", {
-        model, max_tokens: 1600, reasoning: { effort: "none" }, messages
+        model, max_tokens: 1600, messages
       }, AbortSignal.timeout(22_000));
       const answer = result.choices?.[0]?.message?.content;
       if (typeof answer === "string" && answer.trim()) return { answer: answer.trim().slice(0, 4500) };
@@ -217,7 +218,8 @@ async function handleCampusAgent(req, res, json) {
   const mode = audio ? "audio" : wantsImage(question, history) ? "image" : image ? "vision" : "text";
   const matches = mode === "text" ? findCampus(question, history) : [];
   const links = [...new Map(matches.map(({ link }) => [link.href, link])).values()];
-  const limits = mode === "image" || mode === "audio" ? [budgets.all, budgets[mode], budgets.mediaDaily] : [budgets.all];
+  const limits = [budgets.all, budgets.allDaily];
+  if (mode === "image" || mode === "audio") limits.push(budgets[mode], budgets.mediaDaily);
   const now = Date.now();
   for (const limit of limits) {
     limit.entries = limit.entries.filter(timestamp => now - timestamp < limit.window);
