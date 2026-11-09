@@ -170,7 +170,7 @@
 
     // GET /api/v1/forum/categories → { categories }
     fetchForumCategories() {
-      return resolve(() => window.NovaDB.forumCategories || ["吃瓜", "吐槽", "树洞", "求助", "闲置"], "/forum/categories");
+      return resolve(() => window.NovaDB.forumCategories || ["吃瓜", "吐槽", "树洞", "求助", "闲置", "其他"], "/forum/categories");
     },
 
     // GET /api/v1/forum/posts?category=&query=&sort= → { posts }

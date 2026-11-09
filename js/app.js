@@ -63,6 +63,7 @@
   let clubSlideIndex = 0;
   let clubSlideTimer = null;
   let lastFocused = null;
+  let dormitoryViewer = null;
   let touchStartX = null;
   let mapIntroVisible = true;
 
@@ -565,35 +566,76 @@
     return `<section class="discovery-card card building-guide">
       <span class="eyebrow">BUILDING ATLAS · 等距建筑图鉴</span>
       <h2>${buildings.length} 栋建筑，一栋一档</h2>
-      <p>从等距校园底图拆出的建筑单元，点击地图热点即可查看楼层、片区与形态说明。</p>
+      <p>选择片区，再点击地图热点查看建筑档案。东北宿舍的学生住宿建筑可打开独立三维模型。</p>
       <div class="building-guide-list">${rows}</div>
-      <p class="building-guide-note">${icon("info")}建筑单元为底图矢量近似重建，被遮挡的背面未复原。</p>
+      <p class="building-guide-note">${icon("info")}地图位置及建筑外观为近似示意。</p>
     </section>`;
   }
 
   function buildingCard(building) {
     const region = regionMeta(building.region);
     const place = building.placeId ? Store.getPlace(building.placeId) : null;
+    const name = escapeHTML(building.name);
+    const image = building.residenceModel ? `assets/buildings/residences/${building.id}.webp` : `assets/buildings/${building.file}`;
     return `<section class="building-card card" style="--rc:${region.color}">
       <div class="building-card-media">
-        <img src="assets/buildings/${building.file}" alt="${escapeHTML(building.name)}的等距建筑单元" decoding="async">
+        <img src="${image}" alt="${name}${building.residenceModel ? "的三维外观渲染" : "的等距建筑单元"}" decoding="async">
         <button class="building-card-close" type="button" data-action="close-building" aria-label="关闭建筑档案">${icon("x")}</button>
         <span class="building-card-tag">${building.id}</span>
       </div>
       <div class="building-card-body">
-        <span class="eyebrow">${region.name} · ISOMETRIC UNIT</span>
-        <h2>${escapeHTML(building.name)}</h2>
+        <span class="eyebrow">${region.name} · ${building.residenceModel ? "RESIDENCE MODEL" : "ISOMETRIC UNIT"}</span>
+        <h2>${name}</h2>
         <div class="building-meta">
-          <span>${icon("layers")}约 ${building.floors} 层</span>
+          <span>${icon("layers")}${building.residenceModel ? "外观近似" : `约 ${building.floors} 层`}</span>
           <span>${icon("map-pin")}${region.name}</span>
-          <span>矢量近似</span>
+          <span>${building.residenceModel ? "Blender 建模" : "矢量近似"}</span>
         </div>
-        <p>${escapeHTML(building.note)}</p>
+        <p>${building.residenceModel ? "依据全景和校园地图制作。楼层、尺寸及遮挡面为估计。" : escapeHTML(building.note)}</p>
+        ${building.residenceModel ? `<button class="button button-small building-model-open" type="button" data-action="open-dormitory-model" data-id="${building.id}">${icon("rotate-ccw")}查看 3D 模型</button>` : ""}
         ${place
           ? `<a class="building-link" href="#place/${place.id}">${icon("arrow-right")}前往 ${escapeHTML(place.name)}</a>`
           : `<div class="building-note">${icon("info")}点击其他热点，继续查看建筑档案。</div>`}
       </div>
     </section>`;
+  }
+
+  async function openDormitoryModel(id) {
+    const building = ui.mapData?.buildings.find(item => item.id === id && item.residenceModel);
+    if (!building) return;
+    const name = escapeHTML(building.name);
+    openModal(`${modalHeader("RESIDENCE MODEL", name, "外观为近似示意，可切换角度查看。")}
+      <div class="dormitory-stage">
+        <img src="assets/buildings/residences/${id}.webp" alt="${name}的三维渲染预览">
+      </div>
+      <p class="dormitory-status muted" role="status">正在加载三维模型…</p>
+      <div class="dormitory-tools" role="group" aria-label="模型视角" hidden>
+        <button class="button button-small button-secondary" type="button" data-dormitory-view="rotateView">旋转视角</button>
+        <button class="button button-small button-secondary" type="button" data-dormitory-view="zoomIn">放大</button>
+        <button class="button button-small button-secondary" type="button" data-dormitory-view="zoomOut">缩小</button>
+        <button class="button button-small button-secondary" type="button" data-dormitory-view="reset">复位</button>
+      </div>`);
+    const viewer = new AbortController();
+    dormitoryViewer = viewer;
+    const container = modalRoot.querySelector(".dormitory-stage");
+    const status = modalRoot.querySelector(".dormitory-status");
+    const tools = modalRoot.querySelector(".dormitory-tools");
+    try {
+      const { mountDormitory } = await import("./dormitory-viewer.js");
+      await mountDormitory(container, id, viewer.signal, controls => {
+        tools.hidden = !controls;
+        container.classList.toggle("is-ready", Boolean(controls));
+        status.textContent = controls ? "拖动平移，滚轮或双指缩放。也可用下方按钮操作。" : "三维模型暂不可用，当前显示渲染预览。";
+        tools.onclick = controls ? event => {
+          const action = event.target.closest("[data-dormitory-view]")?.dataset.dormitoryView;
+          if (action) controls[action]();
+        } : null;
+      });
+    } catch (error) {
+      if (viewer.signal.aborted) return;
+      console.warn("Dormitory model could not load", error);
+      status.textContent = "三维模型暂不可用，当前显示渲染预览。";
+    }
   }
 
   function renderMap() {
@@ -612,7 +654,7 @@
     const buildingPins = (ui.activeRegion ? buildings.filter(building => building.region === ui.activeRegion) : []).map(building => {
       const active = selectedBuilding && selectedBuilding.id === building.id;
       const color = regionMeta(building.region).color;
-      return `<button class="building-pin ${active ? "is-active" : ""}" style="left:${building.x}%;top:${building.y}%;--rc:${color}" data-action="select-building" data-id="${building.id}" aria-pressed="${active ? "true" : "false"}" aria-label="查看${escapeHTML(building.name)}建筑档案">
+      return `<button class="building-pin${building.residenceModel ? " is-residence" : ""}${active ? " is-active" : ""}" style="left:${building.x}%;top:${building.y}%;--rc:${color}" data-action="select-building" data-id="${building.id}" aria-pressed="${active ? "true" : "false"}" aria-label="查看${escapeHTML(building.name)}建筑档案">
         <span class="building-pin-dot" aria-hidden="true"></span>
         <span class="building-pin-name">${escapeHTML(building.name)}</span>
       </button>`;
@@ -672,6 +714,13 @@
             ${mapControls}
           </div>
           ${zoneBar}
+          ${ui.activeRegion === "ne" ? `<div class="residence-picker">
+            <label for="residence-picker">宿舍建筑档案</label>
+            <select id="residence-picker">
+              <option value="">选择楼栋</option>
+              ${buildings.filter(building => building.residenceModel).map(building => `<option value="${building.id}"${selectedBuilding?.id === building.id ? " selected" : ""}>${escapeHTML(building.name)}</option>`).join("")}
+            </select>
+          </div>` : ""}
           <div class="map-caption">
             <div class="map-legend"><span><i class="legend-dot" style="--lc:#3E6FA8;--lb:#EAF2FB"></i>教学楼</span><span><i class="legend-dot" style="--lc:#2F8F63;--lb:#E8F5EC"></i>宿舍</span><span><i class="legend-dot" style="--lc:#C9762F;--lb:#FDF1E3"></i>生活服务</span><span><i class="legend-dot" style="--lc:#7A5AA6;--lb:#F1ECFA"></i>其他</span></div>
             <span>底图：校本部等距插画 · 点击标签查看所属板块${ui.activeRegion ? " · 当前片区已显示建筑热点" : ""}</span>
@@ -699,6 +748,19 @@
     const ty = focus ? -(focus.y / 100 - 0.5) * scale * 100 : 0;
     stage.style.transform = `translate(${tx.toFixed(2)}%, ${ty.toFixed(2)}%) scale(${scale.toFixed(3)})`;
     stage.style.setProperty("--spot-scale", (1 / scale).toFixed(3));
+  }
+
+  function selectBuilding(id, fromPicker = false) {
+    ui.activeBuilding = id || null;
+    view.innerHTML = renderMap();
+    requestAnimationFrame(() => {
+      applyMapFocus();
+      if (ui.activeBuilding && window.matchMedia("(max-width: 1180px)").matches) {
+        view.querySelector(".map-side")?.scrollIntoView({ behavior: "smooth", block: "start" });
+      } else if (fromPicker) {
+        document.getElementById("residence-picker")?.focus({ preventScroll: true });
+      }
+    });
   }
 
   function updateMapZoom(nextZoom) {
@@ -812,6 +874,7 @@
   }
 
   function openModal(content, small = false) {
+    if (dormitoryViewer) closeModal(false);
     lastFocused = document.activeElement;
     modalRoot.innerHTML = `<div class="modal-backdrop" data-modal-backdrop><section class="modal ${small ? "modal-small" : ""}" role="dialog" aria-modal="true"><div class="modal-handle"></div>${content}</section></div>`;
     document.body.classList.add("modal-open");
@@ -823,6 +886,8 @@
 
   function closeModal(restoreFocus = true) {
     if (!modalRoot.firstChild) return;
+    dormitoryViewer?.abort();
+    dormitoryViewer = null;
     modalRoot.innerHTML = "";
     document.body.classList.remove("modal-open");
     if (restoreFocus && lastFocused && document.contains(lastFocused)) lastFocused.focus();
@@ -1851,18 +1916,14 @@
       requestAnimationFrame(applyMapFocus);
     } else if (action === "select-building") {
       const id = trigger.dataset.id;
-      ui.activeBuilding = ui.activeBuilding === id ? null : id;
-      view.innerHTML = renderMap();
-      requestAnimationFrame(applyMapFocus);
-      if (window.matchMedia("(max-width: 1180px)").matches) {
-        const side = view.querySelector(".map-side");
-        if (side) requestAnimationFrame(() => side.scrollIntoView({ behavior: "smooth", block: "start" }));
-      }
+      selectBuilding(ui.activeBuilding === id ? null : id);
     } else if (action === "close-building") {
       if (!ui.activeBuilding) return;
       ui.activeBuilding = null;
       view.innerHTML = renderMap();
       requestAnimationFrame(applyMapFocus);
+    } else if (action === "open-dormitory-model") {
+      openDormitoryModel(trigger.dataset.id);
     } else if (action === "map-zoom-in") {
       updateMapZoom(ui.mapZoom + 0.2);
     } else if (action === "map-zoom-out") {
@@ -1983,6 +2044,10 @@
   });
 
   document.addEventListener("change", event => {
+    if (event.target.id === "residence-picker") {
+      selectBuilding(event.target.value, true);
+      return;
+    }
     if (event.target.id === "avatar-file") handleAvatarFile(event.target);
   });
 

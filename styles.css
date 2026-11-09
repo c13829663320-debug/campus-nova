@@ -769,7 +769,7 @@ button, a, input, select, textarea { outline: none; }
 .forum-hero-stats span { color: var(--text-sub); font-size: 12px; }
 .forum-layout { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 20px; margin-top: 20px; align-items: start; }
 .forum-main { display: grid; gap: 16px; min-width: 0; }
-.forum-composer { display: grid; gap: 4px; padding: 20px; }
+.forum-composer { display: grid; grid-template-columns: minmax(0, 1fr); gap: 4px; padding: 20px; }
 .composer-head { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
 .composer-head > div { flex: 1; min-width: 0; }
 .composer-head strong { display: block; font-size: 14px; }
@@ -780,7 +780,7 @@ button, a, input, select, textarea { outline: none; }
 .composer-body { min-height: 84px; padding-top: 12px; border-bottom: 0; resize: vertical; line-height: 1.7; }
 .composer-title::placeholder, .composer-body::placeholder { color: var(--text-sub); opacity: .75; }
 .composer-title:focus, .composer-body:focus { border-color: var(--secondary); }
-.composer-foot { display: flex; align-items: center; gap: 14px; padding-top: 12px; border-top: 1px solid var(--border); }
+.composer-foot { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; padding-top: 12px; border-top: 1px solid var(--border); }
 .composer-category { min-height: 36px; padding: 0 12px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface-soft); color: var(--text); font-size: 12px; cursor: pointer; }
 .composer-submit { margin-left: auto; }
 .anon-control { display: inline-flex; align-items: center; gap: 8px; color: var(--text-sub); font-size: 12px; font-weight: 650; cursor: pointer; user-select: none; }
@@ -861,7 +861,6 @@ button.post-action:hover { background: var(--surface-soft); color: var(--text); 
   :root { --rail-width: 224px; }
   .side-rail { padding-inline: 16px; }
   .topbar, .view-container { padding-left: 24px; padding-right: 24px; }
-  .map-layout { grid-template-columns: 1fr; }
   .map-side { display: grid; grid-template-columns: 1fr 1fr; }
   .place-hero, .detail-grid, .club-detail-grid, .profile-grid { grid-template-columns: 1fr; }
   .forum-layout, .thread-layout { grid-template-columns: 1fr; }
@@ -926,7 +925,7 @@ button.post-action:hover { background: var(--surface-soft); color: var(--text); 
   .node-count { right: -9px; top: -8px; min-width: 18px; height: 18px; font-size: 8px; }
   .map-caption { align-items: flex-start; }
   .map-caption > span { max-width: 130px; text-align: right; }
-  .map-side { grid-template-columns: 1fr; }
+  .map-side { grid-template-columns: minmax(0, 1fr); }
   .discovery-card, .next-card { padding: 20px; }
   .section-block { margin-top: 26px; }
   .group-preview-grid, .club-grid { grid-template-columns: 1fr; }
@@ -1639,6 +1638,7 @@ body.map-intro .view-container { max-width: none; padding: 0; }
 }
 .building-pin:hover .building-pin-dot,
 .building-pin:focus-visible .building-pin-dot { transform: scale(1.35); }
+.building-pin.is-residence { z-index: 5; }
 .building-pin.is-active { z-index: 6; }
 .building-pin.is-active .building-pin-dot {
   transform: scale(1.45);
@@ -1804,6 +1804,25 @@ body.map-intro .view-container { max-width: none; padding: 0; }
 }
 .building-meta svg { width: 12px; height: 12px; }
 .building-card-body > p { margin-top: 12px; color: var(--text-sub); font-size: 12px; line-height: 1.7; }
+.building-model-open { margin-top: 14px; }
+.residence-picker { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 4px 0 10px; font-size: 12px; color: var(--text-sub); }
+.residence-picker select { padding: 6px 9px; min-height: 36px; border: 1px solid var(--border-strong); border-radius: 10px; color: var(--text); background: var(--surface-raised); font: inherit; }
+.dormitory-stage {
+  position: relative;
+  display: grid;
+  place-items: center;
+  aspect-ratio: 8 / 5;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: radial-gradient(ellipse at 50% 55%, var(--surface-raised), var(--surface-soft));
+}
+.dormitory-stage img { width: 100%; height: 100%; padding: 10px; object-fit: contain; }
+.dormitory-stage.is-ready img { visibility: hidden; }
+.dormitory-stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; touch-action: none; cursor: grab; }
+.dormitory-stage.is-dragging canvas { cursor: grabbing; }
+.dormitory-status { margin-top: 10px; }
+.dormitory-tools:not([hidden]) { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
 .building-link {
   display: inline-flex;
   align-items: center;
