@@ -152,6 +152,12 @@ body[data-page="events"] .view-container { padding-top: clamp(24px, 4vw, 48px); 
 .activity-editor .modal-header p { font-size: 13px; }
 .activity-form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 12px; }
 .activity-form-grid input, .activity-form-grid select { min-width: 0; }
+.place-activities .activity-grid { margin-top: 14px; }
+#activity-cover-file { width: 100%; font: inherit; }
+#activity-cover-preview { width: min(100%, 240px); max-height: 160px; object-fit: cover; border-radius: 12px; margin-top: 8px; }
+#activity-cover-preview[hidden],
+.activity-editor [data-action="clear-activity-cover"][hidden] { display: none; }
+.activity-editor [data-action="clear-activity-cover"] { margin-top: 6px; }
 .activity-form-error { color: var(--danger); font-size: 13px; margin-top: 12px; }
 .activity-form-error:empty { display: none; }
 

@@ -273,9 +273,11 @@
           if (request === routeRequest && route.id) focusMapPoint(route.id);
         });
       } else if (route.name === "place") {
-        const [place, groups] = await Promise.all([API.fetchPlace(route.id), API.fetchGroups(route.id)]);
+        const [place, groups, activities] = await Promise.all([
+          API.fetchPlace(route.id), API.fetchGroups(route.id), API.fetchPlaceActivities(route.id).catch(() => null)
+        ]);
         if (request !== routeRequest) return;
-        ui.placeData = { place, groups };
+        ui.placeData = { place, groups, activities };
         updateShell(route);
         view.innerHTML = renderPlace();
       } else if (route.name === "forum") {
@@ -311,9 +313,7 @@
             ui.activityMine = false;
             resetActivityFilters();
           }
-          const studentFeed = (ui.studentActivitiesAvailable ? students : []).map(studentActivity)
-            .sort((a, b) => a.upcoming !== b.upcoming ? Number(b.upcoming) - Number(a.upcoming) :
-              a.upcoming ? a.startAt - b.startAt : b.startAt - a.startAt);
+          const studentFeed = studentActivityFeed(ui.studentActivitiesAvailable ? students : []);
           ui.activities = [...studentFeed, ...campusActivities(catalog)];
           view.innerHTML = renderActivities();
         }
@@ -667,7 +667,6 @@
     if (mapIntroVisible) return renderMapIntro();
     const { places, groups, buildings = [], pois = [] } = ui.mapData;
     const selectedBuilding = activeBuilding();
-    const defaultPlaceId = (places[0] || {}).id || "";
     const mapTypes = [
       { id: "all", label: "全部地点" },
       { id: "teach", label: "教学楼" },
@@ -757,7 +756,7 @@
         </aside>
       </div>
       <section class="section-block">
-        <div class="section-heading"><div><span class="eyebrow">校园活动</span><h2>${isDemo() ? "校园组局体验" : "校园组局"}</h2><p>${isDemo() ? "示例活动和操作记录仅在当前浏览器可见。" : "按地点发现校园活动。"}</p></div><button class="text-button" data-action="open-create-group" data-place="${defaultPlaceId}">${isDemo() ? "体验发起组局" : "发起我的组局"} ${icon("plus")}</button></div>
+        <div class="section-heading"><div><span class="eyebrow">校园活动</span><h2>${isDemo() ? "校园组局体验" : "校园组局"}</h2><p>${isDemo() ? "下方是组局示例。你也可以发起共享活动。" : "按地点发现校园活动。"}</p></div><button class="text-button" data-action="open-student-activity" data-meetup>发起组局 ${icon("plus")}</button></div>
         <div class="group-preview-grid stagger">${groups.slice(0, 3).map(groupCard).join("")}</div>
       </section>
     </div>`;
@@ -817,7 +816,7 @@
   }
 
   function renderPlace() {
-    const { place, groups } = ui.placeData;
+    const { place, groups, activities } = ui.placeData;
     const point = (ui.mapData?.pois || window.NovaDB.campusPois).find(poi => poi.placeId === place.id);
     const mapLink = `#map/${point ? encodeURIComponent(point.id) : "browse"}`;
     const lit = Store.state.litPlaceIds.includes(place.id);
@@ -826,7 +825,7 @@
     const guideContent = `
       ${place.menu?.length ? `<section class="guide-card card"><div class="card-heading"><h3>${icon("utensils")}参考菜单</h3><span>供应和价格以现场为准</span></div><div class="menu-list">${place.menu.map(item => `<div class="menu-item"><span class="menu-icon">${icon("utensils")}</span><div><strong>${escapeHTML(item.name)}</strong><small>${escapeHTML(item.stall)}</small></div><span class="menu-price">${escapeHTML(item.price)}</span></div>`).join("")}</div></section>` : ""}
       ${place.tips?.length ? `<section class="guide-card card"><div class="card-heading"><h3>${icon("lightbulb")}地点提示</h3></div><div class="tip-list">${place.tips.map((tip, i) => `<div class="tip-item"><span class="tip-number">${i + 1}</span><div><strong>${escapeHTML(tip.title)}</strong><p>${escapeHTML(tip.text)}</p></div></div>`).join("")}</div></section>` : ""}`;
-    const groupContent = groups.length ? `<div class="group-list">${groups.map(groupCard).join("")}</div>` : `<div class="empty-state">${icon("users")}<h3>这里还很安静</h3><p>成为第一个发起组局的人，让同好知道你现在想做什么。</p><button class="button button-small" data-action="open-create-group" data-place="${place.id}">${icon("plus")}发起第一场组局</button></div>`;
+    const shared = studentActivityFeed((activities || []).filter(event => !event.cancelled));
 
     return `<div class="view-enter">
       <nav class="breadcrumb" aria-label="面包屑"><a href="${mapLink}">${icon("arrow-left")}${point ? "在地图上查看" : "返回校园地图"}</a><span>/</span><span>${place.categoryLabel}</span><span>/</span><strong>${place.name}</strong></nav>
@@ -842,17 +841,28 @@
           <h2>${place.name}</h2><p class="place-en">${place.en}</p><p class="place-description">${place.description}</p>
           <div class="place-facts"><div>${icon("clock")}${place.hours ? `参考开放时间 · ${escapeHTML(place.hours)}，以学校公告为准` : "开放与通行安排以学校公告或现场指引为准。"}</div>${point ? `<div>${icon("map-pin")}<a href="${mapLink}">在地图上定位 ${escapeHTML(place.shortName || place.name)}</a></div>` : ""}</div>
           ${lit ? `<div class="checkin-success">${icon("circle-check")}已点亮此地，探索积分已收入档案</div>` : ""}
-          <div class="place-actions" style="margin-top:16px"><button class="button ${lit ? "button-ghost" : "button-secondary"}" data-action="check-in" data-id="${place.id}" ${lit ? "disabled" : ""}>${icon(lit ? "check" : "map-pin")}${lit ? "已点亮地点" : "点亮地点 +20"}</button><button class="button" data-action="open-create-group" data-place="${place.id}">${icon("plus")}${isDemo() ? "体验组局" : "一键组局"}</button></div>
+          <div class="place-actions" style="margin-top:16px"><button class="button ${lit ? "button-ghost" : "button-secondary"}" data-action="check-in" data-id="${place.id}" ${lit ? "disabled" : ""}>${icon(lit ? "check" : "map-pin")}${lit ? "已点亮地点" : "点亮地点 +20"}</button><button class="button" data-action="open-student-activity" data-place="${place.id}">${icon("plus")}发起组局</button></div>
           ${isDemo() ? '<p class="muted">点亮记录保存在当前浏览器。</p>' : ""}
         </section>
       </div>
       <div class="detail-grid">
-        <div class="detail-main">${guideContent}<section class="groups-panel card" aria-labelledby="place-groups-title">
+        <div class="detail-main">
+          <section class="groups-panel place-activities card" aria-labelledby="place-activities-title">
+            <div class="card-heading group-panel-heading">
+              <h3 id="place-activities-title"><span class="group-panel-icon">${icon("calendar")}</span>从此地点发起的活动</h3>
+              <a class="text-button" href="#events">全部校园活动 ${icon("arrow-right")}</a>
+            </div>
+            <p class="muted">实际集合点以活动填写的地点为准。</p>
+            ${activities === null ? '<p class="activity-service-note">活动暂时无法加载。 <button class="text-button" type="button" data-action="retry-route">重新加载</button></p>'
+              : shared.length ? renderActivityResults(shared) : '<p class="activity-service-note">暂无活动。可以发起一场，邀请同学参加。</p>'}
+          </section>
+          ${guideContent}
+          ${groups.length ? `<section class="groups-panel card" aria-labelledby="place-groups-title">
           <div class="card-heading group-panel-heading">
             <h3 id="place-groups-title"><span class="group-panel-icon">${icon("users")}</span>${isDemo() ? "地点组局示例" : "地点组局"}</h3>
             <span class="group-panel-count">${groups.length} 场组局</span>
-          </div>${groupContent}
-        </section></div>
+          </div><div class="group-list">${groups.map(groupCard).join("")}</div>
+        </section>` : ""}</div>
         <aside class="detail-aside">
           <section class="next-card card"><div class="next-card-header"><h3>地点资料</h3><span class="tag">校园指南</span></div><p class="muted">图片供识别地点时参考。发现位置有误或有最新的开放通知，可通过「用户反馈」告诉我们。</p></section>
         </aside>
@@ -931,33 +941,6 @@
     return `<p class="field-error" data-error-for="${name}"></p>`;
   }
 
-  function formatDateTimeValue(date) {
-    const pad = number => String(number).padStart(2, "0");
-    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
-  }
-
-  function defaultDateTime() {
-    const date = new Date(Date.now() + 24 * 60 * 60 * 1000);
-    date.setHours(19, 0, 0, 0);
-    return formatDateTimeValue(date);
-  }
-
-  function openGroupModal(placeId) {
-    const place = Store.getPlace(placeId);
-    if (!place) return;
-    const category = place.category === "sports" ? "运动" : place.category === "study" ? "自习" : place.id === "cafeteria" ? "饭搭子" : "兴趣社交";
-    const categoryOptions = [...new Set([category, "运动", "自习", "饭搭子", "桌游", "兴趣社交"])].map(option => `<option>${option}</option>`).join("");
-    openModal(`${modalHeader("CREATE A MEETUP", isDemo() ? "体验发起组局" : "发起组局", `集合地点为 ${place.name}。`)}
-      <form id="group-form" data-place="${place.id}" novalidate>
-        <div class="form-note">${icon("info")}${isDemo() ? "体验组局仅保存在当前浏览器，其他同学不会收到通知。" : "请发布真实的校园活动。"}</div>
-        <div class="field"><label for="group-title">想做什么？<span> *</span></label><input id="group-title" name="title" maxlength="30" placeholder="例如：今晚飞盘，新手友好局">${fieldError("title")}</div>
-        <div class="form-row"><div class="field"><label for="group-category">活动类型<span> *</span></label><select id="group-category" name="category">${categoryOptions}</select>${fieldError("category")}</div><div class="field"><label for="group-time">集合时间<span> *</span></label><input id="group-time" name="time" type="datetime-local" value="${defaultDateTime()}" min="${formatDateTimeValue(new Date())}">${fieldError("time")}</div></div>
-        <div class="form-row"><div class="field"><label for="group-total">希望人数<span> *</span></label><input id="group-total" name="total" type="number" min="2" max="20" value="4" inputmode="numeric"><p class="field-hint">包含你自己，2–20 人</p>${fieldError("total")}</div><div class="field"><label for="group-duration">预计时长</label><select id="group-duration" name="duration"><option>约 1 小时</option><option>约 1.5 小时</option><option>约 2 小时</option><option>约 3 小时</option></select>${fieldError("duration")}</div></div>
-        <div class="field"><label for="group-description">补充说明<span> *</span></label><textarea id="group-description" name="description" maxlength="120" placeholder="说说集合点、是否适合新手、需要准备什么…"></textarea><p class="field-hint">至少 8 个字，最多 120 字</p>${fieldError("description")}</div>
-        <div class="form-actions"><button type="button" class="button button-ghost" data-action="close-modal">再想想</button><button type="submit" class="button">${icon("plus")}发布组局</button></div>
-      </form>`);
-  }
-
   function clearFormErrors(form) {
     form.querySelectorAll("[data-error-for]").forEach(node => node.textContent = "");
     form.querySelectorAll("[aria-invalid]").forEach(node => node.removeAttribute("aria-invalid"));
@@ -968,54 +951,6 @@
     if (input) input.setAttribute("aria-invalid", "true");
     const error = form.querySelector(`[data-error-for="${name}"]`);
     if (error) error.textContent = message;
-  }
-
-  async function submitGroup(form) {
-    clearFormErrors(form);
-    const data = new FormData(form);
-    const title = String(data.get("title") || "").trim();
-    const time = String(data.get("time") || "");
-    const total = Number(data.get("total"));
-    const description = String(data.get("description") || "").trim();
-    let valid = true;
-    if (title.length < 4) { setFormError(form, "title", "请用至少 4 个字说清楚要做什么"); valid = false; }
-    if (!time || Number.isNaN(new Date(time).getTime())) { setFormError(form, "time", "请选择有效的集合时间"); valid = false; }
-    else if (new Date(time).getTime() < Date.now()) { setFormError(form, "time", "集合时间需要晚于现在"); valid = false; }
-    if (!Number.isInteger(total) || total < 2 || total > 20) { setFormError(form, "total", "人数需为 2–20 之间的整数"); valid = false; }
-    if (description.length < 8) { setFormError(form, "description", "再多介绍一点吧，至少 8 个字"); valid = false; }
-    if (!valid) {
-      const first = form.querySelector('[aria-invalid="true"]');
-      if (first) first.focus();
-      return;
-    }
-    const button = form.querySelector('[type="submit"]');
-    button.disabled = true;
-    button.textContent = "正在发布…";
-    try {
-      const date = new Date(time);
-      const pad = number => String(number).padStart(2, "0");
-      const group = await API.createGroup({
-        placeId: form.dataset.place,
-        title,
-        category: String(data.get("category")),
-        total,
-        description,
-        duration: String(data.get("duration")),
-        timeLabel: `${date.getMonth() + 1}月${date.getDate()}日 ${pad(date.getHours())}:${pad(date.getMinutes())}`,
-        day: pad(date.getDate()),
-        month: `${date.getMonth() + 1}月`
-      });
-      closeModal(false);
-      showToast(isDemo() ? "组局示例已保存" : "组局发布成功 · +15 积分", isDemo() ? "本次操作仅保存在当前浏览器。" : "已展示在对应地点，也加入了你的个人组局列表。");
-      ui.placeData = { place: Store.getPlace(group.placeId), groups: Store.getGroups(group.placeId) };
-      ui.activeRoute = { name: "place", id: group.placeId };
-      if (location.hash !== `#place/${group.placeId}`) location.hash = `place/${group.placeId}`;
-      else view.innerHTML = renderPlace();
-    } catch (error) {
-      showToast("发布失败", error.message, "error");
-      button.disabled = false;
-      button.innerHTML = `${icon("plus")}发布组局`;
-    }
   }
 
   /* 社团类别配色：用类别底图 + 程序化徽标替代重复的场景照片 */
@@ -1263,6 +1198,11 @@
     };
   }
 
+  function studentActivityFeed(events) {
+    return events.map(studentActivity).sort((a, b) => a.upcoming !== b.upcoming ? Number(b.upcoming) - Number(a.upcoming) :
+      a.upcoming ? a.startAt - b.startAt : b.startAt - a.startAt);
+  }
+
   const activityThemeGroups = [
     ["学习与发展", ["学习自习", "技能实战", "就业创业"]],
     ["运动与生活", ["运动健身", "美食聚餐", "文艺娱乐"]],
@@ -1293,16 +1233,17 @@
 
   function activityMeta(event, showMap = false) {
     return `<ul class="activity-meta">
-      <li>${icon("calendar")}<span>${escapeHTML([event.dateLabel, event.time].filter(Boolean).join(" · "))}</span></li>
+      <li>${icon("calendar")}<span>${escapeHTML([event.dateLabel, event.time, event.duration].filter(Boolean).join(" · "))}</span></li>
       <li>${icon("map-pin")}<span>${showMap && event.mapPoint ? `<a href="#map/${encodeURIComponent(event.mapPoint)}">${escapeHTML(event.venue)} · 地图定位</a>` : escapeHTML(event.venue)}</span></li>
       ${event.student ? `<li>${icon("users")}<span>${event.count} / ${event.capacity} 人（含发起人）</span></li>` : ""}
     </ul>`;
   }
 
   function activityCover(event) {
-    return `<div class="activity-cover${event.student ? " activity-cover-student" : ""}">
-      ${event.student ? `<span class="activity-cover-symbol">${icon(activityTags.categories[event.category])}</span>` :
-        `<img src="${escapeHTML(event.image)}" alt="" loading="lazy" decoding="async">`}
+    const image = event.student ? event.hasCover && `./api/student-activities/${encodeURIComponent(event.id)}/cover` : event.image;
+    return `<div class="activity-cover${image ? "" : " activity-cover-student"}">
+      ${image ? `<img src="${escapeHTML(image)}" alt="" loading="lazy" decoding="async">` :
+        `<span class="activity-cover-symbol">${icon(activityTags.categories[event.category])}</span>`}
       <span class="activity-status${event.upcoming && event.status !== "已满员" ? " is-planned" : ""}">${event.status}</span>
       ${event.mapPoint ? '<span class="activity-illustration">主题配图</span>' : ""}
     </div>`;
@@ -1442,33 +1383,113 @@
     </aside>`;
   }
 
-  function openStudentActivity() {
-    openModal(`${modalHeader("CAMPUS EVENTS", "发布校园活动", "同学们可以在活动页看到并报名。请填写校园公共集合点。")}
-      <form id="student-activity-form" data-id="${API.newStudentActivityId()}">
+  function openStudentActivity(placeId, meetup) {
+    const place = placeId && Store.getPlace(placeId);
+    const isMeetup = Boolean(place || meetup);
+    const type = isMeetup ? "组局" : "";
+    const theme = place?.category === "sports" ? "运动健身" : place?.category === "study" ? "学习自习" : place?.id === "cafeteria" ? "美食聚餐" : "";
+    openModal(`${modalHeader("CAMPUS EVENTS", isMeetup ? "发起组局" : "发布校园活动", "发布后，同学们可以在校园活动页查看并报名。")}
+      <form id="student-activity-form" data-id="${API.newStudentActivityId()}" data-place="${escapeHTML(place?.id || "")}">
         <div class="field"><label for="activity-title">活动标题</label><input id="activity-title" name="title" required minlength="2" maxlength="50" placeholder="例如：周四晚一起打羽毛球"></div>
         <div class="activity-form-grid">
-          <div class="field"><label for="activity-type">活动类型</label><select id="activity-type" name="type" required><option value="">选择类型</option>${activityTags.types.map(type => `<option>${type}</option>`).join("")}</select></div>
-          <div class="field"><label for="activity-category">活动主题</label><select id="activity-category" name="category" required><option value="">选择主题</option>${activityThemeOptions()}</select></div>
+          <div class="field"><label for="activity-type">活动类型</label><select id="activity-type" name="type" required><option value="">选择类型</option>${activityTags.types.map(value => activityOption(value, value === "其他活动" ? "其他" : value, type)).join("")}</select></div>
+          <div class="field"><label for="activity-category">活动主题</label><select id="activity-category" name="category" required><option value="">选择主题</option>${activityThemeOptions(theme)}</select></div>
           <div class="field"><label for="activity-start">开始时间（北京时间）</label><input id="activity-start" name="start" type="datetime-local" required></div>
           <div class="field"><label for="activity-capacity">总人数（含发起人）</label><input id="activity-capacity" name="capacity" type="number" min="2" max="50" value="4" required></div>
+          <div class="field"><label for="activity-duration">预计时长（选填）</label><select id="activity-duration" name="duration"><option value="">未填写</option>${activityTags.durations.map(duration => activityOption(duration)).join("")}</select></div>
+          <div class="field"><label for="activity-host">发起人昵称</label><input id="activity-host" name="host" required maxlength="16" value="${escapeHTML(Store.getProfile().name)}"></div>
         </div>
-        <div class="field"><label for="activity-venue">集合地点</label><input id="activity-venue" name="venue" required minlength="2" maxlength="60" placeholder="例如：图书馆一楼入口"></div>
-        <div class="field"><label for="activity-host">发起人昵称</label><input id="activity-host" name="host" required maxlength="16" value="${escapeHTML(Store.getProfile().name)}"></div>
+        <div class="field"><label for="activity-venue">集合地点</label><input id="activity-venue" name="venue" required minlength="2" maxlength="60" value="${escapeHTML(place?.name || "")}" placeholder="例如：图书馆一楼入口"><p class="field-hint">填写同学可以找到的公共集合点。${place ? "可以修改带入的地点名。" : ""}</p></div>
         <div class="field"><label for="activity-summary">活动说明</label><textarea id="activity-summary" name="summary" rows="3" required minlength="5" maxlength="400" placeholder="说说活动安排、需要带什么，或怎么在现场认出你。"></textarea></div>
-        <p class="form-note">${icon("info")}请勿填写手机号、宿舍房号等隐私信息。发布和报名记录可在本浏览器中管理。</p>
+        <div class="field">
+          <label for="activity-cover-file">活动封面（选填）</label>
+          <input id="activity-cover-file" type="file" accept="image/jpeg,image/png,image/webp" aria-describedby="activity-cover-note">
+          <p id="activity-cover-note" class="field-hint" role="status">支持 JPG、PNG、WebP，原图不超过 8 MB。</p>
+          <img id="activity-cover-preview" alt="活动封面预览" hidden>
+          <button class="text-button" type="button" data-action="clear-activity-cover" hidden>移除图片</button>
+        </div>
+        <p class="form-note">${icon("info")}活动信息和封面将公开展示。请勿发布手机号、宿舍房号等隐私信息。可在当前浏览器的「我的活动」管理。</p>
         <p class="activity-form-error" role="alert"></p>
         <div class="form-actions"><button type="button" class="button button-ghost" data-action="close-modal">取消</button><button type="submit" class="button">${icon("plus")}确认发布</button></div>
       </form>`, false, "activity-editor");
   }
 
+  async function prepareActivityCover(file) {
+    if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) throw new Error("请选择 JPG、PNG 或 WebP 图片。");
+    if (file.size > 8 * 1024 * 1024) throw new Error("请选择 8 MB 以内的图片。");
+    const url = URL.createObjectURL(file);
+    try {
+      const image = new Image();
+      image.src = url;
+      await image.decode();
+      const canvas = document.createElement("canvas");
+      const maxEncoded = Math.floor(activityTags.coverMaxBytes / 3) * 4;
+      for (const maxSide of [activityTags.coverMaxSide, 640, 400]) {
+        const scale = Math.min(1, maxSide / Math.max(image.naturalWidth, image.naturalHeight));
+        canvas.width = Math.max(1, Math.round(image.naturalWidth * scale));
+        canvas.height = Math.max(1, Math.round(image.naturalHeight * scale));
+        const context = canvas.getContext("2d");
+        context.fillStyle = "#fff";
+        context.fillRect(0, 0, canvas.width, canvas.height);
+        context.drawImage(image, 0, 0, canvas.width, canvas.height);
+        const data = canvas.toDataURL("image/jpeg", 0.8);
+        if (data.startsWith("data:image/jpeg;base64,") && data.split(",")[1].length <= maxEncoded) return data;
+      }
+    } catch {
+      throw new Error("图片读取失败，请换一张图片。");
+    } finally {
+      URL.revokeObjectURL(url);
+    }
+    throw new Error("图片压缩后仍然太大，请换一张图片。");
+  }
+
+  async function updateActivityCover(input) {
+    const file = input.files[0];
+    const form = input.form;
+    const button = form.querySelector('[type="submit"]');
+    const preview = form.querySelector("#activity-cover-preview");
+    const remove = form.querySelector('[data-action="clear-activity-cover"]');
+    const note = form.querySelector("#activity-cover-note");
+    const isCurrent = () => input.isConnected && input.files[0] === file;
+    preview.hidden = true;
+    preview.removeAttribute("src");
+    input.setCustomValidity("");
+    remove.hidden = !file;
+    button.disabled = Boolean(file);
+    if (!file) {
+      note.textContent = "支持 JPG、PNG、WebP，原图不超过 8 MB。";
+      return;
+    }
+    note.textContent = "正在处理图片…";
+    try {
+      const image = await prepareActivityCover(file);
+      if (!isCurrent()) return;
+      preview.src = image;
+      preview.hidden = false;
+      note.textContent = "封面将在发布后公开展示。";
+    } catch (error) {
+      if (!isCurrent()) return;
+      input.setCustomValidity(error.message);
+      note.textContent = error.message;
+    } finally {
+      if (isCurrent()) button.disabled = false;
+    }
+  }
+
   async function submitStudentActivity(form) {
     const button = form.querySelector('[type="submit"]');
+    if (button.disabled) return;
+    const input = form.querySelector("#activity-cover-file");
+    const remove = form.querySelector('[data-action="clear-activity-cover"]');
+    const cover = form.querySelector("#activity-cover-preview").getAttribute("src")?.split(",")[1];
     const errorRegion = form.querySelector('[role="alert"]');
     const values = Object.fromEntries(new FormData(form));
-    button.disabled = true;
+    const original = button.innerHTML;
+    button.disabled = input.disabled = remove.disabled = true;
+    button.textContent = "正在发布…";
     errorRegion.textContent = "";
     try {
-      const activity = await API.createStudentActivity({ ...values, capacity: Number(values.capacity), id: form.dataset.id });
+      const activity = await API.createStudentActivity({ ...values, capacity: Number(values.capacity), id: form.dataset.id, placeId: form.dataset.place, cover });
       showToast("活动已发布", "其他同学现在可以查看详情和报名。");
       if (form.isConnected) {
         resetActivityFilters();
@@ -1478,7 +1499,8 @@
     } catch (error) {
       errorRegion.textContent = error.message;
     } finally {
-      button.disabled = false;
+      button.disabled = input.disabled = remove.disabled = false;
+      button.innerHTML = original;
     }
   }
 
@@ -2097,7 +2119,12 @@
     if (action === "copy-pilot-wechat") {
       copyPilotWechat();
     } else if (action === "open-student-activity") {
-      openStudentActivity();
+      openStudentActivity(trigger.dataset.place, trigger.hasAttribute("data-meetup"));
+    } else if (action === "clear-activity-cover") {
+      const input = trigger.form.querySelector("#activity-cover-file");
+      input.value = "";
+      updateActivityCover(input);
+      input.focus();
     } else if (action === "student-activity-action") {
       const { id, operation } = trigger.dataset;
       if (operation === "cancel") {
@@ -2172,8 +2199,6 @@
     } else if (action === "open-place") {
       location.hash = `place/${trigger.dataset.id}`;
       return;
-    } else if (action === "open-create-group") {
-      openGroupModal(trigger.dataset.place);
     } else if (action === "join-group") {
       handleJoin(trigger.dataset.id, false, trigger);
     } else if (action === "leave-group") {
@@ -2252,9 +2277,6 @@
     if (event.target.id === "student-activity-form") {
       event.preventDefault();
       submitStudentActivity(event.target);
-    } else if (event.target.id === "group-form") {
-      event.preventDefault();
-      submitGroup(event.target);
     } else if (event.target.id === "application-form") {
       event.preventDefault();
       submitApplication(event.target);
@@ -2286,6 +2308,8 @@
       selectBuilding(event.target.value, true);
     } else if (event.target.id === "avatar-file") {
       handleAvatarFile(event.target);
+    } else if (event.target.id === "activity-cover-file") {
+      updateActivityCover(event.target);
     }
   });
 

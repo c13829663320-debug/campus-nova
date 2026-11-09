@@ -22,7 +22,7 @@ const instructions = [
   "根据下列项目资料，直接回答学生当前的问题。给出能在站内搜索到的名称和必要操作。用简洁纯文本，只写和问题相关的内容。",
   "能否在网站内点亮只取决于资料中的「可点亮地点」列表。该列表也可从「我的」页面的「校园点亮进度」查看。其余地图地标用于定位。",
   "被问到开放时间而资料未收录时，引导查看校方公告或现场指引。不要推测实时开放、招新时间、行走路线或联系方式。",
-  "站内可用功能有地点搜索、地图位置、地点点亮和社团图鉴。侧边栏的「活动」可发布和报名同学发起的找搭子、组局等活动。地点详情里的组局和论坛仍是本机体验。站内没有步行路线、实时定位或实时开放查询。只建议实际支持的操作。超出校园探索和站内功能的问题请引导回校园主题。",
+  "站内可用功能有地点搜索、地图位置、地点点亮和社团图鉴。侧边栏的「活动」和地点详情均可发布共享活动，其他同学可以查看并报名。地点详情同时保留本机组局示例，论坛也是本机体验。站内没有步行路线、实时定位或实时开放查询。只建议实际支持的操作。超出校园探索和站内功能的问题请引导回校园主题。",
   campusData
 ].join("\n");
 
@@ -126,15 +126,17 @@ async function chat(req, res) {
 
 const server = http.createServer(async (req, res) => {
   res.setHeader("X-Content-Type-Options", "nosniff");
-  let pathname;
+  let pathname, searchParams;
   try {
-    pathname = decodeURIComponent(new URL(req.url, "http://localhost").pathname);
+    const url = new URL(req.url, "http://localhost");
+    pathname = decodeURIComponent(url.pathname);
+    searchParams = url.searchParams;
   } catch {
     return json(res, 400, { error: "无效的请求路径。" });
   }
   if (pathname === "/api/campus-ai") return chat(req, res);
-  const activityRoute = /^\/api\/student-activities(?:\/(student-[a-f0-9]{32})(?:\/(join|leave|cancel))?)?$/.exec(pathname);
-  if (activityRoute) return handleStudentActivities(req, res, json, activityRoute[1], activityRoute[2]);
+  const activityRoute = /^\/api\/student-activities(?:\/(student-[a-f0-9]{32})(?:\/(join|leave|cancel|cover))?)?$/.exec(pathname);
+  if (activityRoute) return handleStudentActivities(req, res, json, activityRoute[1], activityRoute[2], searchParams.get("placeId"));
   if (req.method !== "GET" && req.method !== "HEAD") return json(res, 405, { error: "请求方法不受支持。" });
   if (pathname === "/api/features") return json(res, 200, { aiEnabled: Boolean(key), feedbackUrl });
 

@@ -169,6 +169,10 @@
       return studentActivityRequest(id ? `/${encodeURIComponent(id)}` : "");
     },
 
+    fetchPlaceActivities(placeId) {
+      return studentActivityRequest(`?placeId=${encodeURIComponent(placeId)}`);
+    },
+
     newStudentActivityId() {
       return `student-${randomHex(16)}`;
     },
