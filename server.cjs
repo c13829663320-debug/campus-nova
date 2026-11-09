@@ -59,3 +59,5 @@ const server = http.createServer(async (req, res) => {
 const host = process.env.HOST || "127.0.0.1";
 const port = Number(process.env.PORT || 8080);
 server.listen(port, host, () => console.log(`星图校园 http://${host}:${server.address().port}/`));
+// Let in-flight requests finish when systemd restarts the service.
+process.once("SIGTERM", () => server.close());

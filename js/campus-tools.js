@@ -87,10 +87,9 @@
   }));
   input.addEventListener("input", updateControls);
   input.addEventListener("keydown", event => {
-    if ((event.ctrlKey || event.metaKey) && event.key === "Enter" && !event.isComposing && !send.disabled) {
-      event.preventDefault();
-      form.requestSubmit();
-    }
+    if (event.key !== "Enter" || event.shiftKey || event.altKey || event.isComposing || event.keyCode === 229) return;
+    event.preventDefault();
+    if (!send.disabled) form.requestSubmit();
   });
 
   function showDraft() {
@@ -181,9 +180,13 @@
       method: "POST", headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload), signal: AbortSignal.timeout(75_000)
     });
-    const result = await response.json().catch(() => ({}));
+    const result = await response.json().catch(error => {
+      if (!(error instanceof SyntaxError)) throw error;
+      return {};
+    });
     if (!response.ok) {
-      throw new Error(result.error || (response.status === 413 ? "附件太大，请缩小后重试。" : "助手暂时无法连接，请稍后重试。"));
+      throw new Error(result.error || (response.status === 413 ? "附件太大，请缩小后重试。"
+        : "助手连接中断，草稿已保留。请稍后重新发送。"));
     }
     return result;
   }
