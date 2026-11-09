@@ -11,3 +11,4 @@ node_modules/
 dist/
 *.zip
 .env
+/assets/campus-tour/

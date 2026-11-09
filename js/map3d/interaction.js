@@ -14,7 +14,9 @@ export function attachControls(stage) {
   const { camera, renderer, target, requestRender } = stage;
   const container = stage.container;
   const dom = renderer.domElement;
-  const offset = camera.position.clone().sub(target);
+  const initialOffset = camera.position.clone().sub(target);
+  const offset = initialOffset.clone();
+  const up = new THREE.Vector3(0, 1, 0);
 
   let zoom = 1;
   let zoomTarget = 1;
@@ -103,7 +105,17 @@ export function attachControls(stage) {
   }
 
   function reset() {
+    offset.copy(initialOffset);
+    applyPosition();
     focus({ x: 0, z: 0, zoom: 1 });
+  }
+
+  function rotateView() {
+    anchorNdc = null;
+    anchorWorld = null;
+    offset.applyAxisAngle(up, Math.PI / 4);
+    applyPosition();
+    requestRender();
   }
 
   /* 镜头飞行：板块聚焦、回全景都用它，位移与缩放同步缓动 */
@@ -207,6 +219,7 @@ export function attachControls(stage) {
   return {
     zoomIn: () => zoomBy(1.25),
     zoomOut: () => zoomBy(1 / 1.25),
+    rotateView,
     reset,
     focus,
     getZoom: () => zoomTarget,

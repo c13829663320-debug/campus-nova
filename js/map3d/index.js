@@ -54,6 +54,7 @@ export function mountCampusMap(container, { data } = {}) {
     data,
     zoomIn: controls.zoomIn,
     zoomOut: controls.zoomOut,
+    rotateView: controls.rotateView,
     resetView: controls.reset,
     setZone,
     setCategory,

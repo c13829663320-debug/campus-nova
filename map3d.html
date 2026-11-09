@@ -17,6 +17,8 @@
   html, body { margin: 0; background: var(--bg); color: var(--ink); font-family: "PingFang SC", "Microsoft YaHei", system-ui, sans-serif; }
   .page { max-width: 1180px; margin: 0 auto; padding: 40px 28px 56px; }
   .eyebrow { color: var(--sub); font-size: 11px; letter-spacing: 2.4px; text-transform: uppercase; }
+  .map-links { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+  .tour-link { padding: 6px 10px; border-radius: 999px; background: #E0F0EB; color: #126A6E; font-size: 13px; font-weight: 700; text-decoration: none; }
   h1 { margin: 10px 0 6px; font-size: 30px; letter-spacing: -.03em; }
   .lead { margin: 0 0 22px; color: var(--sub); font-size: 13px; }
 
@@ -85,9 +87,12 @@
 </head>
 <body>
 <div class="page">
-  <a class="eyebrow" href="panorama.html">← 返回校园导览</a>
+  <nav class="map-links" aria-label="校园导览">
+    <a class="eyebrow" href="panorama.html">← 返回校园导览</a>
+    <a class="tour-link" href="panorama.html#vr-tour">切换到 VR 全景 →</a>
+  </nav>
   <h1>东莞职业技术学院 · 3D 校园地图</h1>
-  <p class="lead">拖动平移，缩放查看校园建筑和地点。点击地点标记可查看详情。</p>
+  <p class="lead">拖动平移，或用右侧按钮旋转、缩放。点击地标可查看地点详情。</p>
 
   <nav class="cats" id="cats" aria-label="地点分类"></nav>
 
@@ -97,6 +102,7 @@
       <div class="zoom">
         <button type="button" id="zoom-in" aria-label="放大">+</button>
         <button type="button" id="zoom-out" aria-label="缩小">−</button>
+        <button type="button" id="rotate-view" aria-label="旋转视角" title="旋转 45°">↻</button>
         <button type="button" id="zoom-reset" aria-label="重置视角">⟲</button>
       </div>
       <div class="hint"><i></i>拖动平移 · 滚轮 / 双指缩放</div>
@@ -116,6 +122,7 @@
   if (map) {
     document.getElementById("zoom-in").addEventListener("click", map.zoomIn);
     document.getElementById("zoom-out").addEventListener("click", map.zoomOut);
+    document.getElementById("rotate-view").addEventListener("click", map.rotateView);
     document.getElementById("zoom-reset").addEventListener("click", map.resetView);
 
     const legend = document.getElementById("legend");

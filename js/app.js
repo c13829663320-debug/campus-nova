@@ -436,7 +436,7 @@
               <a class="nova-quick" href="#club/${pilotClubId}">${icon("users")}<span>元启AI社</span></a>
               <a class="nova-quick" href="#forum">${icon("message-square")}<span>校园论坛</span></a>
               <a class="nova-quick" href="#clubs">${icon("star")}<span>社团介绍</span></a>
-              <a class="nova-quick" href="panorama.html">${icon("camera")}<span>校园导览</span></a>
+              <a class="nova-quick" href="panorama.html">${icon("camera")}<span>3D 与全景</span></a>
             </div>
 
             <button class="nova-hero-scroll" type="button" data-action="enter-campus-map">
@@ -636,7 +636,7 @@
       ${renderPlaceSearch()}
       <div class="map-layout stagger">
         <section class="map-card card" aria-label="校园探索地图">
-          <a class="button button-small button-secondary map-panorama-link" href="panorama.html">${icon("camera")}校园导览</a>
+          <a class="button button-small button-secondary map-panorama-link" href="panorama.html">${icon("camera")}3D 与全景</a>
           <div class="map-toolbar">
             <div class="filter-chips" aria-label="地点分类">${categories}</div>
             <span class="map-scale">${icon("navigation")}${pois.length} 个地图点位 · ${new Set(pois.map(poi => poi.type)).size} 类标注</span>
