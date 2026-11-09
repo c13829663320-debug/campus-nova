@@ -1,8 +1,8 @@
 const { places, clubs, campusPois } = require("./js/mock.js");
 
 const key = process.env.OPENROUTER_API_KEY?.trim();
-const textModel = process.env.OPENROUTER_MODEL?.trim() || "google/gemini-2.5-flash-lite";
-const visionModel = process.env.OPENROUTER_VISION_MODEL?.trim() || "google/gemini-2.5-flash-lite";
+const textModel = process.env.OPENROUTER_MODEL?.trim() || "qwen/qwen3.7-flash";
+const visionModel = process.env.OPENROUTER_VISION_MODEL?.trim() || "qwen/qwen3-vl-30b-a3b-instruct";
 const imageModel = process.env.OPENROUTER_IMAGE_MODEL?.trim() || "black-forest-labs/flux.2-klein-4b";
 const audioModel = process.env.OPENROUTER_AUDIO_MODEL?.trim() || "openai/whisper-large-v3";
 const maxBody = 2 * 1024 * 1024;
@@ -156,7 +156,7 @@ async function answerQuestion(question, history, image, documents, matches) {
       if (typeof answer === "string" && answer.trim()) return { answer: answer.trim().slice(0, 4500) };
       throw modelError(502);
     } catch (error) {
-      if (model === models.at(-1) || ![undefined, 400, 404, 429, 500, 502, 503, 504].includes(error.status)) throw error;
+      if (model === models.at(-1) || ![undefined, 400, 403, 404, 429, 500, 502, 503, 504].includes(error.status)) throw error;
       console.warn("Campus agent retry " + (error.status || error.name));
     }
   }
