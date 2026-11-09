@@ -346,25 +346,38 @@
     const profile = Store.getProfile();
     const isMine = group.hostId === profile.id;
     const remaining = Math.max(group.total - group.joined, 0);
+    const occupancy = group.total > 0 ? Math.min(100, Math.max(0, group.joined / group.total * 100)) : 0;
+    // 示例头像图集为五列两行，按从左到右、从上到下的顺序编号。
+    const portrait = group.hostPortrait;
+    const hasPortrait = Number.isInteger(portrait) && portrait >= 0 && portrait < 10;
+    const avatar = isMine ? avatarMarkup(profile, "host-avatar") : hasPortrait
+      ? `<span class="avatar host-avatar group-portrait" aria-hidden="true" style="--portrait-x:${portrait % 5 * 25}%;--portrait-y:${Math.floor(portrait / 5) * 100}%">${escapeHTML(group.hostInitial)}</span>`
+      : `<span class="avatar host-avatar" aria-hidden="true">${escapeHTML(group.hostInitial)}</span>`;
     let button = `<button class="button button-small" data-action="join-group" data-id="${group.id}">${isDemo() ? "体验加入" : "加入组局"} ${icon("plus")}</button>`;
     if (group.isOwner) button = `<button class="button button-small button-ghost" disabled>我发起的</button>`;
     else if (group.isJoined) button = `<button class="button button-small button-outline" data-action="leave-group" data-id="${group.id}">退出组局</button>`;
     else if (remaining === 0) button = `<button class="button button-small button-ghost" disabled>已经满员</button>`;
 
     return `<article class="group-card card">
-      <div class="group-top">
-        ${isMine ? avatarMarkup(profile, "host-avatar") : `<span class="avatar host-avatar">${escapeHTML(group.hostInitial)}</span>`}
-        <div class="host-info"><strong>${escapeHTML(isMine ? profile.name : group.host)}</strong><span>${escapeHTML(group.hostMajor)}</span></div>
-        <span class="tag tag-secondary">${escapeHTML(group.category)}${isDemo() ? group.isOwner ? " · 本机记录" : " · 示例" : ""}</span>
-      </div>
-      <h3>${escapeHTML(group.title)}</h3>
-      <p class="group-description">${escapeHTML(group.description)}</p>
-      <div class="group-meta">
-        <span>${icon("clock")}${escapeHTML(group.time)} · ${escapeHTML(group.duration)}</span>
-        <span>${icon("map-pin")}<a href="#place/${group.placeId}">${escapeHTML(place ? place.name : "校园地点")}</a></span>
+      <div class="group-content">
+        <div class="group-top">
+          ${avatar}
+          <div class="host-info"><strong>${escapeHTML(isMine ? profile.name : group.host)}</strong><span>${escapeHTML(group.hostMajor)}</span></div>
+          <span class="tag tag-secondary">${escapeHTML(group.category)}${isDemo() ? group.isOwner ? " · 本机记录" : " · 示例" : ""}</span>
+        </div>
+        <h3>${escapeHTML(group.title)}</h3>
+        <p class="group-description">${escapeHTML(group.description)}</p>
+        <div class="group-meta">
+          <span>${icon("clock")}${escapeHTML(group.time)} · ${escapeHTML(group.duration)}</span>
+          <span>${icon("map-pin")}<a href="#place/${group.placeId}">${escapeHTML(place ? place.name : "校园地点")}</a></span>
+        </div>
       </div>
       <div class="group-footer">
-        <div class="seat-info"><span>${group.joined}/${group.total} 人已加入</span><small>${remaining ? `还差 ${remaining} 人` : "全员就位"}</small></div>
+        <div class="seat-info">
+          <span>${group.joined}/${group.total} 人已加入</span>
+          <div class="progress-track group-seat-progress" aria-hidden="true"><span style="width:${occupancy}%"></span></div>
+          <small>${remaining ? `还差 ${remaining} 人` : "全员就位"}</small>
+        </div>
         ${button}
       </div>
     </article>`;
@@ -830,7 +843,12 @@
         </section>
       </div>
       <div class="detail-grid">
-        <div class="detail-main">${guideContent}<section class="groups-panel card"><div class="card-heading"><h3>${icon("users")}${isDemo() ? "地点组局示例" : "地点组局"}</h3><span class="live-label">${groups.length} 场组局</span></div>${groupContent}</section></div>
+        <div class="detail-main">${guideContent}<section class="groups-panel card" aria-labelledby="place-groups-title">
+          <div class="card-heading group-panel-heading">
+            <h3 id="place-groups-title"><span class="group-panel-icon">${icon("users")}</span>${isDemo() ? "地点组局示例" : "地点组局"}</h3>
+            <span class="group-panel-count">${groups.length} 场组局</span>
+          </div>${groupContent}
+        </section></div>
         <aside class="detail-aside">
           <section class="next-card card"><div class="next-card-header"><h3>地点资料</h3><span class="tag">校园指南</span></div><p class="muted">图片供识别地点时参考。发现位置有误或有最新的开放通知，可通过「用户反馈」告诉我们。</p></section>
         </aside>
