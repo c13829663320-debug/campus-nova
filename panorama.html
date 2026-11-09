@@ -6,31 +6,48 @@
   <title>校园导览 · 星图校园</title>
   <link rel="icon" type="image/svg+xml" href="assets/logo-mark.svg?v=2">
   <link rel="stylesheet" href="styles.css?v=13">
-  <link rel="stylesheet" href="css/campus-tools.css?v=7">
+  <link rel="stylesheet" href="css/campus-tools.css?v=8">
   <script src="js/panorama.js?v=2" defer></script>
 </head>
-<body>
+<body class="campus-panorama-page">
   <main class="campus-panorama">
-    <header>
-      <a class="button button-small button-ghost" href="./#map">← 返回星图校园</a>
-      <h1>东莞职业技术学院 · 校园导览</h1>
-      <p>先在沙盘里看懂建筑分布，再进入全景看看现场。</p>
+    <a class="button button-small campus-panorama-back" href="./#map">← 返回星图校园</a>
+    <header class="campus-panorama-hero">
+      <div>
+        <p class="campus-panorama-kicker">CAMPUS NOVA · <span>东莞职业技术学院</span></p>
+        <h1>校园导览</h1>
+        <p>先在沙盘里看懂建筑分布，再进入全景看看现场。</p>
+      </div>
+      <div class="campus-panorama-mark" aria-hidden="true">
+        <img src="assets/logo-mark.svg?v=2" alt="" width="76" height="76">
+      </div>
     </header>
     <div class="campus-panorama-modes">
       <section class="campus-panorama-card" aria-labelledby="campus-map-title">
-        <span class="campus-panorama-tag">3D 沙盘</span>
-        <h2 id="campus-map-title">俯瞰校本部</h2>
-        <p>拖动、旋转和缩放地图，按区域或地点类型筛选，点击地标查看详情。</p>
-        <a class="button button-secondary" href="map3d.html">打开 3D 沙盘 →</a>
+        <div class="campus-panorama-cover">
+          <img src="assets/tour/sandbox.webp" alt="" width="1000" height="500">
+          <span class="campus-panorama-tag">3D 沙盘</span>
+          <span class="campus-panorama-illustration">示意图</span>
+        </div>
+        <div class="campus-panorama-card-copy">
+          <h2 id="campus-map-title">俯瞰校本部</h2>
+          <p>旋转、缩放沙盘，按区域或地点类型筛选，点击地标查看详情。</p>
+          <a class="button campus-panorama-action" href="map3d.html">打开 3D 沙盘 →</a>
+        </div>
       </section>
       <section id="vr-tour" class="campus-panorama-card" aria-labelledby="campus-vr-title">
-        <span class="campus-panorama-tag">360° 全景</span>
-        <h2 id="campus-vr-title">VR 全景漫游</h2>
-        <p>拖动环顾实景，缩放查看细节，通过场景列表或热点前往下一个地点。</p>
-        <button id="campus-tour-toggle" class="button button-secondary" type="button"
-          aria-controls="campus-tour-player" aria-expanded="false" hidden>进入全景漫游 →</button>
-        <p id="campus-tour-unavailable" class="campus-panorama-credit">当前版本暂未开放全景漫游。</p>
-        <p class="campus-panorama-credit">全景来源为花尔工作室的 720 云作品。</p>
+        <div class="campus-panorama-cover">
+          <img src="assets/tour/panorama.webp" alt="" width="1000" height="500">
+          <span class="campus-panorama-tag">360° 全景</span>
+          <span class="campus-panorama-illustration">示意图</span>
+        </div>
+        <div class="campus-panorama-card-copy">
+          <h2 id="campus-vr-title">VR 全景漫游</h2>
+          <p>拖动环顾实景，缩放查看细节，通过场景列表或热点切换地点。</p>
+          <button id="campus-tour-toggle" class="button campus-panorama-action" type="button"
+            aria-controls="campus-tour-player" aria-expanded="false" hidden>进入全景漫游 →</button>
+          <p id="campus-tour-unavailable" class="campus-panorama-status">当前版本暂未开放全景漫游</p>
+        </div>
       </section>
     </div>
     <section id="campus-tour-player" class="campus-panorama-player" aria-label="校园全景播放器" hidden>
@@ -39,11 +56,23 @@
         target="_blank" rel="noopener noreferrer">在新窗口打开全景 ↗</a>
     </section>
     <section class="campus-panorama-places" aria-labelledby="campus-panorama-places-title">
-      <h2 id="campus-panorama-places-title">地点照片</h2>
-      <div>
-        <a class="button button-small button-ghost" href="./#place/library">图书馆</a>
-        <a class="button button-small button-ghost" href="./#place/stadium">田径场</a>
-        <a class="button button-small button-ghost" href="./#place/cafeteria">滋兰餐厅</a>
+      <h2 id="campus-panorama-places-title">地点速览</h2>
+      <div class="campus-panorama-gallery">
+        <a href="./#place/library">
+          <img src="assets/tour/library.webp" alt="" width="550" height="413" loading="lazy">
+          <span><small>学习空间</small><strong>图书馆</strong></span>
+          <span aria-hidden="true">→</span>
+        </a>
+        <a href="./#place/stadium">
+          <img src="assets/tour/stadium.webp" alt="" width="550" height="413" loading="lazy">
+          <span><small>运动场地</small><strong>田径场</strong></span>
+          <span aria-hidden="true">→</span>
+        </a>
+        <a href="./#place/cafeteria">
+          <img src="assets/tour/cafeteria.webp" alt="" width="550" height="413" loading="lazy">
+          <span><small>校园餐饮</small><strong>滋兰餐厅</strong></span>
+          <span aria-hidden="true">→</span>
+        </a>
       </div>
     </section>
   </main>
