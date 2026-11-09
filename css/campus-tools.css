@@ -75,11 +75,42 @@
   --tour-ink: #10283A;
   --tour-muted: #4A657A;
   --tour-accent: #145F58;
-  --tour-tint: #E4F4EE;
   --tour-line: #D6E5EB;
-  background: linear-gradient(154deg, #DEEFFB, #F4F9FB 57%, #F6F8F6);
+  --tour-bg: linear-gradient(154deg, #DEEFFB, #F4F9FB 57%, #F6F8F6);
+  --tour-hero: radial-gradient(ellipse at 88% 20%, #D1EFE5, transparent 52%), linear-gradient(118deg, #F7FBFF, #DEEFF6);
+  --tour-hero-line: #C8E2ED;
+  --tour-orbit: #A1D0CD;
+  --tour-panel: #FFFFFF;
+  --tour-tint: #EDF4F6;
+  --tour-cover: #DCEEF2;
+  --tour-tag: #F6FEFC;
+  --tour-action: var(--tour-accent);
+  --tour-action-hover: #0B4943;
+  --tour-on-action: #FFFFFF;
+  --tour-back: rgb(255 255 255 / 65%);
+  --tour-shadow: 0 8px 24px rgb(33 74 92 / 6%);
+  background: var(--tour-bg);
   color: var(--tour-ink);
   min-height: 100vh;
+}
+:root[data-theme="dark"] .campus-panorama-page {
+  --tour-ink: #EFF7FC;
+  --tour-muted: #B3C7D8;
+  --tour-accent: #A2DFD5;
+  --tour-line: #294962;
+  --tour-bg: linear-gradient(154deg, #04101E, #0A192A 57%, #0B1E25);
+  --tour-hero: radial-gradient(ellipse at 88% 20%, #184943, transparent 55%), linear-gradient(118deg, #0C1C31, #102941);
+  --tour-hero-line: var(--tour-line);
+  --tour-orbit: #3D7779;
+  --tour-panel: #102337;
+  --tour-tint: #193149;
+  --tour-cover: #142F46;
+  --tour-tag: #102E39;
+  --tour-action: #A2DFD5;
+  --tour-action-hover: #C2EFE7;
+  --tour-on-action: #102C31;
+  --tour-back: var(--tour-panel);
+  --tour-shadow: 0 12px 32px rgb(1 10 22 / 32%);
 }
 .campus-panorama {
   width: min(1120px, calc(100% - 32px));
@@ -87,11 +118,12 @@
   padding-block: clamp(20px, 4vw, 44px);
 }
 .campus-panorama .campus-panorama-back {
-  background: rgb(255 255 255 / 65%);
+  background: var(--tour-back);
   border: 1px solid var(--tour-line);
   color: var(--tour-ink);
   margin-bottom: 14px;
 }
+.campus-panorama .campus-panorama-back:hover { background: var(--tour-tint); }
 .campus-panorama-hero {
   display: flex;
   justify-content: space-between;
@@ -100,9 +132,9 @@
   padding: clamp(20px, 4vw, 40px);
   margin-bottom: 18px;
   overflow: hidden;
-  border: 1px solid #C8E2ED;
+  border: 1px solid var(--tour-hero-line);
   border-radius: 26px;
-  background: radial-gradient(ellipse at 88% 20%, #D1EFE5, transparent 52%), linear-gradient(118deg, #F7FBFF, #DEEFF6);
+  background: var(--tour-hero);
 }
 .campus-panorama h1 { margin: 6px 0 8px; font-size: clamp(34px, 6vw, 52px); line-height: 1.1; }
 .campus-panorama p { color: var(--tour-muted); }
@@ -115,8 +147,8 @@
   width: clamp(86px, 15vw, 146px);
   aspect-ratio: 1;
   border-radius: 50%;
-  border: 1px solid #A1D0CD;
-  background: repeating-radial-gradient(circle, transparent 0 21%, #A1D0CD 22%, transparent 23% 38%);
+  border: 1px solid var(--tour-orbit);
+  background: repeating-radial-gradient(circle, transparent 0 21%, var(--tour-orbit) 22%, transparent 23% 38%);
 }
 .campus-panorama-mark img { width: 48%; height: auto; }
 .campus-panorama-modes {
@@ -131,13 +163,13 @@
   border: 1px solid var(--tour-line);
   border-radius: 22px;
   overflow: hidden;
-  background: #fff;
-  box-shadow: 0 8px 24px rgb(33 74 92 / 6%);
+  background: var(--tour-panel);
+  box-shadow: var(--tour-shadow);
 }
 .campus-panorama-cover {
   position: relative;
   overflow: hidden;
-  background: #DCEEF2;
+  background: var(--tour-cover);
 }
 .campus-panorama-cover img {
   width: 100%;
@@ -158,7 +190,7 @@
   top: 12px;
   padding: 4px 10px;
   border-radius: 999px;
-  background: #F6FEFC;
+  background: var(--tour-tag);
   color: var(--tour-accent);
   font-size: 13px;
   font-weight: 800;
@@ -170,21 +202,23 @@
   padding: 10px 15px;
   font-size: 14px;
 }
-.campus-panorama .campus-panorama-action { background: var(--tour-accent); color: #fff; min-height: 44px; }
-.campus-panorama .campus-panorama-action:hover { background: #0B4943; }
-.campus-panorama .campus-panorama-status { background: #EDF4F6; color: var(--tour-muted); }
+.campus-panorama .campus-panorama-action { background: var(--tour-action); color: var(--tour-on-action); min-height: 44px; }
+.campus-panorama .campus-panorama-action:hover { background: var(--tour-action-hover); }
+.campus-panorama .campus-panorama-status { background: var(--tour-tint); color: var(--tour-muted); }
 .campus-panorama :is(a, button):focus-visible {
   outline: 2px solid var(--tour-accent);
   outline-offset: 3px;
 }
 .campus-panorama [hidden] { display: none; }
 .campus-panorama-player { margin-bottom: 20px; }
+.campus-panorama-player .button-ghost { background: var(--tour-tint); }
+.campus-panorama-player .button-ghost:hover { background: var(--tour-panel); }
 .campus-panorama-player iframe {
   display: block;
   width: 100%;
   height: clamp(380px, 68dvh, 680px);
   margin-bottom: 8px;
-  border: 1px solid var(--border);
+  border: 1px solid var(--tour-line);
   border-radius: 20px;
   background: #102333;
 }
@@ -207,7 +241,7 @@
   padding: 8px;
   border: 1px solid var(--tour-line);
   border-radius: 16px;
-  background: #fff;
+  background: var(--tour-panel);
 }
 .campus-panorama-gallery a:hover { border-color: var(--tour-accent); }
 .campus-panorama-gallery img { grid-column: 1 / -1; width: 100%; height: auto; aspect-ratio: 2.5; object-fit: cover; border-radius: 10px; }
