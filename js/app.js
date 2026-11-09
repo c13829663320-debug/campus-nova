@@ -462,7 +462,7 @@
 
             <div class="nova-hero-quick" aria-label="快速入口">
               <button class="nova-quick" type="button" data-action="enter-campus-map">${icon("map-pin")}<span>校园地图</span></button>
-              <a class="nova-quick nova-quick-events" href="#events">${icon("calendar")}<span>校园活动</span></a>
+              <a class="nova-quick" href="#events">${icon("calendar")}<span>校园活动</span></a>
               <a class="nova-quick" href="#forum">${icon("message-square")}<span>校园论坛</span></a>
               <a class="nova-quick" href="#clubs">${icon("star")}<span>社团介绍</span></a>
               <a class="nova-quick" href="panorama.html">${icon("camera")}<span>3D 与全景</span></a>
