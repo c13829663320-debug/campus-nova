@@ -840,9 +840,16 @@
           <div class="place-summary-top"><span class="tag tag-primary">${place.categoryLabel}</span></div>
           <h2>${place.name}</h2><p class="place-en">${place.en}</p><p class="place-description">${place.description}</p>
           <div class="place-facts"><div>${icon("clock")}${place.hours ? `参考开放时间 · ${escapeHTML(place.hours)}，以学校公告为准` : "开放与通行安排以学校公告或现场指引为准。"}</div>${point ? `<div>${icon("map-pin")}<a href="${mapLink}">在地图上定位 ${escapeHTML(place.shortName || place.name)}</a></div>` : ""}</div>
-          ${lit ? `<div class="checkin-success">${icon("circle-check")}已点亮此地，探索积分已收入档案</div>` : ""}
-          <div class="place-actions" style="margin-top:16px"><button class="button ${lit ? "button-ghost" : "button-secondary"}" data-action="check-in" data-id="${place.id}" ${lit ? "disabled" : ""}>${icon(lit ? "check" : "map-pin")}${lit ? "已点亮地点" : "点亮地点 +20"}</button><button class="button" data-action="open-student-activity" data-place="${place.id}">${icon("plus")}发起组局</button></div>
-          ${isDemo() ? '<p class="muted">点亮记录保存在当前浏览器。</p>' : ""}
+          <div class="place-action-panel">
+            <div class="place-actions">
+              <button type="button" class="button place-checkin${lit ? " is-lit" : ""}" data-action="check-in" data-id="${place.id}" ${lit ? "disabled" : ""}>
+                ${icon(lit ? "check" : "map-pin")}<span class="place-action-label">${lit ? "已点亮地点" : "点亮地点"}</span>
+                ${lit ? "" : '<span class="place-action-reward">+20 积分</span>'}
+              </button>
+              <button type="button" class="button place-create-group" data-action="open-student-activity" data-place="${place.id}">${icon("plus")}<span>发起组局</span></button>
+            </div>
+            ${lit || isDemo() ? `<p class="place-action-note${lit ? " is-lit" : ""}">${icon(lit ? "circle-check" : "info")}<span>${lit ? "探索积分已计入档案。" : ""}${isDemo() ? "点亮记录保存在当前浏览器。" : ""}</span></p>` : ""}
+          </div>
         </section>
       </div>
       <div class="detail-grid">
@@ -899,8 +906,10 @@
   }
 
   async function handleCheckIn(placeId, button) {
+    const label = button.querySelector(".place-action-label");
     button.disabled = true;
-    button.textContent = "正在点亮地点…";
+    button.setAttribute("aria-busy", "true");
+    label.textContent = "点亮中…";
     try {
       const result = await API.checkIn(placeId);
       const place = Store.getPlace(placeId);
@@ -909,7 +918,8 @@
     } catch (error) {
       showToast("未能点亮地点", error.message, "error");
       button.disabled = false;
-      button.innerHTML = `${icon("map-pin")}点亮地点 +20`;
+      button.removeAttribute("aria-busy");
+      label.textContent = "点亮地点";
     }
   }
 
