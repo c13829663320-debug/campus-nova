@@ -7,7 +7,7 @@
   <link rel="icon" type="image/svg+xml" href="assets/logo-mark.svg?v=2">
   <link rel="stylesheet" href="styles.css?v=13">
   <link rel="stylesheet" href="css/campus-tools.css?v=7">
-  <script src="js/panorama.js" defer></script>
+  <script src="js/panorama.js?v=2" defer></script>
 </head>
 <body>
   <main class="campus-panorama">
@@ -29,9 +29,8 @@
         <p>拖动环顾实景，缩放查看细节，通过场景列表或热点前往下一个地点。</p>
         <button id="campus-tour-toggle" class="button button-secondary" type="button"
           aria-controls="campus-tour-player" aria-expanded="false" hidden>进入全景漫游 →</button>
-        <a class="button button-ghost" href="https://www.720yun.com/t/14vk6hf7O8h?scene_id=107800357"
-          target="_blank" rel="noopener noreferrer">在 720 云查看原作 ↗</a>
-        <p class="campus-panorama-credit">全景来源为花尔工作室的 720 云作品，原作的观看条件以平台为准。</p>
+        <p id="campus-tour-unavailable" class="campus-panorama-credit">当前版本暂未开放全景漫游。</p>
+        <p class="campus-panorama-credit">全景来源为花尔工作室的 720 云作品。</p>
       </section>
     </div>
     <section id="campus-tour-player" class="campus-panorama-player" aria-label="校园全景播放器" hidden>

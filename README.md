@@ -69,7 +69,7 @@ node --env-file-if-exists=.env server.cjs
 
 ### 接入 VR 全景素材
 
-将可使用的 H5 全景包的 `index.html`、`viewer.js`、`viewer.css`、`scenes.js` 和 `panos/` 放在 `assets/campus-tour/` 下，保持原有目录层级。在主站的「3D 与全景」里选择「进入全景漫游」。未配置素材包时，页面提供 720 云原作链接。素材目录已加入 Git 忽略列表，公开部署前请核对素材授权范围。
+将可使用的 H5 全景包的 `index.html`、`viewer.js`、`viewer.css`、`scenes.js` 和 `panos/` 放在 `assets/campus-tour/` 下，保持原有目录层级。在主站的「3D 与全景」里选择「进入全景漫游」。未配置素材包时，页面提示暂未开放全景漫游。素材目录已加入 Git 忽略列表，公开部署前请核对素材授权范围。
 
 ## 技术说明
 

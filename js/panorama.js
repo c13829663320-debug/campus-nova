@@ -8,6 +8,7 @@ fetch(tourPath + "scenes.js", { method: "HEAD", signal: AbortSignal.timeout(4000
   .then(response => {
     if (response.ok && /(?:java|ecma)script/.test(response.headers.get("Content-Type") ?? "")) {
       tourButton.hidden = false;
+      document.getElementById("campus-tour-unavailable").hidden = true;
     }
   })
   .catch(() => {});
