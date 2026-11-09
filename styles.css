@@ -431,9 +431,40 @@ button, a, input, select, textarea { outline: none; }
 .group-meta { display: grid; gap: 7px; margin-top: 16px; color: var(--text-sub); font-size: 11px; }
 .group-meta span { display: flex; align-items: center; gap: 7px; }
 .group-meta svg { width: 15px; height: 15px; color: var(--secondary); }
-.group-footer { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--border); }
-.seat-info { display: flex; flex-direction: column; font-size: 11px; font-weight: 700; }
-.seat-info small { color: var(--text-sub); font-size: 9px; font-weight: 500; }
+.group-footer { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--border); }
+.seat-info {
+  display: flex;
+  flex: 1 1 116px;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 5px 6px;
+  color: var(--text-sub);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+.seat-info > span { white-space: nowrap; }
+.seat-info strong { color: var(--text); font-size: 16px; line-height: 1.2; }
+.seat-info small {
+  padding: 2px 5px;
+  border-radius: 6px;
+  background: var(--feature-tint, var(--surface-soft));
+  color: var(--feature-ink, var(--text-sub));
+  font-size: 10px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.group-footer .button {
+  flex-shrink: 0;
+  min-height: 40px;
+  padding: 0 10px;
+  gap: 5px;
+  border-radius: 10px;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+.group-footer .button svg { flex: none; width: 14px; height: 14px; }
+.group-footer .button:focus-visible { outline: 2px solid var(--feature-ink, var(--primary)); outline-offset: 2px; }
 .groups-panel.card {
   min-width: 0;
   border: 1px solid var(--feature-line);
@@ -461,7 +492,7 @@ button, a, input, select, textarea { outline: none; }
 .group-list { display: grid; gap: 12px; container-type: inline-size; }
 .group-list .group-card {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(132px, 24%);
+  grid-template-columns: minmax(0, 1fr) minmax(152px, 24%);
   align-items: stretch;
   gap: clamp(12px, 2vw, 20px);
   padding: clamp(12px, 2vw, 20px);
@@ -479,27 +510,28 @@ button, a, input, select, textarea { outline: none; }
 .group-list .group-meta { display: flex; flex-wrap: wrap; gap: 8px 14px; margin-top: 12px; font-size: 12px; }
 .group-list .group-meta svg { flex: none; }
 .group-list .group-footer {
-  display: flex;
+  align-self: center;
   flex-direction: column;
+  flex-wrap: nowrap;
   align-items: stretch;
-  justify-content: center;
   margin: 0;
-  padding: 12px;
+  padding: 10px;
   border: 1px solid var(--feature-line);
   border-radius: 14px;
   background: var(--feature-panel);
 }
-.group-list .seat-info { gap: 5px; font-size: 12px; font-variant-numeric: tabular-nums; }
-.group-list .seat-info small { font-size: 11px; }
-.group-list .group-footer .button { justify-content: center; }
+.group-list .seat-info { flex: 0 1 auto; }
 .group-list [data-action="join-group"] { background: var(--feature-ink); color: var(--feature-start); }
 .group-list [data-action="join-group"]:hover { background: color-mix(in srgb, var(--feature-ink) 88%, var(--feature-start)); }
-.group-seat-progress { width: 100%; height: 5px; margin-block: 3px; background: var(--feature-tint, var(--surface-soft)); }
+.group-seat-progress { flex-basis: 100%; height: 4px; background: var(--feature-tint, var(--surface-soft)); }
 .progress-track.group-seat-progress > span { background: var(--feature-ink, var(--secondary)); }
 @container (max-width: 460px) {
   .group-list .group-card { grid-template-columns: minmax(0, 1fr); }
-  .group-list .group-footer { flex-direction: row; align-items: center; justify-content: space-between; }
-  .group-list .seat-info { flex: 1; max-width: 140px; }
+  .group-list .group-footer { flex-direction: row; flex-wrap: wrap; align-items: center; }
+  .group-list .seat-info { flex: 1 1 116px; }
+}
+@container (max-width: 285px) {
+  .group-list .group-footer .button { flex: 1 1 100%; }
 }
 
 /* Place details */

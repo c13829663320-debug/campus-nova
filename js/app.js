@@ -357,7 +357,7 @@
     const avatar = isMine ? avatarMarkup(profile, "host-avatar") : hasPortrait
       ? `<span class="avatar host-avatar group-portrait" aria-hidden="true" style="--portrait-x:${portrait % 5 * 25}%;--portrait-y:${Math.floor(portrait / 5) * 100}%">${escapeHTML(group.hostInitial)}</span>`
       : `<span class="avatar host-avatar" aria-hidden="true">${escapeHTML(group.hostInitial)}</span>`;
-    let button = `<button class="button button-small" data-action="join-group" data-id="${group.id}">${isDemo() ? "体验加入" : "加入组局"} ${icon("plus")}</button>`;
+    let button = `<button class="button button-small" data-action="join-group" data-id="${group.id}">${icon("plus")}<span>${isDemo() ? "体验加入" : "加入组局"}</span></button>`;
     if (group.isOwner) button = `<button class="button button-small button-ghost" disabled>我发起的</button>`;
     else if (group.isJoined) button = `<button class="button button-small button-outline" data-action="leave-group" data-id="${group.id}">退出组局</button>`;
     else if (remaining === 0) button = `<button class="button button-small button-ghost" disabled>已经满员</button>`;
@@ -378,9 +378,9 @@
       </div>
       <div class="group-footer">
         <div class="seat-info">
-          <span>${group.joined}/${group.total} 人已加入</span>
+          <span><strong>${group.joined}/${group.total}</strong> 人已加入</span>
+          <small>${remaining ? `余 ${remaining} 席` : "满员"}</small>
           <div class="progress-track group-seat-progress" aria-hidden="true"><span style="width:${occupancy}%"></span></div>
-          <small>${remaining ? `还差 ${remaining} 人` : "全员就位"}</small>
         </div>
         ${button}
       </div>
