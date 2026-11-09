@@ -386,7 +386,18 @@
 }
 .campus-agent-compose textarea:focus { outline: 2px solid var(--agent-accent); outline-offset: 1px; }
 .campus-agent-actions, .campus-agent-files { display: flex; align-items: center; gap: 7px; }
-.campus-agent-actions { margin-top: 9px; }
+.campus-agent-actions { margin-top: 9px; flex-wrap: wrap; }
+.campus-agent-tool[hidden], .campus-voice-draft[hidden] { display: none; }
+.campus-voice-draft {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.campus-voice-draft audio, .campus-message audio { display: block; width: min(100%, 244px); height: 40px; }
+.campus-message audio { margin-top: 6px; }
+.campus-agent-status a { color: var(--agent-accent); text-decoration: underline; }
 .campus-agent-files { flex-wrap: wrap; margin-bottom: 8px; }
 .campus-agent-files[hidden] { display: none; }
 .campus-agent-file { display: block; min-height: 30px; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

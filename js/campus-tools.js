@@ -10,13 +10,17 @@
   const welcome = document.getElementById("campus-agent-welcome");
   const files = document.getElementById("campus-agent-files");
   const fileInput = document.getElementById("campus-agent-file");
-  const audioInput = document.getElementById("campus-agent-audio");
   const attach = document.getElementById("campus-attach");
   const voice = document.getElementById("campus-voice");
+  const voiceLabel = voice.querySelector("span");
+  const cancelVoice = document.getElementById("campus-cancel-voice");
+  const voicePreview = document.getElementById("campus-voice-draft");
+  const voicePlayer = voicePreview.querySelector("audio");
+  const removeVoice = document.getElementById("campus-remove-voice");
   const reset = document.getElementById("campus-new-chat");
   const history = [];
   const imageTypes = ["image/png", "image/jpeg", "image/webp"];
-  const voiceFormats = /\.(wav|mp3|flac|m4a|ogg|webm|aac)$/i;
+  const voiceFormats = { "audio/webm": "webm", "audio/mp4": "m4a", "audio/ogg": "ogg" };
   const served = location.protocol === "http:" || location.protocol === "https:";
   const liveVoice = Boolean(window.isSecureContext && navigator.mediaDevices?.getUserMedia && window.MediaRecorder);
   const links = new Set(["#clubs", "campus-map.html", "map3d.html"]);
@@ -25,6 +29,7 @@
   let busy = false;
   let available = false;
   let recording = null;
+  let voiceDraft = null;
 
   function setStatus(message, isError = false) {
     status.textContent = message;
@@ -33,10 +38,15 @@
   }
 
   function updateControls() {
-    send.disabled = !available || busy || Boolean(recording) || !(input.value.trim() || draft.length);
+    send.disabled = !available || busy || Boolean(recording) || !(input.value.trim() || draft.length || voiceDraft);
+    send.firstElementChild.textContent = voiceDraft ? "发送语音" : "发送";
     attach.disabled = busy || Boolean(recording);
     reset.disabled = busy;
-    voice.disabled = busy;
+    voice.disabled = busy || Boolean(voiceDraft) || Boolean(recording && !recording.recorder);
+    voiceLabel.textContent = recording?.recorder ? "结束录音" : "语音消息";
+    voice.setAttribute("aria-pressed", String(Boolean(recording?.recorder)));
+    cancelVoice.hidden = !recording;
+    removeVoice.disabled = busy;
     input.readOnly = busy;
   }
 
@@ -145,7 +155,7 @@
   fileInput.addEventListener("change", async () => {
     const selected = [...fileInput.files];
     fileInput.value = "";
-    if (!selected.length || busy) return;
+    if (!selected.length || busy || recording) return;
     if (selected.length + draft.length > 3) return setStatus("每轮最多添加 3 个附件。", true);
     busy = true;
     updateControls();
@@ -178,119 +188,116 @@
     return result;
   }
 
-  const voiceLabel = voice.querySelector("span");
-  let uploadVoice = !liveVoice;
-  if (uploadVoice) voiceLabel.textContent = "上传录音";
-
   function stopVoice(discard = true) {
     if (!recording) return;
     const session = recording;
-    recording = null;
-    session.discard = discard;
     clearTimeout(session.timer);
-    if (session.recorder?.state === "recording") {
-      if (!discard) busy = true;
-      session.recorder.stop();
+    if (discard) {
+      recording = null;
+      session.stream?.getTracks().forEach(track => track.stop());
+      setStatus("");
     }
-    session.stream?.getTracks().forEach(track => track.stop());
-    voice.setAttribute("aria-pressed", "false");
-    voiceLabel.textContent = "语音输入";
-    if (discard) setStatus("");
+    if (session.recorder?.state === "recording") session.recorder.stop();
     updateControls();
   }
 
+  function clearVoiceDraft(release = true) {
+    if (!voiceDraft) return;
+    voicePlayer.removeAttribute("src");
+    voicePlayer.load();
+    if (release) URL.revokeObjectURL(voiceDraft.url);
+    voiceDraft = null;
+    voicePreview.hidden = true;
+  }
+
+  cancelVoice.addEventListener("click", () => {
+    stopVoice();
+    voice.focus();
+  });
+  removeVoice.addEventListener("click", () => {
+    clearVoiceDraft();
+    setStatus("");
+    updateControls();
+    voice.focus();
+  });
+
   voice.addEventListener("click", async () => {
-    if (uploadVoice) return audioInput.click();
-    if (recording) return stopVoice(!recording.recorder);
-    const session = { discard: false };
+    if (!liveVoice) {
+      if (!window.isSecureContext && location.protocol === "http:") {
+        const secureUrl = new URL(location.href);
+        secureUrl.protocol = "https:";
+        const link = document.createElement("a");
+        link.href = secureUrl.href;
+        link.textContent = "打开 HTTPS 版";
+        setStatus("语音消息需要安全连接。", true);
+        status.append(" ", link);
+      } else {
+        setStatus("当前浏览器无法录音，请用支持麦克风录音的浏览器打开星图校园。", true);
+      }
+      return;
+    }
+    if (!available) {
+      setStatus("正在连接校园助手…");
+      return featureCheck();
+    }
+    if (recording) return stopVoice(false);
+    const session = {};
     recording = session;
     updateControls();
     setStatus("正在请求麦克风权限…");
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      if (session.discard) {
+      if (recording !== session) {
         stream.getTracks().forEach(track => track.stop());
         return;
       }
       session.stream = stream;
-      const mime = ["audio/webm;codecs=opus", "audio/mp4"].find(type => MediaRecorder.isTypeSupported(type));
+      const mime = ["audio/webm;codecs=opus", "audio/mp4", "audio/ogg;codecs=opus"].find(type => MediaRecorder.isTypeSupported(type));
       const recorder = new MediaRecorder(stream, { ...(mime && { mimeType: mime }), audioBitsPerSecond: 48_000 });
       session.recorder = recorder;
       const chunks = [];
       recorder.addEventListener("dataavailable", event => { if (event.data.size) chunks.push(event.data); });
       recorder.addEventListener("stop", () => {
-        if (session.discard) return;
+        if (recording !== session) return;
+        stopVoice();
         const type = recorder.mimeType.split(";")[0];
-        const format = ({ "audio/mp4": "m4a", "audio/webm": "webm", "audio/ogg": "ogg" })[type];
-        if (!format) {
-          busy = false;
-          updateControls();
-          uploadVoice = true;
-          voiceLabel.textContent = "上传录音";
-          setStatus("录音格式暂不支持，可以上传常见格式的录音。", true);
-          return;
-        }
-        transcribeFile(new File(chunks, "录音." + format, { type }));
+        const format = voiceFormats[type];
+        const blob = new Blob(chunks, { type });
+        if (!format || !blob.size || blob.size > 600_000) return setStatus("未能保存语音，请重新录制一段较短的语音。", true);
+        voiceDraft = { blob, format, url: URL.createObjectURL(blob) };
+        voicePlayer.src = voiceDraft.url;
+        voicePreview.hidden = false;
+        updateControls();
+        setStatus("录音完成，可以试听后发送。");
       });
       recorder.addEventListener("error", () => {
-        if (recording === session) stopVoice();
-        setStatus("录音中断，可以上传一段录音。", true);
+        if (recording !== session) return;
+        stopVoice();
+        setStatus("录音中断，请检查麦克风后重试。", true);
       });
       recorder.start();
-      voice.setAttribute("aria-pressed", "true");
-      voiceLabel.textContent = "结束录音";
-      setStatus("正在录音，最长 20 秒。结束后会转写为可编辑的文字。");
+      updateControls();
+      voice.focus();
+      setStatus("正在录音，最长 20 秒。说完后点击「结束录音」。");
       session.timer = setTimeout(() => stopVoice(false), 20_000);
-    } catch {
+    } catch (error) {
       if (recording !== session) return;
       stopVoice();
-      voiceLabel.textContent = "上传录音";
-      uploadVoice = true;
-      setStatus("麦克风暂不可用。再次点击可上传录音。", true);
+      setStatus(error.name === "NotAllowedError" ? "请在浏览器中允许麦克风权限，再试一次。"
+        : "无法使用麦克风，请检查设备连接和系统权限后重试。", true);
     }
-  });
-
-  async function transcribeFile(file) {
-    const format = file.name.match(voiceFormats)?.[1].toLowerCase() || ({
-      "audio/mpeg": "mp3", "audio/mp4": "m4a", "audio/wav": "wav", "audio/webm": "webm", "audio/ogg": "ogg"
-    })[file.type];
-    if (!format || !file.size || file.size > 600_000) {
-      busy = false;
-      updateControls();
-      return setStatus("请选择 600 KB 内的常见录音格式，例如 MP3、M4A 或 WAV。", true);
-    }
-    busy = true;
-    updateControls();
-    setStatus("正在转写录音…");
-    try {
-      const result = await request({ action: "transcribe", attachments: [
-        { kind: "audio", name: file.name.slice(0, 120), format, data: await base64(file) }
-      ] });
-      if (typeof result.transcript !== "string") throw new Error("录音未能转写，请换一段录音。");
-      input.value = [input.value.trim(), result.transcript].filter(Boolean).join(" ").slice(0, input.maxLength);
-      setStatus("转写完成，可以修改后发送。");
-    } catch (error) {
-      setStatus(error instanceof TypeError ? "无法连接语音服务，请稍后重试。" : error.message, true);
-    } finally {
-      busy = false;
-      updateControls();
-    }
-  }
-
-  audioInput.addEventListener("change", () => {
-    const file = audioInput.files[0];
-    audioInput.value = "";
-    if (file && !busy) transcribeFile(file);
   });
 
 
   ai.addEventListener("close", () => stopVoice());
   reset.addEventListener("click", () => {
     stopVoice();
+    clearVoiceDraft();
     history.length = 0;
     lastFiles = [];
     draft = [];
     input.value = "";
+    chat.querySelectorAll("audio").forEach(audio => URL.revokeObjectURL(audio.src));
     chat.replaceChildren();
     welcome.hidden = false;
     showDraft();
@@ -308,7 +315,16 @@
       image: "图像生成", vision: "图片解读", lookup: "校园资料", text: "校园助手"
     })[options.mode] || "校园助手";
     body.textContent = message;
-    item.append(label, body);
+    item.append(label);
+    if (options.audio) {
+      const player = document.createElement("audio");
+      player.controls = true;
+      player.preload = "metadata";
+      player.src = options.audio;
+      player.setAttribute("aria-label", "播放已发送的语音");
+      item.append(player);
+    }
+    item.append(body);
     if (options.files?.length) {
       const names = document.createElement("small");
       names.textContent = "附件 · " + options.files.map(file => file.name).join("、");
@@ -346,16 +362,27 @@
   form.addEventListener("submit", async event => {
     event.preventDefault();
     if (send.disabled) return;
-    const question = input.value.trim() || "请帮我解读这份附件。";
-    const reusesAttachment = /^(?:那|它|这|再|继续|上[一次轮]|刚才|根据|提取|总结|改成|换成|调整|把|给它加)/.test(question);
-    const attachments = draft.length ? draft : reusesAttachment ? lastFiles : [];
     busy = true;
     updateControls();
-    welcome.hidden = true;
-    const pending = addMessage("user", question, { files: draft });
-    pending.scrollIntoView({ block: "nearest" });
-    setStatus("助手正在处理请求…");
+    let pending;
     try {
+      if (voiceDraft && !voiceDraft.transcript) {
+        setStatus("正在识别语音…");
+        const { format, blob } = voiceDraft;
+        const { transcript } = await request({ action: "transcribe", attachments: [
+          { kind: "audio", name: "语音." + format, format, data: await base64(blob) }
+        ] });
+        if (typeof transcript !== "string" || !transcript.trim()) throw new Error("没有识别到清晰语音，请重新录制。");
+        voiceDraft.transcript = transcript.trim();
+      }
+      const question = [voiceDraft?.transcript, input.value.trim()].filter(Boolean).join("\n").slice(0, input.maxLength)
+        || "请帮我解读这份附件。";
+      const reusesAttachment = /^(?:那|它|这|再|继续|上[一次轮]|刚才|根据|提取|总结|改成|换成|调整|把|给它加)/.test(question);
+      const attachments = draft.length ? draft : reusesAttachment ? lastFiles : [];
+      welcome.hidden = true;
+      pending = addMessage("user", question, { files: draft, audio: voiceDraft?.url });
+      pending.scrollIntoView({ block: "nearest" });
+      setStatus("助手正在处理请求…");
       const result = await request({ question, history, attachments });
       if (typeof result.answer !== "string") throw new Error("助手暂时没有返回内容，请重试。");
       addMessage("assistant", result.answer, result);
@@ -366,12 +393,13 @@
         lastFiles = [{ kind: "image", name: "上一张生成图", ...result.image }];
       }
       draft = [];
+      clearVoiceDraft(false);
       input.value = "";
       showDraft();
       setStatus("");
       scroller.scrollTop = scroller.scrollHeight;
     } catch (error) {
-      pending.remove();
+      pending?.remove();
       welcome.hidden = Boolean(history.length);
       setStatus(error.name === "TimeoutError" ? "处理超时。草稿仍在，可以再试一次。"
         : error instanceof TypeError ? "连接中断。草稿仍在，可以重新发送。" : error.message, true);
