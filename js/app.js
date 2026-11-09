@@ -124,26 +124,21 @@
     return String(value ?? "").replace(/[&<>'"]/g, char => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" }[char]));
   }
 
-  function avatarState(user) {
-    if (user.avatarType === "upload" && user.avatarValue) {
-      return { className: "avatar-photo", background: "", html: `<img src="${escapeHTML(user.avatarValue)}" alt="">` };
-    }
-    return { className: "", background: "", html: escapeHTML(user.initial) };
+  const defaultAvatar = "assets/profile/nova-star.webp";
+
+  function avatarImage(user) {
+    const src = user.avatarType === "upload" && user.avatarValue ? user.avatarValue : defaultAvatar;
+    return `<img src="${escapeHTML(src)}" alt="">`;
   }
 
   function avatarMarkup(user, className = "") {
-    const state = avatarState(user);
-    const style = state.background ? ` style="background:${state.background}"` : "";
-    return `<span class="avatar ${className} ${state.className}"${style}>${state.html}</span>`;
+    return `<span class="avatar avatar-photo ${className}">${avatarImage(user)}</span>`;
   }
 
   function applyAvatar(element, user) {
     if (!element) return;
-    const state = avatarState(user);
-    element.classList.remove("avatar-photo");
-    if (state.className) element.classList.add(state.className);
-    element.style.background = state.background;
-    element.innerHTML = state.html;
+    element.classList.add("avatar-photo");
+    element.innerHTML = avatarImage(user);
   }
 
   function maskPhone(phone) {
@@ -873,10 +868,10 @@
     }
   }
 
-  function openModal(content, small = false) {
+  function openModal(content, small = false, variant = "") {
     if (dormitoryViewer) closeModal(false);
     lastFocused = document.activeElement;
-    modalRoot.innerHTML = `<div class="modal-backdrop" data-modal-backdrop><section class="modal ${small ? "modal-small" : ""}" role="dialog" aria-modal="true"><div class="modal-handle"></div>${content}</section></div>`;
+    modalRoot.innerHTML = `<div class="modal-backdrop" data-modal-backdrop><section class="modal ${small ? "modal-small" : ""} ${variant}" role="dialog" aria-modal="true"><div class="modal-handle"></div>${content}</section></div>`;
     document.body.classList.add("modal-open");
     requestAnimationFrame(() => {
       const target = modalRoot.querySelector("input, select, textarea, button");
@@ -1395,21 +1390,34 @@
   function openProfileModal() {
     const profile = Store.getProfile();
     ui.profileDraft = { avatarType: profile.avatarType, avatarValue: profile.avatarValue };
-    openModal(`${modalHeader("MY NOVA", "编辑个人资料", "头像、姓名和手机号只保存在本机，手机号不会公开展示。")}
+    openModal(`${modalHeader("MY NOVA · 个人档案", "编辑个人资料", "头像、姓名和手机号仅保存在当前浏览器。")}
       <form id="profile-form" novalidate>
-        <div class="profile-edit-head">
-          <span class="avatar profile-avatar-preview" id="profile-avatar-preview"></span>
-          <div><strong>头像</strong><p class="muted">默认使用姓名首字，也可以上传你自己的照片</p></div>
-        </div>
-        <div class="avatar-options">
-          <button type="button" class="avatar-option avatar-option-initial" data-action="pick-avatar-initial" title="默认头像" aria-label="使用默认头像">${escapeHTML(profile.initial)}</button>
-          <button type="button" class="avatar-option avatar-option-upload" data-action="pick-avatar-file" title="上传照片" aria-label="上传照片">${icon("camera")}</button>
+        <div class="profile-avatar-editor">
+          <div class="profile-edit-head">
+            <span class="avatar profile-avatar-preview" id="profile-avatar-preview"></span>
+            <div><h3>个人头像</h3><p id="profile-avatar-caption" aria-live="polite"></p></div>
+          </div>
+          <div class="avatar-options">
+            <button type="button" class="avatar-option" data-action="pick-avatar-initial" aria-pressed="false">
+              <span class="avatar-option-icon"><img src="${defaultAvatar}" alt=""></span>
+              <span>使用默认头像</span>
+            </button>
+            <button type="button" class="avatar-option" data-action="pick-avatar-file">
+              <span class="avatar-option-icon">${icon("camera")}</span><span>上传照片</span>
+            </button>
+          </div>
         </div>
         <input type="file" id="avatar-file" accept="image/png,image/jpeg,image/webp" hidden>
-        <div class="field"><label for="profile-name">姓名<span> *</span></label><input id="profile-name" name="name" maxlength="12" value="${escapeHTML(profile.name)}" autocomplete="name">${fieldError("name")}</div>
-        <div class="field"><label for="profile-phone">手机号</label><input id="profile-phone" name="phone" type="tel" inputmode="numeric" maxlength="11" value="${escapeHTML(profile.phone)}" placeholder="选填">${fieldError("phone")}<p class="field-hint">当前浏览器保存，页面展示时隐藏部分号码。</p></div>
+        <div class="profile-edit-fields">
+          <div class="field"><label for="profile-name">姓名<span aria-hidden="true"> *</span></label><input id="profile-name" name="name" maxlength="12" value="${escapeHTML(profile.name)}" autocomplete="name" required>${fieldError("name")}</div>
+          <div class="field"><label for="profile-phone">手机号<small>选填</small></label><input id="profile-phone" name="phone" type="tel" inputmode="numeric" maxlength="11" value="${escapeHTML(profile.phone)}" placeholder="11 位手机号" autocomplete="tel-national" aria-describedby="profile-phone-hint">${fieldError("phone")}</div>
+        </div>
+        <p class="profile-edit-privacy" id="profile-phone-hint">${icon("shield-check")}个人资料页会隐藏手机号的中间四位。</p>
         <div class="form-actions"><button type="button" class="button button-ghost" data-action="close-modal">取消</button><button type="submit" class="button">${icon("check")}保存资料</button></div>
-      </form>`);
+      </form>`, false, "profile-editor");
+    const title = modalRoot.querySelector(".profile-editor h2");
+    title.id = "profile-editor-title";
+    title.closest("[role=dialog]").setAttribute("aria-labelledby", title.id);
     refreshProfilePreview();
   }
 
@@ -1417,23 +1425,16 @@
     const preview = document.getElementById("profile-avatar-preview");
     if (!preview || !ui.profileDraft) return;
     applyAvatar(preview, { ...Store.getProfile(), ...ui.profileDraft });
-    const draft = ui.profileDraft;
-    const initial = document.querySelector(".avatar-option-initial");
-    if (initial) initial.classList.toggle("active", draft.avatarType !== "upload");
-    const upload = document.querySelector(".avatar-option-upload");
-    if (upload) {
-      const isUpload = draft.avatarType === "upload" && Boolean(draft.avatarValue);
-      upload.classList.toggle("active", isUpload);
-      upload.classList.toggle("has-image", isUpload);
-      upload.innerHTML = isUpload ? `<img src="${escapeHTML(draft.avatarValue)}" alt="">` : icon("camera");
-    }
+    const isUpload = ui.profileDraft.avatarType === "upload" && Boolean(ui.profileDraft.avatarValue);
+    modalRoot.querySelector('[data-action="pick-avatar-initial"]').setAttribute("aria-pressed", String(!isUpload));
+    document.getElementById("profile-avatar-caption").textContent = isUpload ? "自定义照片" : "星图小星 · 默认头像";
   }
 
   function handleAvatarFile(input) {
     const file = input.files && input.files[0];
     input.value = "";
     if (!file) return;
-    if (!file.type.startsWith("image/")) {
+    if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
       showToast("无法使用这个文件", "请选择 JPG、PNG 或 WebP 图片。", "error");
       return;
     }
@@ -1441,10 +1442,17 @@
       showToast("图片太大了", "请选择 8MB 以内的图片。", "error");
       return;
     }
+    const draft = { ...ui.profileDraft };
+    ui.profileDraft = draft;
+    const isCurrent = () => input.isConnected && ui.profileDraft === draft;
+    const reportError = () => {
+      if (isCurrent()) showToast("图片读取失败", "换一张图片再试试。", "error");
+    };
     const reader = new FileReader();
     reader.onload = () => {
       const image = new Image();
       image.onload = () => {
+        if (!isCurrent()) return;
         const size = 256;
         const canvas = document.createElement("canvas");
         canvas.width = size;
@@ -1457,10 +1465,10 @@
         ui.profileDraft = { avatarType: "upload", avatarValue: canvas.toDataURL("image/jpeg", 0.82) };
         refreshProfilePreview();
       };
-      image.onerror = () => showToast("图片读取失败", "换一张图片再试试。", "error");
+      image.onerror = reportError;
       image.src = reader.result;
     };
-    reader.onerror = () => showToast("图片读取失败", "换一张图片再试试。", "error");
+    reader.onerror = reportError;
     reader.readAsDataURL(file);
   }
 
