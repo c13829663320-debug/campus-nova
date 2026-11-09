@@ -83,12 +83,13 @@ function validAttachment(file) {
   return file.kind === "audio" && audioTypes.includes(file.format);
 }
 
-function wantsImage(question, history) {
+function wantsImage(question, history, image) {
   const explicit = /(?:生成|设计|绘制|画[一个幅张]|画个|做[一张个幅]|制作|出[一张]|帮我做|generate|draw|create).{0,24}(?:海报|插画|图像|图片|封面|配图|头像|壁纸|场景图|效果图|宣传图|image|poster|illustration)/i.test(question)
     || /(?:生成|画|绘制)(?:一张|一幅|张|幅)?图(?:[，。：:\s]|$)/.test(question);
   const copy = /(?:海报|图片|配图|插画|封面).{0,5}(?:文案|提示词|设计方案|文字说明)|(?:写|润色|改写).{0,10}(?:文案|文字|提示词)/.test(question);
   const revision = history.at(-1)?.mode === "image" && /^(?:请|再)?(?:改成|换成|重画|再来|调整|重新生成|给它加|把.*(?:改|换|调|加))/.test(question);
-  return (explicit || revision) && !copy;
+  const edit = image && /(?:图|照片|插画|海报).{0,12}(?:改成|换成|换色|重绘|去掉背景|改背景|加上背景)|^(?:请|帮我)?(?:重绘|修图|抠图|换背景)/.test(question);
+  return (explicit || revision || edit) && !copy;
 }
 
 function modelError(status) {
@@ -120,7 +121,7 @@ async function generateImage(question, history, image, documents) {
   ].filter(Boolean).join("\n");
   const result = await requestModel("images", {
     model: imageModel, prompt, n: 1, aspect_ratio: "1:1", output_format: "jpeg",
-    ...(image && { input_references: [imageUrl(image)] })
+    ...(image && { input_references: [{ type: "image_url", image_url: { url: imageUrl(image) } }] })
   }, AbortSignal.timeout(65_000));
   const data = result.data?.[0]?.b64_json;
   const type = validBase64(data, 4_000_000) && imageType(data);
@@ -215,7 +216,7 @@ async function handleCampusAgent(req, res, json) {
   if (!audio && !question) return json(res, 400, { error: "请输入 1 至 1500 字的问题。" });
 
   const image = images[0];
-  const mode = audio ? "audio" : wantsImage(question, history) ? "image" : image ? "vision" : "text";
+  const mode = audio ? "audio" : wantsImage(question, history, image) ? "image" : image ? "vision" : "text";
   const matches = mode === "text" ? findCampus(question, history) : [];
   const links = [...new Map(matches.map(({ link }) => [link.href, link])).values()];
   const limits = [budgets.all, budgets.allDaily];
