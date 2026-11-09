@@ -9,18 +9,21 @@
   const pilotSignup = { contact: "小明", wechat: "CMH5123" };
   const pilotSchedule = [
     {
+      id: "ai-talk-2", category: "技能实战", image: "assets/ai/seminar.jpg",
       title: "第二期 · 元启 · AI Talk Workshop",
       date: "2026-11-11", time: "15:00–17:00",
       venue: "笃行楼（教二）303", mapPoint: "teach-2",
       summary: "现场练习用 AI 写文稿、做视觉素材和整理信息，并为「百校造百岛」作品构思创意、写脚本和生成素材。"
     },
     {
+      id: "workbuddy", category: "技能实战", image: "assets/ai/coding.jpg",
       title: "元启 · 实战工坊｜WorkBuddy 小程序开发实战",
       date: "2026-11-11", time: "19:00–21:00",
       venue: "笃行楼（教二）303", mapPoint: "teach-2",
       summary: "从一个点子出发，用自然语言描述需求，跟练微信小程序的生成、预览、修改和试用版发布。零代码基础也可参加。"
     },
     {
+      id: "wowland", category: "技能实战", image: "assets/ai/robotics.jpg",
       title: "抖音校园 WowLand「百校造百岛」AIGC 3D 世界创作训练营",
       date: "2026-11-14", time: "08:30–18:00",
       venue: "创新楼（教三）304、305", mapPoint: "teach-3",
@@ -38,6 +41,9 @@
     clubFilter: "all",
     clubQuery: "",
     clubCatalog: { clubs: [], categories: [], events: [] },
+    activityCategory: "",
+    activityPeriod: "",
+    activities: [],
     forumCategory: "all",
     forumQuery: "",
     forumSort: "latest",
@@ -179,7 +185,7 @@
   }
 
   function updateShell(route) {
-    const activeNav = route.name === "place" ? "map" : route.name === "club" ? "clubs" : route.name === "thread" ? "forum" : ["map", "forum", "clubs", "me"].includes(route.name) ? route.name : "map";
+    const activeNav = route.name === "place" ? "map" : route.name === "club" ? "clubs" : route.name === "thread" ? "forum" : ["map", "forum", "clubs", "me", "events"].includes(route.name) ? route.name : "map";
     document.body.dataset.page = activeNav;
     document.body.classList.toggle("map-intro", route.name === "map" && mapIntroVisible);
     document.querySelectorAll("[data-nav]").forEach(link => {
@@ -196,6 +202,8 @@
     if (route.name === "place") {
       const place = Store.getPlace(route.id);
       meta = { eyebrow: "SPACE DISCOVERY · 空间破茧", title: place ? place.name : "地点探索", subtitle: "看见实景，也遇见此刻同路的人。", documentTitle: place ? place.name : "地点探索" };
+    } else if (route.name === "events") {
+      meta = { eyebrow: "CAMPUS EVENTS", title: "校园活动", subtitle: "按兴趣发现校园里的活动。", documentTitle: "校园活动" };
     } else if (route.name === "clubs") {
       meta = { eyebrow: "CLUB MATRIX · 同好宇宙", title: "让热爱，找到它的组织", subtitle: "从一次活动开始，认识一群志同道合的人。", documentTitle: "社团招新" };
     } else if (route.name === "forum") {
@@ -284,6 +292,18 @@
         ui.threadData = post;
         updateShell(route);
         view.innerHTML = renderThread(post);
+      } else if (route.name === "events") {
+        const catalog = await API.fetchClubCatalog();
+        if (request !== routeRequest) return;
+        ui.activities = campusActivities(catalog);
+        if (route.id) {
+          const activity = ui.activities.find(item => item.id === route.id);
+          if (!activity) throw new Error("没有找到这场活动。可从首页的校园活动入口继续浏览。");
+          document.title = `${activity.title} · 校园活动 · 星图校园`;
+          view.innerHTML = renderActivityDetail(activity);
+        } else {
+          view.innerHTML = renderActivities();
+        }
       } else if (route.name === "clubs") {
         const [clubs, catalog] = await Promise.all([
           API.fetchClubs({ query: ui.clubQuery, category: ui.clubFilter }),
@@ -433,7 +453,7 @@
 
             <div class="nova-hero-quick" aria-label="快速入口">
               <button class="nova-quick" type="button" data-action="enter-campus-map">${icon("map-pin")}<span>校园地图</span></button>
-              <a class="nova-quick" href="#club/${pilotClubId}">${icon("users")}<span>元启AI社</span></a>
+              <a class="nova-quick nova-quick-events" href="#events">${icon("calendar")}<span>校园活动</span></a>
               <a class="nova-quick" href="#forum">${icon("message-square")}<span>校园论坛</span></a>
               <a class="nova-quick" href="#clubs">${icon("star")}<span>社团介绍</span></a>
               <a class="nova-quick" href="panorama.html">${icon("camera")}<span>3D 与全景</span></a>
@@ -1107,17 +1127,126 @@
       <aside class="club-detail-aside"><section class="apply-card card"><div class="card-heading"><h3>报名方式</h3><span class="tag">${isPilot ? "社团试点" : "招新信息"}</span></div>${applyContent}</section>${!isDemo() && place ? `<section class="club-content-card card"><div class="card-heading"><h3>地点参考</h3><span>以活动通知为准</span></div><div class="compact-list"><a class="compact-list-item" href="#place/${place.id}">${icon("map-pin")}<div><strong>${place.name}</strong><small>打开校园地点指南</small></div>${icon("chevron-right")}</a></div></section>` : ""}</aside></div></div>`;
   }
 
+  function pilotEventEnded(event) {
+    const endTime = event.time.split("–")[1];
+    return Date.now() >= Date.parse(`${event.date}T${endTime}:00+08:00`);
+  }
+
+  function campusActivities({ clubs, events = [] }) {
+    const schedule = pilotSchedule.map(event => ({
+      ...event,
+      clubId: pilotClubId,
+      dateLabel: event.date.replace(/^(\d+)-(\d+)-(\d+)$/, (_, year, month, day) => `${year}年${Number(month)}月${Number(day)}日`),
+      status: pilotEventEnded(event) ? "计划时间已过" : "拟定安排"
+    }));
+    const archive = events.map(event => ({
+      ...event,
+      venue: event.place,
+      summary: event.desc,
+      dateLabel: [event.date, event.weekday].filter(Boolean).join(" "),
+      status: "往期活动"
+    }));
+    const upcoming = schedule.filter(event => event.status === "拟定安排");
+    const elapsed = schedule.filter(event => event.status === "计划时间已过").reverse();
+    return [...upcoming, ...elapsed, ...archive]
+      .map(event => ({ ...event, club: clubs.find(club => club.id === event.clubId) }));
+  }
+
+  function activityMeta(event, showMap = false) {
+    return `<ul class="activity-meta">
+      <li>${icon("calendar")}<span>${escapeHTML([event.dateLabel, event.time].filter(Boolean).join(" · "))}</span></li>
+      <li>${icon("map-pin")}<span>${showMap && event.mapPoint ? `<a href="#map/${encodeURIComponent(event.mapPoint)}">${escapeHTML(event.venue)} · 地图定位</a>` : escapeHTML(event.venue)}</span></li>
+    </ul>`;
+  }
+
+  function activityCover(event) {
+    return `<div class="activity-cover">
+      <img src="${escapeHTML(event.image)}" alt="" loading="lazy" decoding="async">
+      <span class="activity-status${event.status === "拟定安排" ? " is-planned" : ""}">${event.status}</span>
+      ${event.mapPoint ? '<span class="activity-illustration">主题配图</span>' : ""}
+    </div>`;
+  }
+
+  function renderActivityResults() {
+    const events = ui.activities.filter(event =>
+      (!ui.activityCategory || event.category === ui.activityCategory) &&
+      (!ui.activityPeriod || (event.status === "拟定安排") === (ui.activityPeriod === "planned"))
+    );
+    return `<p class="activity-count" role="status">${events.length} 场活动</p>
+      ${events.length ? `<div class="activity-grid">${events.map(event => `<article class="activity-card card">
+        <a href="#events/${encodeURIComponent(event.id)}" aria-labelledby="activity-title-${escapeHTML(event.id)}">
+          ${activityCover(event)}
+          <div class="activity-card-body">
+            <p class="activity-category">${escapeHTML(event.category || "校园活动")}</p>
+            <h3 id="activity-title-${escapeHTML(event.id)}">${escapeHTML(event.title)}</h3>
+            ${activityMeta(event)}
+            <span class="activity-card-link" aria-hidden="true">查看详情 ${icon("arrow-right")}</span>
+          </div>
+        </a>
+      </article>`).join("")}</div>` : `<div class="empty-state">
+        ${icon("calendar")}<h3>这个筛选下暂无活动</h3><p>切换日期或兴趣分类，看看其他活动。</p>
+      </div>`}`;
+  }
+
+  function renderActivities() {
+    const categories = [...new Set(ui.activities.map(event => event.category).filter(Boolean))];
+    return `<div class="activity-page view-enter">
+      <section class="activity-banner">
+        <div><span class="eyebrow">CAMPUS EVENTS · 东莞职业技术学院</span>
+          <h1>校园活动</h1>
+          <p>想学点新东西，还是约同好一起玩？从一场校园活动开始。</p>
+        </div>
+      </section>
+      <section class="activity-feed" aria-labelledby="activity-feed-title">
+        <div class="activity-feed-heading">
+          <h2 id="activity-feed-title">发现活动</h2>
+          <div class="activity-period" role="group" aria-label="活动时间">
+            ${[["", "全部"], ["planned", "近期计划"], ["past", "往期与归档"]].map(([value, label]) => `<button type="button" data-action="filter-activity" data-period="${value}" aria-pressed="${ui.activityPeriod === value}">${label}</button>`).join("")}
+          </div>
+        </div>
+        <div class="activity-filters filter-chips" role="group" aria-label="兴趣分类">
+          ${["", ...categories].map(category => `<button class="chip" type="button" data-action="filter-activity" data-category="${escapeHTML(category)}" aria-pressed="${ui.activityCategory === category}">${escapeHTML(category || "全部兴趣")}</button>`).join("")}
+        </div>
+        <div id="activity-results">${renderActivityResults()}</div>
+      </section>
+    </div>`;
+  }
+
+  function renderActivityDetail(event) {
+    const planned = event.status === "拟定安排";
+    return `<div class="activity-page view-enter">
+      <a class="button button-secondary button-small activity-back" href="#events">${icon("arrow-left")} 返回校园活动</a>
+      <div class="activity-detail">
+        <article class="activity-detail-main card">
+          ${activityCover(event)}
+          <div class="activity-detail-copy">
+            <p class="activity-category">${escapeHTML(event.category || "校园活动")}</p>
+            <h1>${escapeHTML(event.title)}</h1>
+            ${activityMeta(event, true)}
+            <h2>活动介绍</h2>
+            <p>${escapeHTML(event.summary)}</p>
+          </div>
+        </article>
+        <aside class="activity-detail-side card">
+          <h2>${planned ? "报名咨询" : "活动状态"}</h2>
+          <p>${planned ? "本场为拟定安排。请先向社团确认举办时间和报名方式。" : event.status === "计划时间已过" ? "拟定的活动时间已过，是否举办以社团通知为准。" : "这场活动已归档，可查看活动资料。"}</p>
+          ${planned ? renderPilotSignup(event.title) : ""}
+          ${event.club ? `<a class="button button-secondary button-small" href="#club/${encodeURIComponent(event.club.id)}">了解${escapeHTML(event.club.name)} ${icon("arrow-right")}</a>` : ""}
+        </aside>
+      </div>
+    </div>`;
+  }
+
   function renderPilotSchedule() {
     return `<section class="club-content-card card">
       <div class="card-heading"><h3>活动日程</h3><span>拟定安排</span></div>
       <p>面向全校师生。活动安排和报名截止时间以社团通知为准。</p>
       <div class="activity-timeline">${pilotSchedule.map(event => {
         const [year, month, day] = event.date.split("-").map(Number);
-        const endsAt = Date.parse(`${event.date}T${event.time.split("–")[1]}:00+08:00`);
         return `<div class="activity-item">
           <time datetime="${event.date}">${month}月${day}日</time>
           <div><strong>${event.title}</strong>
-            <p>${year}年 · ${event.time} · <a href="#map/${event.mapPoint}">${event.venue}</a>${Date.now() >= endsAt ? " · 计划时间已过" : ""}</p>
+            <p>${year}年 · ${event.time} · <a href="#map/${event.mapPoint}">${event.venue}</a>${pilotEventEnded(event) ? " · 计划时间已过" : ""}</p>
             <p>${event.summary}</p>
           </div>
         </div>`;
@@ -1125,9 +1254,9 @@
     </section>`;
   }
 
-  function renderPilotSignup() {
+  function renderPilotSignup(eventTitle) {
     return `<div class="pilot-signup">
-      <p>在微信搜索并添加报名联系人「${pilotSignup.contact}」。社团报名请备注「星图校园 + 元启AI社报名」。咨询活动报名时，请附上活动名称。</p>
+      <p>在微信搜索并添加报名联系人「${pilotSignup.contact}」。${eventTitle ? `请备注「星图校园 + ${escapeHTML(eventTitle)}」。` : "社团报名请备注「星图校园 + 元启AI社报名」。咨询活动报名时，请附上活动名称。"}</p>
       <label for="pilot-wechat">微信号</label>
       <div><input id="pilot-wechat" value="${pilotSignup.wechat}" readonly><button class="button button-small" type="button" data-action="copy-pilot-wechat">复制微信号</button></div>
       <p id="pilot-copy-status" class="muted" role="status"></p>
@@ -1689,6 +1818,12 @@
 
     if (action === "copy-pilot-wechat") {
       copyPilotWechat();
+    } else if (action === "filter-activity") {
+      const isPeriod = "period" in trigger.dataset;
+      if (isPeriod) ui.activityPeriod = trigger.dataset.period;
+      else ui.activityCategory = trigger.dataset.category;
+      trigger.parentElement.querySelectorAll("button").forEach(button => button.setAttribute("aria-pressed", String(button === trigger)));
+      document.getElementById("activity-results").innerHTML = renderActivityResults();
     } else if (action === "toggle-poi") {
       const isOpen = trigger.classList.contains("is-open");
       view.querySelectorAll(".map-pill.is-open").forEach(item => item.classList.remove("is-open"));

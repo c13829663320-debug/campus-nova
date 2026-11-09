@@ -1031,13 +1031,13 @@ const novaData = {
   ],
 
   clubEvents: [
-    { id: "event-1", clubId: "club-52", kind: "回顾", title: "第十六届校园十大歌手大赛初赛", date: "10月25日", time: "19:00", place: "修远楼报告厅", signup: "往期资料", image: "assets/activities/singer-live.webp", desc: "校园十大歌手大赛初赛资料。" },
-    { id: "event-2", clubId: "club-57", kind: "赛况", title: "第二届“东超杯”足球赛运动防护保障纪实", date: "11月02日", time: "16:30", place: "田径场", signup: "往期资料", image: "assets/stadium.jpg", desc: "足球赛事的运动防护与志愿服务资料。" },
-    { id: "event-3", clubId: "club-49", kind: "招新回顾", title: "2026 社团招新 · 松山湖主会场", date: "10月21–22日", weekday: "周三/周四", time: "11:30–13:30 / 17:30–19:00", place: "修远楼校道 · 一栋宿舍门口校道", signup: "往期资料", image: "assets/activities/recruit-1.webp", cta: { label: "查看社团目录", directory: true }, desc: "松山湖主会场往期招新资料。各社团当前报名方式见社团通知。" },
-    { id: "event-6", clubId: "club-61", kind: "回顾", title: "醒狮夜场 · 社团文化节现场", date: "4月16日", weekday: "周四", time: "19:30", place: "道滘校区中心广场", signup: "往期资料", image: "assets/activities/lion.webp", desc: "社团文化节醒狮表演资料。" },
-    { id: "event-7", clubId: "club-39", kind: "讲座", title: "元启・AI Talk Workshop", date: "11月04日", weekday: "周三", time: "15:00–17:00", place: "教二 303", signup: "技能特长 · 已结束", image: "assets/activities/ai-talk.jpg", desc: "元启AI社在到梦空间发布的技能特长类活动，围绕 AI 工具的实际用法展开，两小时工作坊形式。" },
-    { id: "event-8", clubId: "club-30", kind: "放映", title: "“魅力电影，精彩故事”主题电影放映", date: "06月17日", weekday: "周三", time: "14:30–17:00", place: "崇德楼（教一）107", signup: "思想成长 · 已结束", image: "assets/activities/movie-night.jpg", desc: "东职院无人机协会在到梦空间发布的往期放映活动。" },
-    { id: "event-9", clubId: "club-16", kind: "系列", title: "工业软件赋能未来工程师 · 校园系列活动", date: "06月18日", weekday: "周四", time: "08:00–12:00", place: "8B206", signup: "往期资料", image: "assets/activities/industry-software.jpg", desc: "智能制造学院团学组织连开多场，6月18日至22日覆盖 8B206 与培训楼一楼，内容围绕工业软件实操。" }
+    { id: "event-1", category: "文艺娱乐", clubId: "club-52", kind: "回顾", title: "第十六届校园十大歌手大赛初赛", date: "10月25日", time: "19:00", place: "修远楼报告厅", signup: "往期资料", image: "assets/activities/singer-live.webp", desc: "校园十大歌手大赛初赛资料。" },
+    { id: "event-2", category: "运动赛事", clubId: "club-57", kind: "赛况", title: "第二届“东超杯”足球赛运动防护保障纪实", date: "11月02日", time: "16:30", place: "田径场", signup: "往期资料", image: "assets/stadium.jpg", desc: "足球赛事的运动防护与志愿服务资料。" },
+    { id: "event-3", category: "社团交流", clubId: "club-49", kind: "招新回顾", title: "2026 社团招新 · 松山湖主会场", date: "10月21–22日", weekday: "周三/周四", time: "11:30–13:30 / 17:30–19:00", place: "修远楼校道 · 一栋宿舍门口校道", signup: "往期资料", image: "assets/activities/recruit-1.webp", cta: { label: "查看社团目录", directory: true }, desc: "松山湖主会场往期招新资料。各社团当前报名方式见社团通知。" },
+    { id: "event-6", category: "文艺娱乐", clubId: "club-61", kind: "回顾", title: "醒狮夜场 · 社团文化节现场", date: "4月16日", weekday: "周四", time: "19:30", place: "道滘校区中心广场", signup: "往期资料", image: "assets/activities/lion.webp", desc: "社团文化节醒狮表演资料。" },
+    { id: "event-7", category: "技能实战", clubId: "club-39", kind: "讲座", title: "元启・AI Talk Workshop", date: "11月04日", weekday: "周三", time: "15:00–17:00", place: "教二 303", signup: "技能特长 · 已结束", image: "assets/activities/ai-talk.jpg", desc: "元启AI社在到梦空间发布的技能特长类活动，围绕 AI 工具的实际用法展开，两小时工作坊形式。" },
+    { id: "event-8", category: "文艺娱乐", clubId: "club-30", kind: "放映", title: "“魅力电影，精彩故事”主题电影放映", date: "06月17日", weekday: "周三", time: "14:30–17:00", place: "崇德楼（教一）107", signup: "思想成长 · 已结束", image: "assets/activities/movie-night.jpg", desc: "东职院无人机协会在到梦空间发布的往期放映活动。" },
+    { id: "event-9", category: "技能实战", clubId: "club-16", kind: "系列", title: "工业软件赋能未来工程师 · 校园系列活动", date: "06月18日", weekday: "周四", time: "08:00–12:00", place: "8B206", signup: "往期资料", image: "assets/activities/industry-software.jpg", desc: "智能制造学院团学组织连开多场，6月18日至22日覆盖 8B206 与培训楼一楼，内容围绕工业软件实操。" }
   ]
 };
 
