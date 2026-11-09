@@ -90,6 +90,47 @@ button { cursor: pointer; }
 .atlas-detail p { margin: 4px 0 6px; color: #38574f; font-size: 12px; line-height: 1.55; }
 .atlas-detail a { color: #175f4c; font-size: 12px; font-weight: 800; text-underline-offset: 3px; }
 
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --ink: #eff7fc;
+  --muted: #b3c7d8;
+  --green: #a2dfd5;
+  --line: #294962;
+  --atlas-panel: #102337;
+  --atlas-control: #142f46;
+  --atlas-hover: #214447;
+  background: radial-gradient(ellipse at 80% 5%, #143d40, transparent 43%),
+    linear-gradient(145deg, #04101e, #0a192a 60%, #0b1e25) fixed;
+}
+:root[data-theme="dark"] :focus-visible { outline-color: var(--green); }
+:root[data-theme="dark"] :is(.atlas-map, .atlas-guide) {
+  background: var(--atlas-panel);
+  box-shadow: 0 12px 38px #010a1640;
+}
+:root[data-theme="dark"] :is(.atlas-vr, .atlas-zone select, .atlas-controls, .atlas-filters button, .map3d-label) {
+  border-color: var(--line);
+  background: var(--atlas-control);
+  color: var(--ink);
+}
+:root[data-theme="dark"] :is(.atlas-vr, .atlas-controls button, .atlas-detail a) { color: var(--green); }
+:root[data-theme="dark"] :is(.atlas-school, .atlas-detail p) { color: var(--muted); }
+:root[data-theme="dark"] :is(.atlas-model-icon, .atlas-detail) { background: var(--atlas-control); }
+:root[data-theme="dark"] :is(.atlas-vr:hover, .atlas-controls button:hover, .atlas-filters button:hover, .atlas-place:hover, .atlas-place[aria-pressed="true"]) {
+  background: var(--atlas-hover);
+  border-color: #386363;
+}
+:root[data-theme="dark"] :is(.map3d-label:hover, .map3d-label[aria-pressed="true"], .atlas-filters button[aria-pressed="true"]) {
+  border-color: var(--green);
+  background: var(--green);
+  color: #102c31;
+}
+:root[data-theme="dark"] .atlas-header .atlas-kicker span:first-child { background: var(--green); }
+:root[data-theme="dark"] .map-stage {
+  border-color: var(--line);
+  background: radial-gradient(ellipse at 49% 40%, #1d424a, #112c3d 63%, #0a1b2c);
+}
+:root[data-theme="dark"] .map-stage::before { background-image: radial-gradient(#9ecac842 0.65px, transparent 0.8px); }
+
 @media (max-width: 970px) {
   .atlas-workspace { grid-template-columns: minmax(0, 1fr) 250px; gap: 11px; }
   .atlas-guide { padding: 13px; }

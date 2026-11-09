@@ -1,5 +1,3 @@
-import { mountCampusMap } from "./index.js";
-
 const stage = document.getElementById("stage");
 const status = document.getElementById("map-status");
 const hint = document.getElementById("map-hint");
@@ -106,7 +104,13 @@ async function initialize() {
   });
   renderPlaces();
 
-  map = await mountCampusMap(stage, { places, onSelect: selectPlace, onUnavailable: unavailable });
+  try {
+    const { mountCampusMap } = await import("./index.js");
+    map = await mountCampusMap(stage, { places, onSelect: selectPlace, onUnavailable: unavailable });
+  } catch (error) {
+    console.warn("Campus viewer could not load", error);
+    unavailable("模型暂未加载，当前显示模型预览");
+  }
   if (!map) return;
   stage.classList.add("is-ready");
   status.textContent = "三维模型已就绪";
