@@ -2,6 +2,7 @@
 (function () {
   const Store = window.NovaStore;
   const API = window.NovaAPI;
+  const activityTags = window.NovaActivityTags;
   const view = document.getElementById("app-view");
   const modalRoot = document.getElementById("modal-root");
   const toastRegion = document.getElementById("toast-region");
@@ -43,6 +44,9 @@
     clubCatalog: { clubs: [], categories: [], events: [] },
     activityCategory: "",
     activityPeriod: "",
+    activityType: "",
+    activityMine: false,
+    studentActivitiesAvailable: false,
     activities: [],
     forumCategory: "all",
     forumQuery: "",
@@ -289,15 +293,24 @@
         updateShell(route);
         view.innerHTML = renderThread(post);
       } else if (route.name === "events") {
-        const catalog = await API.fetchClubCatalog();
+        const isStudentDetail = route.id?.startsWith("student-");
+        const [catalog, students] = await Promise.all([
+          isStudentDetail ? null : API.fetchClubCatalog(),
+          isStudentDetail ? API.fetchStudentActivities(route.id) :
+            route.id ? null : API.fetchStudentActivities().catch(() => null)
+        ]);
         if (request !== routeRequest) return;
-        ui.activities = campusActivities(catalog);
         if (route.id) {
-          const activity = ui.activities.find(item => item.id === route.id);
-          if (!activity) throw new Error("没有找到这场活动。可从首页的校园活动入口继续浏览。");
+          const activity = isStudentDetail ? studentActivity(students) : campusActivities(catalog).find(item => item.id === route.id);
+          if (!activity) throw new Error("没有找到这场活动。可返回校园活动列表继续浏览。");
           document.title = `${activity.title} · 校园活动 · 星图校园`;
           view.innerHTML = renderActivityDetail(activity);
         } else {
+          ui.studentActivitiesAvailable = Array.isArray(students);
+          const studentFeed = (ui.studentActivitiesAvailable ? students : []).map(studentActivity)
+            .sort((a, b) => a.upcoming !== b.upcoming ? Number(b.upcoming) - Number(a.upcoming) :
+              a.upcoming ? a.startAt - b.startAt : b.startAt - a.startAt);
+          ui.activities = [...studentFeed, ...campusActivities(catalog)];
           view.innerHTML = renderActivities();
         }
       } else if (route.name === "clubs") {
@@ -1209,64 +1222,94 @@
     const upcoming = schedule.filter(event => event.status === "拟定安排");
     const elapsed = schedule.filter(event => event.status === "计划时间已过").reverse();
     return [...upcoming, ...elapsed, ...archive]
-      .map(event => ({ ...event, club: clubs.find(club => club.id === event.clubId) }));
+      .map(event => ({
+        ...event,
+        type: "社团活动",
+        category: event.category === "运动赛事" ? "运动健身" : event.category,
+        upcoming: event.status === "拟定安排",
+        club: clubs.find(club => club.id === event.clubId)
+      }));
+  }
+
+  function studentActivity(event) {
+    const upcoming = !event.cancelled && event.startAt > Date.now();
+    const [year, month, day] = event.start.slice(0, 10).split("-");
+    return {
+      ...event, student: true, upcoming,
+      dateLabel: `${year}年${Number(month)}月${Number(day)}日`, time: event.start.slice(11),
+      status: event.cancelled ? "已取消" : !upcoming ? "已到活动时间" : event.count >= event.capacity ? "已满员" : "招募中"
+    };
+  }
+
+  function activityLabels(event) {
+    return `<p class="activity-tags"><span>${escapeHTML(event.type)}</span><span>${escapeHTML(event.category || "其他")}</span></p>`;
   }
 
   function activityMeta(event, showMap = false) {
     return `<ul class="activity-meta">
       <li>${icon("calendar")}<span>${escapeHTML([event.dateLabel, event.time].filter(Boolean).join(" · "))}</span></li>
       <li>${icon("map-pin")}<span>${showMap && event.mapPoint ? `<a href="#map/${encodeURIComponent(event.mapPoint)}">${escapeHTML(event.venue)} · 地图定位</a>` : escapeHTML(event.venue)}</span></li>
+      ${event.student ? `<li>${icon("users")}<span>${event.count} / ${event.capacity} 人（含发起人）</span></li>` : ""}
     </ul>`;
   }
 
   function activityCover(event) {
-    return `<div class="activity-cover">
-      <img src="${escapeHTML(event.image)}" alt="" loading="lazy" decoding="async">
-      <span class="activity-status${event.status === "拟定安排" ? " is-planned" : ""}">${event.status}</span>
+    return `<div class="activity-cover${event.student ? " activity-cover-student" : ""}">
+      ${event.student ? `<span class="activity-cover-symbol">${icon(activityTags.categories[event.category])}</span>` :
+        `<img src="${escapeHTML(event.image)}" alt="" loading="lazy" decoding="async">`}
+      <span class="activity-status${event.upcoming && event.status !== "已满员" ? " is-planned" : ""}">${event.status}</span>
       ${event.mapPoint ? '<span class="activity-illustration">主题配图</span>' : ""}
     </div>`;
   }
 
   function renderActivityResults() {
     const events = ui.activities.filter(event =>
+      (!ui.activityType || event.type === ui.activityType) &&
+      (ui.activityMine ? event.isOwner || event.joined : !event.cancelled) &&
       (!ui.activityCategory || event.category === ui.activityCategory) &&
-      (!ui.activityPeriod || (event.status === "拟定安排") === (ui.activityPeriod === "planned"))
+      (!ui.activityPeriod || event.upcoming === (ui.activityPeriod === "planned"))
     );
     return `<p class="activity-count" role="status">${events.length} 场活动</p>
       ${events.length ? `<div class="activity-grid">${events.map(event => `<article class="activity-card card">
         <a href="#events/${encodeURIComponent(event.id)}" aria-labelledby="activity-title-${escapeHTML(event.id)}">
           ${activityCover(event)}
           <div class="activity-card-body">
-            <p class="activity-category">${escapeHTML(event.category || "校园活动")}</p>
+            ${activityLabels(event)}
             <h3 id="activity-title-${escapeHTML(event.id)}">${escapeHTML(event.title)}</h3>
             ${activityMeta(event)}
             <span class="activity-card-link" aria-hidden="true">查看详情 ${icon("arrow-right")}</span>
           </div>
         </a>
       </article>`).join("")}</div>` : `<div class="empty-state">
-        ${icon("calendar")}<h3>这个筛选下暂无活动</h3><p>切换日期或兴趣分类，看看其他活动。</p>
+        ${icon("calendar")}<h3>这个筛选下暂无活动</h3><p>试试其他活动类型、兴趣分类或时间。</p>
       </div>`}`;
   }
 
   function renderActivities() {
-    const categories = [...new Set(ui.activities.map(event => event.category).filter(Boolean))];
+    const categories = [...new Set([...Object.keys(activityTags.categories), ...ui.activities.map(event => event.category).filter(Boolean)])];
     return `<div class="activity-page view-enter">
       <section class="activity-banner">
         <div><span class="eyebrow">CAMPUS EVENTS · 东莞职业技术学院</span>
           <h1>校园活动</h1>
-          <p>想学点新东西，还是约同好一起玩？从一场校园活动开始。</p>
+          <p>约同学自习、运动、吃饭，也可以发起自己的校园活动。</p>
+          ${ui.studentActivitiesAvailable ? `<button class="button activity-publish" type="button" data-action="open-student-activity">${icon("plus")}发布活动</button>` : ""}
         </div>
       </section>
+      ${ui.studentActivitiesAvailable ? "" : `<p class="activity-service-note">学生活动暂时无法加载，目前可查看社团活动。 <button type="button" class="text-button" data-action="retry-route">重新加载</button></p>`}
       <section class="activity-feed" aria-labelledby="activity-feed-title">
         <div class="activity-feed-heading">
           <h2 id="activity-feed-title">发现活动</h2>
           <div class="activity-period" role="group" aria-label="活动时间">
-            ${[["", "全部"], ["planned", "近期计划"], ["past", "往期与归档"]].map(([value, label]) => `<button type="button" data-action="filter-activity" data-period="${value}" aria-pressed="${ui.activityPeriod === value}">${label}</button>`).join("")}
+            ${[["", "全部时间"], ["planned", "近期计划"], ["past", "往期与归档"]].map(([value, label]) => `<button type="button" data-action="filter-activity" data-period="${value}" aria-pressed="${ui.activityPeriod === value}">${label}</button>`).join("")}
           </div>
+        </div>
+        <div class="activity-filters filter-chips" role="group" aria-label="活动类型">
+          ${["", ...activityTags.types, "社团活动"].map(type => `<button class="chip" type="button" data-action="filter-activity" data-type="${type}" aria-pressed="${ui.activityType === type}">${type || "全部类型"}</button>`).join("")}
         </div>
         <div class="activity-filters filter-chips" role="group" aria-label="兴趣分类">
           ${["", ...categories].map(category => `<button class="chip" type="button" data-action="filter-activity" data-category="${escapeHTML(category)}" aria-pressed="${ui.activityCategory === category}">${escapeHTML(category || "全部兴趣")}</button>`).join("")}
         </div>
+        ${ui.studentActivitiesAvailable ? `<div class="activity-filters filter-chips"><button class="chip" type="button" data-action="filter-my-activities" aria-pressed="${ui.activityMine}">我发起或报名的</button></div>` : ""}
         <div id="activity-results">${renderActivityResults()}</div>
       </section>
     </div>`;
@@ -1280,21 +1323,93 @@
         <article class="activity-detail-main card">
           ${activityCover(event)}
           <div class="activity-detail-copy">
-            <p class="activity-category">${escapeHTML(event.category || "校园活动")}</p>
-            <h1>${escapeHTML(event.title)}</h1>
+            ${activityLabels(event)}
+            <h1 tabindex="-1">${escapeHTML(event.title)}</h1>
             ${activityMeta(event, true)}
             <h2>活动介绍</h2>
             <p>${escapeHTML(event.summary)}</p>
           </div>
         </article>
-        <aside class="activity-detail-side card">
+        ${event.student ? renderStudentSignup(event) : `<aside class="activity-detail-side card">
           <h2>${planned ? "报名咨询" : "活动状态"}</h2>
           <p>${planned ? "本场为拟定安排。请先向社团确认举办时间和报名方式。" : event.status === "计划时间已过" ? "拟定的活动时间已过，是否举办以社团通知为准。" : "这场活动已归档，可查看活动资料。"}</p>
           ${planned ? renderPilotSignup(event.title) : ""}
           ${event.club ? `<a class="button button-secondary button-small" href="#club/${encodeURIComponent(event.club.id)}">了解${escapeHTML(event.club.name)} ${icon("arrow-right")}</a>` : ""}
-        </aside>
+        </aside>`}
       </div>
     </div>`;
+  }
+
+  function renderStudentSignup(event) {
+    const canJoin = event.upcoming && !event.isOwner && !event.joined && event.count < event.capacity;
+    const action = !event.upcoming ? "" : event.isOwner ? "cancel" : event.joined ? "leave" : canJoin ? "join" : "";
+    const labels = { cancel: "取消活动", leave: "退出活动", join: "报名参加" };
+    const note = event.cancelled ? "发起人已取消这场活动。" : !event.upcoming ? "已到活动时间，报名已关闭。" :
+      event.isOwner ? "你发起了这场活动，已占用一个名额。" : event.joined ? "你已报名，请按时到集合地点。" :
+        canJoin ? `还剩 ${event.capacity - event.count} 个名额，报名后请按时到场。` : "这场活动的名额已满。";
+    return `<aside class="activity-detail-side card">
+      <h2>参与活动</h2>
+      <p class="activity-host">发起人 · ${escapeHTML(event.host)}</p>
+      <p>${note}</p>
+      ${action ? `<button class="button ${canJoin ? "" : "button-secondary"}" type="button" data-action="student-activity-action" data-operation="${action}" data-id="${event.id}">${labels[action]}</button>` : ""}
+    </aside>`;
+  }
+
+  function openStudentActivity() {
+    openModal(`${modalHeader("CAMPUS EVENTS", "发布校园活动", "同学们可以在活动页看到并报名。请填写校园公共集合点。")}
+      <form id="student-activity-form" data-id="${API.newStudentActivityId()}">
+        <div class="field"><label for="activity-title">活动标题</label><input id="activity-title" name="title" required minlength="2" maxlength="50" placeholder="例如：周四晚一起打羽毛球"></div>
+        <div class="activity-form-grid">
+          <div class="field"><label for="activity-type">活动类型</label><select id="activity-type" name="type" required><option value="">选择类型</option>${activityTags.types.map(type => `<option>${type}</option>`).join("")}</select></div>
+          <div class="field"><label for="activity-category">兴趣分类</label><select id="activity-category" name="category" required><option value="">选择分类</option>${Object.keys(activityTags.categories).map(category => `<option>${category}</option>`).join("")}</select></div>
+          <div class="field"><label for="activity-start">开始时间（北京时间）</label><input id="activity-start" name="start" type="datetime-local" required></div>
+          <div class="field"><label for="activity-capacity">总人数（含发起人）</label><input id="activity-capacity" name="capacity" type="number" min="2" max="50" value="4" required></div>
+        </div>
+        <div class="field"><label for="activity-venue">集合地点</label><input id="activity-venue" name="venue" required minlength="2" maxlength="60" placeholder="例如：图书馆一楼入口"></div>
+        <div class="field"><label for="activity-host">发起人昵称</label><input id="activity-host" name="host" required maxlength="16" value="${escapeHTML(Store.getProfile().name)}"></div>
+        <div class="field"><label for="activity-summary">活动说明</label><textarea id="activity-summary" name="summary" rows="3" required minlength="5" maxlength="400" placeholder="说说活动安排、需要带什么，或怎么在现场认出你。"></textarea></div>
+        <p class="form-note">${icon("info")}请勿填写手机号、宿舍房号等隐私信息。发布和报名记录可在本浏览器中管理。</p>
+        <p class="activity-form-error" role="alert"></p>
+        <div class="form-actions"><button type="button" class="button button-ghost" data-action="close-modal">取消</button><button type="submit" class="button">${icon("plus")}确认发布</button></div>
+      </form>`, false, "activity-editor");
+  }
+
+  async function submitStudentActivity(form) {
+    const button = form.querySelector('[type="submit"]');
+    const errorRegion = form.querySelector('[role="alert"]');
+    const values = Object.fromEntries(new FormData(form));
+    button.disabled = true;
+    errorRegion.textContent = "";
+    try {
+      const activity = await API.createStudentActivity({ ...values, capacity: Number(values.capacity), id: form.dataset.id });
+      showToast("活动已发布", "其他同学现在可以查看详情和报名。");
+      if (form.isConnected) {
+        ui.activityType = ui.activityCategory = ui.activityPeriod = "";
+        ui.activityMine = false;
+        location.hash = `events/${activity.id}`;
+      }
+    } catch (error) {
+      errorRegion.textContent = error.message;
+    } finally {
+      button.disabled = false;
+    }
+  }
+
+  async function updateStudentSignup(id, action, button) {
+    button.disabled = true;
+    try {
+      const activity = await API.updateStudentActivity(id, action);
+      if (ui.activeRoute.name === "events" && ui.activeRoute.id === id) {
+        closeModal(false);
+        view.innerHTML = renderActivityDetail(studentActivity(activity));
+        view.querySelector(".activity-detail h1").focus({ preventScroll: true });
+      }
+      showToast({ join: "报名成功", leave: "已退出活动", cancel: "活动已取消" }[action], "");
+    } catch (error) {
+      showToast("操作未完成", error.message, "error");
+    } finally {
+      button.disabled = false;
+    }
   }
 
   function renderPilotSchedule() {
@@ -1891,9 +2006,25 @@
 
     if (action === "copy-pilot-wechat") {
       copyPilotWechat();
+    } else if (action === "open-student-activity") {
+      openStudentActivity();
+    } else if (action === "student-activity-action") {
+      const { id, operation } = trigger.dataset;
+      if (operation === "cancel") {
+        openModal(`${modalHeader("CAMPUS EVENTS", "取消这场活动？", "取消后活动会从公开列表移除。已报名的同学仍可查看取消状态。")}
+          <div class="form-actions"><button type="button" class="button button-ghost" data-action="close-modal">保留活动</button><button type="button" class="button" data-action="confirm-student-cancel" data-id="${id}">确认取消</button></div>`, true);
+      } else {
+        updateStudentSignup(id, operation, trigger);
+      }
+    } else if (action === "confirm-student-cancel") {
+      updateStudentSignup(trigger.dataset.id, "cancel", trigger);
+    } else if (action === "filter-my-activities") {
+      ui.activityMine = !ui.activityMine;
+      trigger.setAttribute("aria-pressed", String(ui.activityMine));
+      document.getElementById("activity-results").innerHTML = renderActivityResults();
     } else if (action === "filter-activity") {
-      const isPeriod = "period" in trigger.dataset;
-      if (isPeriod) ui.activityPeriod = trigger.dataset.period;
+      if ("period" in trigger.dataset) ui.activityPeriod = trigger.dataset.period;
+      else if ("type" in trigger.dataset) ui.activityType = trigger.dataset.type;
       else ui.activityCategory = trigger.dataset.category;
       trigger.parentElement.querySelectorAll("button").forEach(button => button.setAttribute("aria-pressed", String(button === trigger)));
       document.getElementById("activity-results").innerHTML = renderActivityResults();
@@ -2025,7 +2156,10 @@
   });
 
   document.addEventListener("submit", event => {
-    if (event.target.id === "group-form") {
+    if (event.target.id === "student-activity-form") {
+      event.preventDefault();
+      submitStudentActivity(event.target);
+    } else if (event.target.id === "group-form") {
       event.preventDefault();
       submitGroup(event.target);
     } else if (event.target.id === "application-form") {

@@ -27,13 +27,13 @@
     return search ? `${url}?${search}` : url;
   }
 
-  async function request(path, { method = "GET", body, query } = {}) {
+  async function request(path, { method = "GET", body, query, headers, local = false } = {}) {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), config.timeout);
     try {
-      const response = await fetch(buildUrl(path, query), {
+      const response = await fetch(local ? path : buildUrl(path, query), {
         method,
-        headers: body ? { "Content-Type": "application/json" } : undefined,
+        headers: { ...headers, ...(body ? { "Content-Type": "application/json" } : {}) },
         body: body ? JSON.stringify(body) : undefined,
         signal: controller.signal
       });
@@ -62,6 +62,29 @@
   async function resolve(demoFactory, path, options = {}, ms) {
     if (!isRemote()) return respond(demoFactory, ms);
     return request(path, options);
+  }
+
+  const activityIdentityKey = "campus-nova:activity-identity";
+
+  function randomHex(size) {
+    return Array.from(crypto.getRandomValues(new Uint8Array(size)), byte => byte.toString(16).padStart(2, "0")).join("");
+  }
+
+  async function studentActivityRequest(suffix, options = {}) {
+    const write = options.method === "POST";
+    let identity;
+    try {
+      identity = localStorage.getItem(activityIdentityKey);
+      if (write && !/^[a-f0-9]{64}$/.test(identity || "")) {
+        identity = randomHex(32);
+        localStorage.setItem(activityIdentityKey, identity);
+      }
+    } catch (error) {
+      if (write) throw new Error("请允许浏览器保存站点数据，以便管理你发布或报名的活动。");
+    }
+    return request(`./api/student-activities${suffix}`, {
+      ...options, local: true, headers: identity ? { Authorization: `Bearer ${identity}` } : {}
+    });
   }
 
   window.NovaAPI = {
@@ -140,6 +163,22 @@
         categories: [...new Set(window.NovaDB.clubs.map(club => club.category))],
         events: window.NovaDB.clubEvents || []
       }), "/club-catalog");
+    },
+
+    fetchStudentActivities(id) {
+      return studentActivityRequest(id ? `/${encodeURIComponent(id)}` : "");
+    },
+
+    newStudentActivityId() {
+      return `student-${randomHex(16)}`;
+    },
+
+    createStudentActivity(body) {
+      return studentActivityRequest("", { method: "POST", body });
+    },
+
+    updateStudentActivity(id, action) {
+      return studentActivityRequest(`/${encodeURIComponent(id)}/${action}`, { method: "POST" });
     },
 
     // GET /api/v1/clubs?query=&category= → { clubs }

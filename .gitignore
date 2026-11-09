@@ -11,4 +11,5 @@ node_modules/
 dist/
 *.zip
 .env
+/.nova-state/
 /assets/campus-tour/
