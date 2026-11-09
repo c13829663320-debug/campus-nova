@@ -1782,9 +1782,12 @@
   }
 
   function forumAvatar(item) {
-    const profile = Store.getProfile();
-    if (!item.anonymous && item.authorId === profile.id) return avatarMarkup(profile, "avatar-small");
-    return `<span class="avatar avatar-small ${item.anonymous ? "is-anon" : ""}">${escapeHTML(item.authorInitial)}</span>`;
+    if (!item.anonymous) {
+      const profile = Store.getProfile();
+      if (item.authorId === profile.id) return avatarMarkup(profile, "avatar-small");
+    }
+    const image = item.anonymous ? "anonymous.webp" : "member.webp";
+    return `<span class="avatar avatar-photo avatar-small"><img src="assets/forum/${image}" alt=""></span>`;
   }
 
   function forumPostCard(post) {

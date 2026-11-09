@@ -809,7 +809,6 @@ button, a, input, select, textarea { outline: none; }
 .noscript { position: fixed; inset: 20px; z-index: 999; display: grid; place-items: center; background: var(--surface); border-radius: 20px; }
 
 /* Campus forum */
-.avatar.is-anon { background: linear-gradient(145deg, #9FB2C9, #5D7695); color: #fff; font-weight: 700; }
 .forum-hero { display: grid; grid-template-columns: minmax(0, 1fr) minmax(240px, .58fr); align-items: center; gap: clamp(18px, 3vw, 36px); padding: clamp(18px, 3vw, 38px); }
 .forum-hero h2 { margin-top: 10px; font-size: clamp(24px, 3vw, 38px); line-height: 1.2; }
 .forum-hero p { max-width: 52ch; margin-top: 12px; color: var(--text-sub); font-size: 14px; line-height: 1.7; }
