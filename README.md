@@ -9,7 +9,7 @@
 | 模块 | 说明 |
 | --- | --- |
 | 星图导览 | 2.5D 等距校园底图，43 栋建筑热区 + 58 个校园 POI，支持片区聚焦放大、地图缩放、分类筛选与建筑档案卡 |
-| 3D 与全景 | 3D 沙盘支持旋转、缩放、区域筛选和查看地点详情。VR 全景支持在浏览器内环顾、缩放和切换场景，需配置全景素材 |
+| 3D 与全景 | Blender 校园沙盘支持旋转、缩放、区域切换和地标定位。VR 全景支持在浏览器内环顾、缩放和切换场景，需配置全景素材 |
 | 地点详情 | 8 个核心地点的图文画廊、结伴小组（创建 / 加入 / 退出）、到点打卡 |
 | 社团图鉴 | 89 个学生社团的真实年审数据，分类与关键词筛选、推荐轮播、社团详情与入社申请 |
 | 校园论坛 | 5 个话题分类，发帖、评论、点赞、删除，支持最新 / 最热排序 |
@@ -37,10 +37,10 @@ campus-nova/
 │   ├── mock.js             # 地点、片区、建筑、社团、论坛演示数据
 │   ├── store.js            # localStorage 状态与业务操作
 │   ├── campus-map.js       # 独立导览页渲染
-│   └── map3d/              # 3D 沙盘场景、材质、标签与交互
+│   └── map3d/              # 3D 沙盘加载、地标与交互
 ├── data/
 │   ├── campus-pois.json    # 58 个 POI 的百分比坐标数据
-│   └── campus-map.json     # 3D 沙盘建筑与坐标数据
+│   └── campus-map.json     # 3D 地标与区域视角坐标
 ├── assets/                 # 底图、建筑单元、社团封面与 SVG 标识
 └── vendor/three/           # 内置 three.js（无外网依赖）
 ```
@@ -70,6 +70,19 @@ node --env-file-if-exists=.env server.cjs
 ### 接入 VR 全景素材
 
 将可使用的 H5 全景包的 `index.html`、`viewer.js`、`viewer.css`、`scenes.js` 和 `panos/` 放在 `assets/campus-tour/` 下，保持原有目录层级。在主站的「3D 与全景」里选择「进入全景漫游」。未配置素材包时，页面提示暂未开放全景漫游。素材目录已加入 Git 忽略列表，公开部署前请核对素材授权范围。
+
+### 重建 3D 校园模型
+
+模型参考东莞职业技术学院的校园风光和松山湖校区航拍。建筑体量、道路和地标坐标为近似。 [校方校园风光](https://www.dgpt.edu.cn/xygk/xyfg.htm) · [风雨网球场项目航拍](https://www.szhzty.com/sports/89.html)
+
+在项目目录用 Blender 5.2 生成可编辑工程、原始 GLB 和预览，再用 gltfpack 1.3.0 压缩网页模型。
+
+```powershell
+blender -b -t 4 --factory-startup --python-exit-code 1 --python scripts/build_campus_model.py -- --blend ../campus.blend --glb ../campus-raw.glb --preview ../campus-preview.png
+npx --yes --package=gltfpack@1.3.0 gltfpack -i ../campus-raw.glb -o assets/campus3d/campus.glb -c -ce ext -vp 16
+```
+
+将预览 PNG 转成 WebP 后替换 `assets/campus3d/overview.webp`。调整地标模型位置时，同步更新 `data/campus-map.json`。
 
 ## 技术说明
 

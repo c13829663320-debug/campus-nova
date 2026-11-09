@@ -1,161 +1,69 @@
 <!doctype html>
 <html lang="zh-CN">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>3D 校园地图 · 星图校园</title>
-<link rel="icon" type="image/svg+xml" href="assets/logo-mark.svg?v=2">
-<style>
-  :root {
-    --bg: #F8F8F8;
-    --ink: #121212;
-    --sub: #7A7A7A;
-    --line: rgba(18, 18, 18, .1);
-    --accent: #1FFD91;
-  }
-  * { box-sizing: border-box; }
-  html, body { margin: 0; background: var(--bg); color: var(--ink); font-family: "PingFang SC", "Microsoft YaHei", system-ui, sans-serif; }
-  .page { max-width: 1180px; margin: 0 auto; padding: 40px 28px 56px; }
-  .eyebrow { color: var(--sub); font-size: 11px; letter-spacing: 2.4px; text-transform: uppercase; }
-  .map-links { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
-  .tour-link { padding: 6px 10px; border-radius: 999px; background: #E0F0EB; color: #126A6E; font-size: 13px; font-weight: 700; text-decoration: none; }
-  h1 { margin: 10px 0 6px; font-size: 30px; letter-spacing: -.03em; }
-  .lead { margin: 0 0 22px; color: var(--sub); font-size: 13px; }
-
-  /* 顶部分类导航 */
-  .cats { display: flex; gap: 8px; flex-wrap: wrap; margin: 0 0 14px; }
-  .cats button { padding: 8px 15px; border: 1px solid var(--line); border-radius: 999px; background: #fff; color: var(--sub); font-size: 12px; font-family: inherit; cursor: pointer; transition: background .16s ease, color .16s ease, border-color .16s ease; }
-  .cats button:hover { color: var(--ink); }
-  .cats button.active { background: var(--ink); color: #fff; border-color: var(--ink); }
-
-  .map-shell { position: relative; overflow: hidden; border-radius: 22px; background: #EFF3EC; border: 1px solid var(--line); }
-  .map-stage { position: relative; width: 100%; height: min(62vh, 560px); touch-action: none; cursor: grab; }
-  .map-stage.is-dragging { cursor: grabbing; }
-  .map3d-canvas { display: block; width: 100%; height: 100%; }
-
-  .badge { position: absolute; left: 16px; top: 16px; z-index: 3; display: flex; align-items: center; gap: 10px; padding: 7px 13px 7px 7px; border-radius: 14px; background: rgba(255,255,255,.82); border: 1px solid var(--line); }
-  .badge span { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 10px; background: var(--ink); color: var(--accent); font-size: 10px; font-weight: 800; letter-spacing: .5px; }
-  .badge strong { display: block; font-size: 12.5px; }
-  .badge small { display: block; margin-top: 1px; color: var(--sub); font-size: 9.5px; letter-spacing: 1px; }
-
-  .zoom { position: absolute; right: 16px; top: 16px; z-index: 3; display: grid; gap: 4px; padding: 5px; border-radius: 14px; background: rgba(255,255,255,.82); border: 1px solid var(--line); }
-  .zoom button { display: grid; place-items: center; width: 32px; height: 32px; padding: 0; border: 0; border-radius: 9px; background: transparent; color: var(--ink); cursor: pointer; font-size: 16px; line-height: 1; transition: background .16s ease; }
-  .zoom button:hover { background: #F0F0F0; }
-
-  .hint { position: absolute; left: 16px; bottom: 14px; z-index: 3; display: flex; align-items: center; gap: 6px; padding: 5px 10px; border-radius: 999px; background: rgba(255,255,255,.82); border: 1px solid var(--line); color: var(--sub); font-size: 10px; }
-  .hint i { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
-
-  /* 悬浮图标层：DOM 覆盖在 canvas 上，坐标由 3D 投影反算 */
-  .map3d-labels { position: absolute; inset: 0; z-index: 2; pointer-events: none; }
-  .map3d-label { position: absolute; left: 0; top: 0; display: flex; align-items: center; gap: 5px; padding: 5px 7px 5px 8px; border: 1px solid rgba(18,18,18,.08); border-radius: 11px; background: #fff; color: var(--ink); font-family: inherit; cursor: pointer; pointer-events: auto; box-shadow: 0 6px 18px rgba(18,18,18,.1); transition: background .16s ease, opacity .16s ease; will-change: transform; }
-  .map3d-label:hover { background: var(--accent); }
-  .map3d-label.is-out { opacity: 0; pointer-events: none; }
-  .map3d-label.is-muted { opacity: 0; pointer-events: none; }
-  .map3d-label__icon { display: block; width: 15px; height: 15px; }
-  .map3d-label__icon svg { display: block; width: 15px; height: 15px; }
-  .map3d-label__badge { display: grid; place-items: center; min-width: 15px; height: 15px; padding: 0 3px; border-radius: 999px; background: var(--ink); color: var(--accent); font-size: 9px; font-weight: 700; line-height: 1; }
-
-  .legend { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 16px; }
-  .legend button { padding: 7px 13px; border: 1px solid var(--line); border-radius: 999px; background: #fff; color: var(--sub); font-size: 11px; font-family: inherit; cursor: pointer; transition: background .16s ease, color .16s ease, border-color .16s ease; }
-  .legend button:hover { color: var(--ink); }
-  .legend button.active { background: var(--ink); color: #fff; border-color: var(--ink); }
-
-  /* WebGL 不可用时的降级画面 */
-  .map3d-fallback { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; padding: 20px; text-align: center; }
-  .map3d-fallback img { max-width: 82%; max-height: 60%; border-radius: 14px; border: 1px solid var(--line); }
-  .map3d-fallback__copy strong { font-size: 13px; }
-  .map3d-fallback__copy p { margin: 4px 0 0; color: var(--sub); font-size: 11.5px; }
-
-  @media (max-width: 720px) {
-    .page { padding: 24px 16px 40px; }
-    h1 { font-size: 22px; }
-    .map-stage { height: min(58vh, 440px); }
-    .cats, .legend { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
-    .cats button, .legend button { flex: 0 0 auto; }
-    .badge { padding: 5px 10px 5px 5px; }
-    .badge small { display: none; }
-    .map3d-label { padding: 4px 5px; gap: 4px; border-radius: 9px; -webkit-tap-highlight-color: transparent; }
-    .map3d-label__icon, .map3d-label__icon svg { width: 13px; height: 13px; }
-    .map3d-label__badge { min-width: 13px; height: 13px; font-size: 8px; }
-    .zoom { top: auto; bottom: 12px; right: 12px; grid-auto-flow: column; }
-    .hint { max-width: 52%; }
-  }
-</style>
-<script type="importmap">
-{ "imports": { "three": "./vendor/three/three.module.js" } }
-</script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#eef6f2">
+  <title>3D 校园地图 · 星图校园</title>
+  <link rel="icon" type="image/svg+xml" href="assets/logo-mark.svg?v=2">
+  <link rel="stylesheet" href="css/map3d.css?v=1">
+  <script type="importmap">
+    { "imports": { "three": "./vendor/three/three.module.js" } }
+  </script>
+  <script type="module" src="js/map3d/page.js?v=1"></script>
 </head>
 <body>
-<div class="page">
-  <nav class="map-links" aria-label="校园导览">
-    <a class="eyebrow" href="panorama.html">← 返回校园导览</a>
-    <a class="tour-link" href="panorama.html#vr-tour">切换到 VR 全景 →</a>
-  </nav>
-  <h1>东莞职业技术学院 · 3D 校园地图</h1>
-  <p class="lead">拖动平移，或用右侧按钮旋转、缩放。点击地标可查看地点详情。</p>
+  <main class="atlas">
+    <nav class="atlas-nav" aria-label="校园导览">
+      <a class="atlas-brand" href="panorama.html"><img src="assets/logo-mark.svg?v=2" alt="" width="34" height="34"> 星图校园 <span>／ 校园导览</span></a>
+      <a class="atlas-vr" href="panorama.html#vr-tour">VR 全景 <span aria-hidden="true">↗</span></a>
+    </nav>
 
-  <nav class="cats" id="cats" aria-label="地点分类"></nav>
-
-  <div class="map-shell">
-    <div class="map-stage" id="stage">
-      <div class="badge"><span>3D</span><div><strong>东莞职业技术学院</strong><small>校本部 · 等距导览</small></div></div>
-      <div class="zoom">
-        <button type="button" id="zoom-in" aria-label="放大">+</button>
-        <button type="button" id="zoom-out" aria-label="缩小">−</button>
-        <button type="button" id="rotate-view" aria-label="旋转视角" title="旋转 45°">↻</button>
-        <button type="button" id="zoom-reset" aria-label="重置视角">⟲</button>
+    <header class="atlas-header">
+      <div>
+        <p class="atlas-kicker"><span></span> CAMPUS ATLAS <span class="kicker-divider"></span> 松山湖校区</p>
+        <h1>3D 校园地图</h1>
+        <p class="atlas-school">东莞职业技术学院</p>
       </div>
-      <div class="hint"><i></i>拖动平移 · 滚轮 / 双指缩放</div>
+      <p class="atlas-intro">从映月湖出发，看看教学楼、宿舍和运动场如何连在一起。选择地标，地图会带你靠近。</p>
+    </header>
+
+    <div class="atlas-workspace">
+      <section class="atlas-map" aria-label="校园三维沙盘">
+        <div class="atlas-map-bar">
+          <div class="atlas-map-title"><span class="atlas-model-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m12 3 9 5v8l-9 5-9-5V8zM3 8l9 5 9-5m-9 5v8"/></svg></span><span><strong>校园沙盘</strong><small id="map-status" role="status">正在加载 3D 模型</small></span></div>
+          <label class="atlas-zone">区域视角<select id="zone" disabled><option value="">全校视角</option></select></label>
+        </div>
+
+        <div class="map-stage" id="stage">
+          <img class="atlas-preview" src="assets/campus3d/overview.webp" alt="松山湖校区三维模型预览" width="1280" height="780" draggable="false">
+          <div class="atlas-controls" id="map-controls" aria-label="地图控制" hidden>
+            <button type="button" id="zoom-in" aria-label="放大" title="放大">+</button>
+            <button type="button" id="zoom-out" aria-label="缩小" title="缩小">−</button>
+            <button type="button" id="rotate-view" aria-label="旋转视角" title="旋转 45°"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 7v5h-5M20 12a8 8 0 1 1-2.1-5.4L20 9"/></svg></button>
+            <button type="button" id="zoom-reset" aria-label="重置视角" title="重置视角"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 4H4v4m12-4h4v4M4 16v4h4m12-4v4h-4"/><circle cx="12" cy="12" r="2.5"/></svg></button>
+          </div>
+        </div>
+
+        <footer class="atlas-map-footer">
+          <span id="map-hint">拖动平移 · 滚轮或双指缩放</span>
+          <span>依据校园资料建模 · 位置与比例为近似</span>
+        </footer>
+      </section>
+
+      <aside class="atlas-guide" aria-labelledby="guide-title">
+        <div class="atlas-guide-heading">
+          <p class="atlas-kicker">LANDMARKS</p>
+          <h2 id="guide-title">探索地标</h2>
+          <p>在地图上定位，或按类别浏览。</p>
+        </div>
+        <div class="atlas-filters" id="filters" role="group" aria-label="地标类别"></div>
+        <div class="atlas-detail" id="place-detail" aria-live="polite" hidden></div>
+        <p class="atlas-list-count" id="result-count" aria-live="polite"></p>
+        <ul class="atlas-places" id="places"></ul>
+      </aside>
     </div>
-  </div>
-
-  <div class="legend" id="legend"></div>
-</div>
-
-<script type="module">
-  import { mountCampusMap } from "./js/map3d/index.js";
-
-  const data = await fetch("./data/campus-map.json").then(response => response.json());
-  const stage = document.getElementById("stage");
-  const map = mountCampusMap(stage, { data });
-
-  if (map) {
-    document.getElementById("zoom-in").addEventListener("click", map.zoomIn);
-    document.getElementById("zoom-out").addEventListener("click", map.zoomOut);
-    document.getElementById("rotate-view").addEventListener("click", map.rotateView);
-    document.getElementById("zoom-reset").addEventListener("click", map.resetView);
-
-    const legend = document.getElementById("legend");
-    legend.innerHTML = [
-      `<button type="button" data-id="" class="active">全景</button>`,
-      ...data.zones.map(zone => `<button type="button" data-id="${zone.id}">${zone.name}</button>`)
-    ].join("");
-
-    const cats = document.getElementById("cats");
-    cats.innerHTML = data.categories.map((category, index) => (
-      `<button type="button" data-id="${category.id}"${index === 0 ? ` class="active"` : ""}>${category.label}</button>`
-    )).join("");
-
-    const activate = (container, target) => {
-      container.querySelectorAll("button").forEach(button => {
-        button.classList.toggle("active", button === target);
-      });
-    };
-
-    cats.addEventListener("click", event => {
-      const button = event.target.closest("button");
-      if (!button) return;
-      activate(cats, button);
-      map.setCategory(button.dataset.id);
-    });
-
-    legend.addEventListener("click", event => {
-      const button = event.target.closest("button");
-      if (!button) return;
-      activate(legend, button);
-      map.setZone(button.dataset.id || null);
-    });
-  }
-</script>
+    <noscript><p>启用 JavaScript 后可操作三维地图和地标列表。</p></noscript>
+  </main>
 </body>
 </html>

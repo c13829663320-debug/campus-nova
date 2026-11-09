@@ -30,6 +30,7 @@ const mime = {
   ".js": "text/javascript; charset=utf-8", ".json": "application/json; charset=utf-8",
   ".svg": "image/svg+xml", ".png": "image/png", ".jpg": "image/jpeg",
   ".jpeg": "image/jpeg", ".webp": "image/webp", ".gif": "image/gif",
+  ".glb": "model/gltf-binary", ".mjs": "text/javascript; charset=utf-8",
   ".woff": "font/woff", ".woff2": "font/woff2", ".ico": "image/x-icon"
 };
 const pages = new Set(["/index.html", "/campus-map.html", "/logo-preview.html", "/map3d.html", "/panorama.html", "/styles.css"]);
