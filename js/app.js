@@ -307,6 +307,10 @@
           view.innerHTML = renderActivityDetail(activity);
         } else {
           ui.studentActivitiesAvailable = Array.isArray(students);
+          if (!ui.studentActivitiesAvailable && ui.activityMine) {
+            ui.activityMine = false;
+            resetActivityFilters();
+          }
           const studentFeed = (ui.studentActivitiesAvailable ? students : []).map(studentActivity)
             .sort((a, b) => a.upcoming !== b.upcoming ? Number(b.upcoming) - Number(a.upcoming) :
               a.upcoming ? a.startAt - b.startAt : b.startAt - a.startAt);
@@ -1259,8 +1263,32 @@
     };
   }
 
+  const activityThemeGroups = [
+    ["学习与发展", ["学习自习", "技能实战", "就业创业"]],
+    ["运动与生活", ["运动健身", "美食聚餐", "文艺娱乐"]],
+    ["校园参与", ["志愿公益", "社团交流"]]
+  ];
+
+  function activityThemeLabel(category) {
+    return category === "其他" ? "其他主题" : category;
+  }
+
+  function activityOption(value, label = value, selected = "") {
+    return `<option value="${escapeHTML(value)}"${value === selected ? " selected" : ""}>${escapeHTML(label)}</option>`;
+  }
+
+  function activityThemeOptions(selected = "", includeClubThemes = false) {
+    const categories = new Set(Object.keys(activityTags.categories));
+    if (includeClubThemes) ui.activities.forEach(event => categories.add(event.category || "其他"));
+    const groups = activityThemeGroups.map(([label, keys]) => {
+      const options = keys.filter(key => categories.delete(key)).map(key => activityOption(key, key, selected));
+      return `<optgroup label="${label}">${options.join("")}</optgroup>`;
+    });
+    return groups.join("") + [...categories].map(key => activityOption(key, activityThemeLabel(key), selected)).join("");
+  }
+
   function activityLabels(event) {
-    return `<p class="activity-tags"><span>${escapeHTML(event.type)}</span><span>${escapeHTML(event.category || "其他")}</span></p>`;
+    return `<p class="activity-tags"><span>${escapeHTML(event.type)}</span><span>${escapeHTML(activityThemeLabel(event.category || "其他"))}</span></p>`;
   }
 
   function activityMeta(event, showMap = false) {
@@ -1280,15 +1308,25 @@
     </div>`;
   }
 
-  function renderActivityResults() {
-    const events = ui.activities.filter(event =>
+  function filteredActivities() {
+    return ui.activities.filter(event =>
       (!ui.activityType || event.type === ui.activityType) &&
       (ui.activityMine ? event.isOwner || event.joined : !event.cancelled) &&
-      (!ui.activityCategory || event.category === ui.activityCategory) &&
+      (!ui.activityCategory || (event.category || "其他") === ui.activityCategory) &&
       (!ui.activityPeriod || event.upcoming === (ui.activityPeriod === "planned"))
     );
-    return `<p class="activity-count" role="status">${events.length} 场活动</p>
-      ${events.length ? `<div class="activity-grid">${events.map(event => `<article class="activity-card card">
+  }
+
+  function hasActivityFilters() {
+    return Boolean(ui.activityType || ui.activityCategory || ui.activityPeriod);
+  }
+
+  function resetActivityFilters() {
+    ui.activityType = ui.activityCategory = ui.activityPeriod = "";
+  }
+
+  function renderActivityResults(events) {
+    return events.length ? `<div class="activity-grid">${events.map(event => `<article class="activity-card card">
         <a href="#events/${encodeURIComponent(event.id)}" aria-labelledby="activity-title-${escapeHTML(event.id)}">
           ${activityCover(event)}
           <div class="activity-card-body">
@@ -1299,12 +1337,56 @@
           </div>
         </a>
       </article>`).join("")}</div>` : `<div class="empty-state">
-        ${icon("calendar")}<h3>这个筛选下暂无活动</h3><p>试试其他活动类型、兴趣分类或时间。</p>
-      </div>`}`;
+        ${icon("calendar")}${hasActivityFilters()
+          ? "<h3>这个筛选下暂无活动</h3><p>调整筛选条件，或清除筛选查看全部。</p>"
+          : ui.activityMine
+            ? "<h3>你还没有发起或报名的活动</h3><p>发布一场活动，或去「发现活动」看看。</p>"
+            : "<h3>暂无校园活动</h3><p>有新的活动发布后，会在这里显示。</p>"}
+      </div>`;
+  }
+
+  function refreshActivityResults() {
+    const events = filteredActivities();
+    view.querySelector(".activity-count").textContent = `${events.length} 场活动`;
+    view.querySelector('[data-action="clear-activity-filters"]').disabled = !hasActivityFilters();
+    view.querySelector("#activity-results").innerHTML = renderActivityResults(events);
+  }
+
+  function renderActivityFilter(field, label, options) {
+    return `<label class="activity-filter-field"><span>${label}</span>
+      <span class="activity-filter-control">
+        <select data-activity-filter="${field}">${options}</select>${icon("chevron-right")}
+      </span>
+    </label>`;
+  }
+
+  function renderActivityFeed() {
+    const events = filteredActivities();
+    const types = ui.activityMine ? activityTags.types : [...activityTags.types, "社团活动"];
+    const typeOptions = activityOption("", "全部类型") + types.map(type => activityOption(type, type, ui.activityType)).join("");
+    const themeOptions = activityOption("", "全部主题") + activityThemeOptions(ui.activityCategory, !ui.activityMine);
+    const timeOptions = [["", "全部时间"], ["planned", "即将开始"], ["past", "往期与归档"]]
+      .map(([value, label]) => activityOption(value, label, ui.activityPeriod)).join("");
+    return `<div class="activity-feed-heading">
+      <h2 id="activity-feed-title">活动列表</h2>
+      ${ui.studentActivitiesAvailable ? `<div class="activity-scope" role="group" aria-label="浏览范围">
+        <button type="button" data-action="activity-scope" data-scope="all" aria-pressed="${!ui.activityMine}">发现活动</button>
+        <button type="button" data-action="activity-scope" data-scope="mine" aria-pressed="${ui.activityMine}">我的活动</button>
+      </div>` : ""}
+    </div>
+    <div class="activity-filter-panel" role="group" aria-label="筛选活动">
+      ${renderActivityFilter("activityType", "活动类型", typeOptions)}
+      ${renderActivityFilter("activityCategory", "活动主题", themeOptions)}
+      ${renderActivityFilter("activityPeriod", "活动时间", timeOptions)}
+    </div>
+    <div class="activity-results-heading">
+      <p class="activity-count" role="status">${events.length} 场活动</p>
+      <button class="text-button" type="button" data-action="clear-activity-filters"${hasActivityFilters() ? "" : " disabled"}>清除筛选</button>
+    </div>
+    <div id="activity-results">${renderActivityResults(events)}</div>`;
   }
 
   function renderActivities() {
-    const categories = [...new Set([...Object.keys(activityTags.categories), ...ui.activities.map(event => event.category).filter(Boolean)])];
     return `<div class="activity-page view-enter">
       <section class="activity-banner">
         <div><span class="eyebrow">CAMPUS EVENTS · 东莞职业技术学院</span>
@@ -1315,20 +1397,7 @@
       </section>
       ${ui.studentActivitiesAvailable ? "" : `<p class="activity-service-note">学生活动暂时无法加载，目前可查看社团活动。 <button type="button" class="text-button" data-action="retry-route">重新加载</button></p>`}
       <section class="activity-feed" aria-labelledby="activity-feed-title">
-        <div class="activity-feed-heading">
-          <h2 id="activity-feed-title">发现活动</h2>
-          <div class="activity-period" role="group" aria-label="活动时间">
-            ${[["", "全部时间"], ["planned", "近期计划"], ["past", "往期与归档"]].map(([value, label]) => `<button type="button" data-action="filter-activity" data-period="${value}" aria-pressed="${ui.activityPeriod === value}">${label}</button>`).join("")}
-          </div>
-        </div>
-        <div class="activity-filters filter-chips" role="group" aria-label="活动类型">
-          ${["", ...activityTags.types, "社团活动"].map(type => `<button class="chip" type="button" data-action="filter-activity" data-type="${type}" aria-pressed="${ui.activityType === type}">${type || "全部类型"}</button>`).join("")}
-        </div>
-        <div class="activity-filters filter-chips" role="group" aria-label="兴趣分类">
-          ${["", ...categories].map(category => `<button class="chip" type="button" data-action="filter-activity" data-category="${escapeHTML(category)}" aria-pressed="${ui.activityCategory === category}">${escapeHTML(category || "全部兴趣")}</button>`).join("")}
-        </div>
-        ${ui.studentActivitiesAvailable ? `<div class="activity-filters filter-chips"><button class="chip" type="button" data-action="filter-my-activities" aria-pressed="${ui.activityMine}">我发起或报名的</button></div>` : ""}
-        <div id="activity-results">${renderActivityResults()}</div>
+        ${renderActivityFeed()}
       </section>
     </div>`;
   }
@@ -1379,7 +1448,7 @@
         <div class="field"><label for="activity-title">活动标题</label><input id="activity-title" name="title" required minlength="2" maxlength="50" placeholder="例如：周四晚一起打羽毛球"></div>
         <div class="activity-form-grid">
           <div class="field"><label for="activity-type">活动类型</label><select id="activity-type" name="type" required><option value="">选择类型</option>${activityTags.types.map(type => `<option>${type}</option>`).join("")}</select></div>
-          <div class="field"><label for="activity-category">兴趣分类</label><select id="activity-category" name="category" required><option value="">选择分类</option>${Object.keys(activityTags.categories).map(category => `<option>${category}</option>`).join("")}</select></div>
+          <div class="field"><label for="activity-category">活动主题</label><select id="activity-category" name="category" required><option value="">选择主题</option>${activityThemeOptions()}</select></div>
           <div class="field"><label for="activity-start">开始时间（北京时间）</label><input id="activity-start" name="start" type="datetime-local" required></div>
           <div class="field"><label for="activity-capacity">总人数（含发起人）</label><input id="activity-capacity" name="capacity" type="number" min="2" max="50" value="4" required></div>
         </div>
@@ -1402,7 +1471,7 @@
       const activity = await API.createStudentActivity({ ...values, capacity: Number(values.capacity), id: form.dataset.id });
       showToast("活动已发布", "其他同学现在可以查看详情和报名。");
       if (form.isConnected) {
-        ui.activityType = ui.activityCategory = ui.activityPeriod = "";
+        resetActivityFilters();
         ui.activityMine = false;
         location.hash = `events/${activity.id}`;
       }
@@ -2036,16 +2105,19 @@
       }
     } else if (action === "confirm-student-cancel") {
       updateStudentSignup(trigger.dataset.id, "cancel", trigger);
-    } else if (action === "filter-my-activities") {
-      ui.activityMine = !ui.activityMine;
-      trigger.setAttribute("aria-pressed", String(ui.activityMine));
-      document.getElementById("activity-results").innerHTML = renderActivityResults();
-    } else if (action === "filter-activity") {
-      if ("period" in trigger.dataset) ui.activityPeriod = trigger.dataset.period;
-      else if ("type" in trigger.dataset) ui.activityType = trigger.dataset.type;
-      else ui.activityCategory = trigger.dataset.category;
-      trigger.parentElement.querySelectorAll("button").forEach(button => button.setAttribute("aria-pressed", String(button === trigger)));
-      document.getElementById("activity-results").innerHTML = renderActivityResults();
+    } else if (action === "activity-scope") {
+      if (trigger.getAttribute("aria-pressed") === "true") return;
+      ui.activityMine = trigger.dataset.scope === "mine";
+      resetActivityFilters();
+      const feed = trigger.closest(".activity-feed");
+      feed.innerHTML = renderActivityFeed();
+      feed.querySelector('.activity-scope [aria-pressed="true"]').focus({ preventScroll: true });
+    } else if (action === "clear-activity-filters") {
+      resetActivityFilters();
+      const filters = view.querySelectorAll("[data-activity-filter]");
+      filters.forEach(filter => { filter.value = ""; });
+      filters[0].focus({ preventScroll: true });
+      refreshActivityResults();
     } else if (action === "toggle-poi") {
       const isOpen = trigger.classList.contains("is-open");
       view.querySelectorAll(".map-pill.is-open").forEach(item => item.classList.remove("is-open"));
@@ -2204,11 +2276,14 @@
   });
 
   document.addEventListener("change", event => {
-    if (event.target.id === "residence-picker") {
+    if (event.target.matches(".activity-filter-panel select[data-activity-filter]")) {
+      ui[event.target.dataset.activityFilter] = event.target.value;
+      refreshActivityResults();
+    } else if (event.target.id === "residence-picker") {
       selectBuilding(event.target.value, true);
-      return;
+    } else if (event.target.id === "avatar-file") {
+      handleAvatarFile(event.target);
     }
-    if (event.target.id === "avatar-file") handleAvatarFile(event.target);
   });
 
   document.addEventListener("input", event => {
